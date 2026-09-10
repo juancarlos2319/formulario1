@@ -16,6 +16,7 @@ public class FormularioDTO {
     private String ocupacion;
     private Boolean aceptaTerminos;
     private Boolean activo;
+    private LocalDate fechaBaja; // <--- Añadido
 
     // Campos de Emergencia
     private String contactoEmergenciaNombre;
@@ -58,6 +59,9 @@ public class FormularioDTO {
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public LocalDate getFechaBaja() { return fechaBaja; } // <--- Añadido
+    public void setFechaBaja(LocalDate fechaBaja) { this.fechaBaja = fechaBaja; } // <--- Añadido
 
     public String getContactoEmergenciaNombre() { return contactoEmergenciaNombre; }
     public void setContactoEmergenciaNombre(String contactoEmergenciaNombre) { this.contactoEmergenciaNombre = contactoEmergenciaNombre; }

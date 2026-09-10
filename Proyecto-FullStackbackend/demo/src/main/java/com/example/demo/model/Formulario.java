@@ -27,9 +27,6 @@ public class Formulario {
     @Column(name = "acepta_terminos")
     private Boolean aceptaTerminos;
 
-    @Column(name = "activo", nullable = false)
-    private boolean activo = true;
-
     // Campos de Contacto de Emergencia
     @Column(name = "contacto_emergencia_nombre")
     private String contactoEmergenciaNombre;
@@ -39,6 +36,16 @@ public class Formulario {
 
     @Column(name = "contacto_emergencia_parentesco")
     private String contactoEmergenciaParentesco;
+
+    // Columna real en PostgreSQL para la fecha de baja/inactivación
+    @Column(name = "fecha_baja")
+    private LocalDate fechaBaja;
+
+    // Propiedad calculada: Jackson la enviará en el JSON como "activo": true/false
+    @Transient
+    public boolean isActivo() {
+        return fechaBaja == null || fechaBaja.isAfter(LocalDate.now());
+    }
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -74,10 +81,6 @@ public class Formulario {
     public Boolean getAceptaTerminos() { return aceptaTerminos; }
     public void setAceptaTerminos(Boolean aceptaTerminos) { this.aceptaTerminos = aceptaTerminos; }
 
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo = activo; }
-
-    // Getters y Setters para Contacto de Emergencia
     public String getContactoEmergenciaNombre() { return contactoEmergenciaNombre; }
     public void setContactoEmergenciaNombre(String contactoEmergenciaNombre) { this.contactoEmergenciaNombre = contactoEmergenciaNombre; }
 
@@ -86,4 +89,7 @@ public class Formulario {
 
     public String getContactoEmergenciaParentesco() { return contactoEmergenciaParentesco; }
     public void setContactoEmergenciaParentesco(String contactoEmergenciaParentesco) { this.contactoEmergenciaParentesco = contactoEmergenciaParentesco; }
+
+    public LocalDate getFechaBaja() { return fechaBaja; }
+    public void setFechaBaja(LocalDate fechaBaja) { this.fechaBaja = fechaBaja; }
 }

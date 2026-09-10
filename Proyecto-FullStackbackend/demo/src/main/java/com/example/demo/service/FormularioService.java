@@ -6,6 +6,7 @@ import com.example.demo.repository.FormularioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class FormularioService {
         dto.setOcupacion(entity.getOcupacion());
         dto.setAceptaTerminos(entity.getAceptaTerminos());
         dto.setActivo(entity.isActivo());
+        dto.setFechaBaja(entity.getFechaBaja());
 
         // Contacto de Emergencia
         dto.setContactoEmergenciaNombre(entity.getContactoEmergenciaNombre());
@@ -55,7 +57,14 @@ public class FormularioService {
         entity.setCiudad(dto.getCiudad());
         entity.setOcupacion(dto.getOcupacion());
         entity.setAceptaTerminos(dto.getAceptaTerminos());
-        entity.setActivo(dto.getActivo() != null ? dto.getActivo() : true);
+
+        if (dto.getFechaBaja() != null) {
+            entity.setFechaBaja(dto.getFechaBaja());
+        } else if (Boolean.FALSE.equals(dto.getActivo())) {
+            entity.setFechaBaja(LocalDate.now());
+        } else {
+            entity.setFechaBaja(null);
+        }
 
         // Contacto de Emergencia
         entity.setContactoEmergenciaNombre(dto.getContactoEmergenciaNombre());
@@ -91,6 +100,14 @@ public class FormularioService {
             existente.setCiudad(dto.getCiudad());
             existente.setOcupacion(dto.getOcupacion());
 
+            if (dto.getFechaBaja() != null) {
+                existente.setFechaBaja(dto.getFechaBaja());
+            } else if (Boolean.FALSE.equals(dto.getActivo())) {
+                existente.setFechaBaja(LocalDate.now());
+            } else if (Boolean.TRUE.equals(dto.getActivo())) {
+                existente.setFechaBaja(null);
+            }
+
             // Contacto de Emergencia
             existente.setContactoEmergenciaNombre(dto.getContactoEmergenciaNombre());
             existente.setContactoEmergenciaTelefono(dto.getContactoEmergenciaTelefono());
@@ -103,7 +120,7 @@ public class FormularioService {
 
     public void eliminarLogico(Long id) {
         formularioRepository.findById(id).ifPresent(entity -> {
-            entity.setActivo(false);
+            entity.setFechaBaja(LocalDate.now());
             formularioRepository.save(entity);
         });
     }
