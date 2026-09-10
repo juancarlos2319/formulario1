@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.FormularioDTO;
-import com.example.demo.service.FormularioService;
+import com.example.demo.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ import java.util.List;
 public class FormularioController {
 
     @Autowired
-    private FormularioService formularioService;
+    private PersonaService personaService;
 
     @GetMapping
     public ResponseEntity<?> obtenerFormularios() {
         try {
-            List<FormularioDTO> lista = formularioService.obtenerTodos();
+            List<FormularioDTO> lista = personaService.obtenerTodos();
             return ResponseEntity.ok(lista);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -34,7 +34,7 @@ public class FormularioController {
     @PostMapping
     public ResponseEntity<?> guardarFormulario(@RequestBody FormularioDTO dto) {
         try {
-            FormularioDTO guardado = formularioService.guardar(dto);
+            FormularioDTO guardado = personaService.guardar(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -44,7 +44,7 @@ public class FormularioController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarFormulario(@PathVariable Long id, @RequestBody FormularioDTO dto) {
         try {
-            FormularioDTO actualizado = formularioService.actualizar(id, dto);
+            FormularioDTO actualizado = personaService.actualizar(id, dto);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -54,8 +54,7 @@ public class FormularioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarFormulario(@PathVariable Long id) {
         try {
-            formularioService.eliminarLogico(id);
-            // Devuelve HTTP 204 No Content (respuesta vacía correcta para Angular)
+            personaService.eliminarLogico(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
