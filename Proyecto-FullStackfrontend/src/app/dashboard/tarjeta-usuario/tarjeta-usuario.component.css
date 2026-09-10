@@ -1,0 +1,19 @@
+.emergency-box {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 6px;
+}
+
+.emergency-box h4 {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  color: #991b1b;
+}
+
+.emergency-box p {
+  margin: 2px 0;
+  font-size: 0.8rem;
+  color: #7f1d1d;
+}

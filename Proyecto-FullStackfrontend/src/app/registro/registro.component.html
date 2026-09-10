@@ -1,0 +1,91 @@
+<div class="form-wrapper">
+  <div class="form-card">
+    <div class="card-header">
+      <h2>{{ esEdicion ? 'Editar Usuario' : 'Registro de Usuario' }}</h2>
+      <p>Ingresa la información requerida para el expediente</p>
+    </div>
+
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()">
+        <div class="grid-layout">
+          <div class="field-group">
+            <label>Nombre(s)</label>
+            <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required placeholder="Ej. Juan">
+          </div>
+
+          <div class="field-group">
+            <label>Apellido(s)</label>
+            <input type="text" [(ngModel)]="usuario.apellido" name="apellido" required placeholder="Ej. Pérez">
+          </div>
+
+          <div class="field-group">
+            <label>Correo Electrónico</label>
+            <input type="email" [(ngModel)]="usuario.email" name="email" required placeholder="ejemplo@correo.com">
+          </div>
+
+          <div class="field-group">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="usuario.telefono" name="telefono" required placeholder="10 dígitos">
+          </div>
+
+          <div class="field-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="usuario.fechaNacimiento" name="fechaNacimiento" required>
+          </div>
+
+          <div class="field-group">
+            <label>Género</label>
+            <select [(ngModel)]="usuario.genero" name="genero" required>
+              <option value="" disabled selected>Selecciona una opción</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Ocupación</label>
+            <input type="text" [(ngModel)]="usuario.ocupacion" name="ocupacion" placeholder="Ej. Estudiante">
+          </div>
+
+          <div class="field-group">
+            <label>Ciudad</label>
+            <input type="text" [(ngModel)]="usuario.ciudad" name="ciudad" placeholder="Ej. Pachuca">
+          </div>
+
+          <div class="field-group full-width">
+            <label>Dirección Completa</label>
+            <input type="text" [(ngModel)]="usuario.direccion" name="direccion" placeholder="Calle, número, colonia">
+          </div>
+        </div>
+
+        <div class="section-divider">
+          <div class="section-title">🚨 Contacto de Emergencia</div>
+          <div class="section-subtitle">Persona a contactar en caso de una urgencia.</div>
+        </div>
+
+        <div class="grid-layout">
+          <div class="field-group">
+            <label>Nombre Completo</label>
+            <input type="text" [(ngModel)]="usuario.contactoEmergenciaNombre" name="contactoEmergenciaNombre" placeholder="Ej. María Santiago">
+          </div>
+
+          <div class="field-group">
+            <label>Teléfono de Contacto</label>
+            <input type="tel" [(ngModel)]="usuario.contactoEmergenciaTelefono" name="contactoEmergenciaTelefono" placeholder="10 dígitos">
+          </div>
+
+          <div class="field-group full-width">
+            <label>Parentesco / Relación</label>
+            <input type="text" [(ngModel)]="usuario.contactoEmergenciaParentesco" name="contactoEmergenciaParentesco" placeholder="Ej. Madre, Cónyuge, Pareja">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-cancel" (click)="router.navigate(['/dashboard'])">Cancelar</button>
+          <button type="submit" class="btn-save">{{ esEdicion ? 'Actualizar Cambios' : 'Registrar' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

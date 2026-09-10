@@ -1,0 +1,108 @@
+.dashboard-wrapper {
+  max-width: 950px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.user-card, .contacts-card, .no-data-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.avatar {
+  width: 65px;
+  height: 65px;
+  background: #0284c7;
+  color: white;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.badge-status {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.role {
+  color: #64748b;
+  margin: 0.5rem 0 1rem;
+  font-weight: 500;
+}
+
+.info-list {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+}
+
+.info-list p {
+  margin: 0.5rem 0;
+  color: #475569;
+}
+
+.contacts-card h3 {
+  margin-top: 0;
+  color: #0f172a;
+}
+
+.contact-box {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #0284c7;
+  margin-top: 1rem;
+}
+
+.contact-box h4 {
+  margin: 0 0 0.5rem;
+  color: #1e293b;
+}
+
+.contact-box p {
+  margin: 0.2rem 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.no-data-card {
+  text-align: center;
+  max-width: 500px;
+  margin: 3rem auto;
+}
+
+.btn-primary, .btn-link {
+  display: inline-block;
+  margin-top: 1rem;
+  background: #0284c7;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover, .btn-link:hover {
+  background: #0369a1;
+}
+
+.empty-msg {
+  color: #64748b;
+  margin-top: 1rem;
+}

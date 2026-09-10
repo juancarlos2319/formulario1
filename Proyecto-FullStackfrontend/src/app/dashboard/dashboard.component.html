@@ -1,0 +1,19 @@
+<div class="dashboard-wrapper">
+  @if (contactos.length > 0) {
+    <div class="dashboard-grid">
+      @for (usuario of contactos; track usuario.id) {
+        <app-tarjeta-usuario 
+          [usuario]="usuario" 
+          (eliminar)="borrarContacto(usuario.id!)" 
+          (editar)="editarContacto(usuario)">
+        </app-tarjeta-usuario>
+      }
+    </div>
+  } @else {
+    <div class="no-data-card">
+      <h2>Sin información registrada</h2>
+      <p>Llena el formulario de registro para visualizar tus datos en este panel.</p>
+      <a routerLink="/registro" class="btn-primary">Ir al Formulario</a>
+    </div>
+  }
+</div>
