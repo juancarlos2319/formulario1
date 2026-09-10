@@ -1,40 +1,59 @@
--- Script de creación de la tabla "formulario" en PostgreSQL
+-- =========================================================
+-- SCRIPT DE CREACIÓN DE BASE DE DATOS Y TABLAS
+-- =========================================================
 
-CREATE TABLE IF NOT EXISTS formulario (
-                                          id BIGSERIAL PRIMARY KEY,
-                                          nombre VARCHAR(100),
-    apellido VARCHAR(100),
-    email VARCHAR(150),
-    telefono VARCHAR(30),
-    fecha_nacimiento DATE,
+-- 1. Catálogo de Ocupaciones
+CREATE TABLE IF NOT EXISTS catalogo_ocupacion (
+                                                  id BIGSERIAL PRIMARY KEY,
+                                                  nombre VARCHAR(100) NOT NULL UNIQUE
+    );
+
+-- 2. Datos Principales de la Persona
+CREATE TABLE IF NOT EXISTS persona (
+                                       id BIGSERIAL PRIMARY KEY,
+                                       nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
     genero VARCHAR(50),
     direccion VARCHAR(255),
     ciudad VARCHAR(100),
-    ocupacion VARCHAR(100),
-    acepta_terminos BOOLEAN DEFAULT FALSE,
-
-    -- Campos de Contacto de Emergencia
-    contacto_emergencia_nombre VARCHAR(150),
-    contacto_emergencia_telefono VARCHAR(30),
-    contacto_emergencia_parentesco VARCHAR(50),
-
-    -- Fecha de inactivación/baja
-    -- NULL o fecha futura = Usuario ACTIVO
-    -- Fecha actual o pasada = Usuario INACTIVO
-    fecha_baja DATE
+    id_ocupacion BIGINT NOT NULL,
+    fecha_baja DATE, -- NULL o futura = Activo | Pasada = Inactivo
+    CONSTRAINT fk_persona_ocupacion FOREIGN KEY (id_ocupacion) REFERENCES catalogo_ocupacion(id)
     );
 
--- Insertar datos de prueba (Opcional)
-INSERT INTO formulario (
-    nombre, apellido, email, telefono, fecha_nacimiento, genero,
-    direccion, ciudad, ocupacion, acepta_terminos,
-    contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco,
-    fecha_baja
-) VALUES
-      ('Juan', 'Pérez', 'juan.perez@example.com', '5551234567', '1995-05-15', 'Masculino',
-       'Calle Principal #123', 'Pachuca', 'Ingeniero', TRUE,
-       'Maria Pérez', '5559876543', 'Hermana', NULL),
+-- 3. Contacto de Emergencia (Relación 1 a 1)
+CREATE TABLE IF NOT EXISTS contacto_emergencia (
+                                                   id BIGSERIAL PRIMARY KEY,
+                                                   id_persona BIGINT NOT NULL UNIQUE,
+                                                   nombre VARCHAR(150) NOT NULL,
+    telefono VARCHAR(30) NOT NULL,
+    parentesco VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_contacto_persona FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
+    );
 
-      ('Ana', 'Gómez', 'ana.gomez@example.com', '5557654321', '1998-10-20', 'Femenino',
-       'Av. Juárez #456', 'Pachuca', 'Diseñadora', TRUE,
-       'Carlos Gómez', '5553332211', 'Padre', '2026-01-15');
+-- 4. Correos de la Persona (Relación 1 a N)
+CREATE TABLE IF NOT EXISTS persona_correo (
+                                              id BIGSERIAL PRIMARY KEY,
+                                              id_persona BIGINT NOT NULL,
+                                              correo VARCHAR(150) NOT NULL,
+    CONSTRAINT fk_correo_persona FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
+    );
+
+-- 5. Teléfonos de la Persona (Relación 1 a N)
+CREATE TABLE IF NOT EXISTS persona_telefono (
+                                                id BIGSERIAL PRIMARY KEY,
+                                                id_persona BIGINT NOT NULL,
+                                                telefono VARCHAR(30) NOT NULL,
+    CONSTRAINT fk_telefono_persona FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
+    );
+
+-- 6. Usuarios Administradores (Relación 1 a 1 con Persona)
+CREATE TABLE IF NOT EXISTS usuario (
+                                       id BIGSERIAL PRIMARY KEY,
+                                       username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    rol VARCHAR(20) DEFAULT 'ROLE_ADMIN',
+    id_persona BIGINT NOT NULL UNIQUE,
+    CONSTRAINT fk_usuario_persona FOREIGN KEY (id_persona) REFERENCES persona(id) ON DELETE CASCADE
+    );
