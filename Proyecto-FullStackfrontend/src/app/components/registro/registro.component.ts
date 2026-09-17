@@ -34,17 +34,12 @@ export class RegistroComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id !== null) {
       this.personaId = Number(id);
+      this.registroForm.get('aceptaTerminos')?.disable();
       this.cargandoPersona = true;
       if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
         this.mensajeError = 'El ID de la persona no es válido.';
         return;
       }
-      // La API conserva la dirección completa, no sus campos separados.
-      for (const campo of ['cp', 'pais', 'estado', 'municipio', 'colonia', 'calle', 'numero']) {
-        this.registroForm.get(campo)?.disable();
-      }
-      this.registroForm.get('direccion')?.enable();
-      this.registroForm.get('ciudad')?.enable();
       this.registroService.obtenerPersonaPorId(this.personaId).subscribe({
         next: persona => {
           if (!persona) {
@@ -52,6 +47,7 @@ export class RegistroComponent implements OnInit {
             return;
           }
           this.registroForm.patchValue({ ...persona, aceptaTerminos: true });
+          this.cargarDireccion(persona.direccion, persona.ciudad);
           this.cargandoPersona = false;
         },
         error: () => { this.mensajeError = 'No se pudo cargar la persona. Vuelve a intentarlo desde el dashboard.'; }
@@ -66,8 +62,6 @@ export class RegistroComponent implements OnInit {
       genero: ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
       ocupacion: ['', Validators.required],
-      direccion: [{ value: '', disabled: true }, Validators.required],
-      ciudad: [{ value: '', disabled: true }, Validators.required],
       
       // Campos detallados de Dirección
       cp: ['', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
@@ -86,6 +80,20 @@ export class RegistroComponent implements OnInit {
 
       aceptaTerminos: [false, Validators.requiredTrue]
     });
+  }
+
+  private cargarDireccion(direccion: string, ciudad: string): void {
+    // Formato usado al guardar: calle #numero, Col. colonia, C.P. cp, estado.
+    const partes = /^(.*?) #(.+?), Col\. (.*?), C\.P\. (\d{5}), (.+)$/.exec(direccion || '');
+    this.registroForm.patchValue({ municipio: ciudad });
+    if (partes) {
+      const [, calle, numero, colonia, cp, estado] = partes;
+      this.colonias = [colonia];
+      this.registroForm.patchValue({ calle, numero, colonia, cp, estado });
+    } else {
+      this.registroForm.patchValue({ calle: direccion || '' });
+      this.mensajeError = 'La dirección anterior no tiene los datos separados. Revisa la calle y completa el código postal, colonia y número antes de guardar.';
+    }
   }
 
   buscarCodigoPostal(): void {
@@ -170,8 +178,8 @@ export class RegistroComponent implements OnInit {
   
   const payload = {
     ...rawVal,
-    ciudad: this.editando ? rawVal.ciudad : rawVal.municipio,
-    direccion: this.editando ? rawVal.direccion : direccionFormateada
+    ciudad: rawVal.municipio,
+    direccion: direccionFormateada
   };
 
   this.guardando = true;

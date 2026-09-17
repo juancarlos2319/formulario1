@@ -45,7 +45,7 @@
     </fieldset>
 
     <!-- Dirección con CP Autocompletable -->
-    <fieldset *ngIf="!editando">
+    <fieldset>
       <legend>Ubicación y Dirección</legend>
 
       <div class="form-row">
@@ -90,18 +90,6 @@
       </div>
     </fieldset>
 
-    <fieldset *ngIf="editando">
-      <legend>Ubicación y Dirección</legend>
-      <div class="form-group">
-        <label>Dirección completa *</label>
-        <input formControlName="direccion" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label>Municipio / Ciudad *</label>
-        <input formControlName="ciudad" class="form-control" />
-      </div>
-    </fieldset>
-
     <!-- Contactos -->
     <fieldset>
       <legend>Contacto (Máx. 2 emails / 2 teléfonos)</legend>
@@ -134,7 +122,7 @@
     </fieldset>
 
 
-    <div class="form-group checkbox-group">
+    <div class="form-group checkbox-group" *ngIf="!editando">
       <label>
         <input type="checkbox" formControlName="aceptaTerminos" />
         Acepto los Términos y Condiciones
