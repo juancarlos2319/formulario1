@@ -127,3 +127,14 @@ legend {
   border-radius: 6px;
   margin-bottom: 1rem;
 }
+.disabled-input {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.text-muted {
+  font-size: 0.75rem;
+  color: #0284c7;
+  margin-top: 0.2rem;
+}

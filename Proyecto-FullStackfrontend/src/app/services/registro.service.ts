@@ -27,5 +27,9 @@ export class RegistroService {
   }
   obtenerOcupaciones(): Observable<string[]> {
   return this.http.get<string[]>('http://localhost:8080/api/ocupaciones');
-}
+  
+  }
+  consultarCP(cp: string): Observable<any> {
+  return this.http.get(`https://www.correosmexico.com.mx/api/cp?cp=${cp}`);
+  }
 }
