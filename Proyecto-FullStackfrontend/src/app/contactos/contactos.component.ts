@@ -1,37 +1,53 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { RegistroService } from '../services/registro.service';
 
 @Component({
   selector: 'app-contactos',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './contactos.component.html',
-  styleUrl: './contactos.component.css'
+  styleUrls: ['./contactos.component.css']
 })
-export class ContactosComponent {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private registroService = inject(RegistroService);
+export class ContactosComponent implements OnInit {
+  contactos: any[] = [];
 
-  contactosForm: FormGroup = this.fb.group({
-    c1_nombre: ['', Validators.required],
-    c1_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-    c1_parentesco: ['', Validators.required],
-    c2_nombre: ['', Validators.required],
-    c2_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-    c2_parentesco: ['', Validators.required]
-  });
+  constructor(
+    private registroService: RegistroService,
+    private router: Router
+  ) {}
 
-  guardarContactos() {
-    if (this.contactosForm.invalid) {
-      this.contactosForm.markAllAsTouched();
-      return;
+  ngOnInit(): void {
+    this.cargarContactos();
+  }
+
+  cargarContactos(): void {
+    // Si tu servicio usa un método distinto, usa obtenerUsuarios() o el que devuelva la lista
+    const servicio: any = this.registroService;
+    const metodoObtener = servicio.obtenerPersonas ? servicio.obtenerPersonas() : servicio.obtenerUsuarios();
+
+    metodoObtener.subscribe({
+      next: (data: any) => (this.contactos = data),
+      error: (err: any) => console.error('Error al cargar contactos:', err)
+    });
+  }
+
+  onEditar(contacto: any): void {
+    if (contacto?.id) {
+      this.router.navigate(['/registro', contacto.id]);
     }
+  }
 
-    // Evitamos el POST fallido a la entidad principal de PostgreSQL y navegamos directamente
-    alert('¡Contactos guardados exitosamente!');
-    this.router.navigate(['/dashboard']);
+  onEliminar(id: number): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este contacto?')) {
+      const servicio: any = this.registroService;
+      const metodoEliminar = servicio.eliminarPersona ? servicio.eliminarPersona(id) : servicio.eliminarUsuario(id);
+
+      metodoEliminar.subscribe({
+        next: () => this.cargarContactos(),
+        error: (err: any) => console.error('Error al eliminar:', err)
+      });
+    }
   }
 }

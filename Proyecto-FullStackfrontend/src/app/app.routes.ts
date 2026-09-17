@@ -1,15 +1,29 @@
 import { Routes } from '@angular/router';
-import { InicioComponent } from './inicio/inicio.component';
-import { RegistroComponent } from './registro/registro.component';
-import { ContactosComponent } from './contactos/contactos.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { authGuard } from './services/auth.guard'; // Importar guardián
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-  { path: 'inicio', component: InicioComponent }, // Ruta pública (Login)
-  { path: 'registro', component: RegistroComponent, canActivate: [authGuard] },
-  { path: 'contactos', component: ContactosComponent, canActivate: [authGuard] },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: 'inicio' }
+  { 
+    path: '', 
+    redirectTo: 'dashboard', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'dashboard', 
+    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) 
+  },
+  { 
+    path: 'registro', 
+    loadComponent: () => import('./registro/registro.component').then(m => m.RegistroComponent) 
+  },
+  { 
+    path: 'registro/:id', 
+    loadComponent: () => import('./registro/registro.component').then(m => m.RegistroComponent) 
+  },
+  { 
+    path: 'contactos', 
+    loadComponent: () => import('./contactos/contactos.component').then(m => m.ContactosComponent) 
+  },
+  { 
+    path: '**', 
+    redirectTo: 'dashboard' 
+  }
 ];

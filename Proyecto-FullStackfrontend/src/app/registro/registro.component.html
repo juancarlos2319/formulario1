@@ -1,157 +1,69 @@
-<div class="form-container">
-  <h2>Nuevo Registro de Persona</h2>
-  
-  <div *ngIf="mensajeError" class="error-alert">{{ mensajeError }}</div>
+<form (ngSubmit)="onSubmit()" #registroForm="ngForm">
+  <!-- Mantiene tus campos de formulario estructurados -->
+  <div class="form-container">
+    <h2>{{ isEditing ? 'Editar Registro' : 'Nuevo Registro' }}</h2>
 
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
-    <!-- Datos Personales -->
-    <fieldset>
-      <legend>Información Personal</legend>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Nombre *</label>
-          <input type="text" formControlName="nombre" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Apellido *</label>
-          <input type="text" formControlName="apellido" class="form-control" />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Género *</label>
-          <select formControlName="genero" class="form-control">
-            <option value="">-- Selecciona --</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Fecha de Nacimiento *</label>
-          <input type="date" formControlName="fechaNacimiento" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Ocupación *</label>
-          <select formControlName="ocupacion" class="form-control">
-            <option value="">-- Selecciona --</option>
-            <option *ngFor="let o of ocupaciones" [value]="o.nombre || o">{{ o.nombre || o }}</option>
-          </select>
-        </div>
-      </div>
-    </fieldset>
-
-    <!-- Dirección con CP Autocompletable -->
-    <fieldset>
-      <legend>Ubicación y Dirección</legend>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Código Postal *</label>
-          <input type="text" formControlName="cp" class="form-control" (keyup)="buscarCodigoPostal()" placeholder="5 dígitos" maxlength="5" />
-          <small *ngIf="cargandoCP" class="text-muted">Buscando CP...</small>
-        </div>
-        <div class="form-group">
-          <label>País</label>
-          <input type="text" formControlName="pais" class="form-control disabled-input" />
-        </div>
-        <div class="form-group">
-          <label>Estado</label>
-          <input type="text" formControlName="estado" class="form-control disabled-input" />
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Municipio / Ciudad</label>
-          <input type="text" formControlName="municipio" class="form-control disabled-input" />
-        </div>
-        <div class="form-group">
-          <label>Colonia *</label>
-          <select formControlName="colonia" class="form-control">
-            <option value="">-- Seleccione Colonia --</option>
-            <option *ngFor="let col of colonias" [value]="col">{{ col }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-          <label>Calle *</label>
-          <input type="text" formControlName="calle" class="form-control" />
-        </div>
-        <div class="form-group" style="flex: 1;">
-          <label>Número Ext/Int *</label>
-          <input type="text" formControlName="numero" class="form-control" />
-        </div>
-      </div>
-    </fieldset>
-
-    <!-- Contactos -->
-    <fieldset>
-      <legend>Contacto (Máx. 2 emails / 2 teléfonos)</legend>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Email Principal *</label>
-          <input type="email" formControlName="email" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Teléfono Principal (10 dígitos) *</label>
-          <input type="text" formControlName="telefono" class="form-control" />
-        </div>
-      </div>
-
-      <div formArrayName="correosAdicionales" class="dynamic-section">
-        <div *ngFor="let correo of correosAdicionales.controls; let i = index" class="dynamic-row">
-          <input [formControlName]="i" type="email" placeholder="Email Secundario" class="form-control" />
-          <button type="button" (click)="eliminarCorreo(i)" class="btn-remove">Quitar</button>
-        </div>
-        <button type="button" (click)="agregarCorreo()" *ngIf="correosAdicionales.length < 1" class="btn-add">+ Agregar Correo Secundario</button>
-      </div>
-
-      <div formArrayName="telefonosAdicionales" class="dynamic-section">
-        <div *ngFor="let tel of telefonosAdicionales.controls; let i = index" class="dynamic-row">
-          <input [formControlName]="i" type="text" placeholder="Teléfono Secundario" class="form-control" />
-          <button type="button" (click)="eliminarTelefono(i)" class="btn-remove">Quitar</button>
-        </div>
-        <button type="button" (click)="agregarTelefono()" *ngIf="telefonosAdicionales.length < 1" class="btn-add">+ Agregar Teléfono Secundario</button>
-      </div>
-    </fieldset>
-
-    <!-- Contacto de Emergencia con Parentesco Desplegable -->
-    <fieldset class="emergency-fieldset">
-      <legend>🚨 Contacto de Emergencia</legend>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Nombre Completo *</label>
-          <input type="text" formControlName="contactoEmergenciaNombre" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Teléfono (10 dígitos) *</label>
-          <input type="text" formControlName="contactoEmergenciaTelefono" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label>Parentesco / Relación *</label>
-          <select formControlName="contactoEmergenciaParentesco" class="form-control">
-            <option value="">-- Selecciona --</option>
-            <option *ngFor="let p of parentescos" [value]="p">{{ p }}</option>
-          </select>
-        </div>
-      </div>
-    </fieldset>
-
-    <div class="form-group checkbox-group">
-      <label>
-        <input type="checkbox" formControlName="aceptaTerminos" />
-        Acepto los Términos y Condiciones
-      </label>
+    <div class="form-group">
+      <label>Correo Electrónico</label>
+      <input type="email" name="email" [(ngModel)]="contacto.email" required class="form-control" />
     </div>
 
-    <div class="form-actions">
-      <a routerLink="/dashboard" class="btn-secondary">Cancelar</a>
-      <button type="submit" [disabled]="registroForm.invalid" class="btn-primary">Guardar Persona</button>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="text" name="telefono" [(ngModel)]="contacto.telefono" required class="form-control" />
     </div>
-  </form>
-</div>
+
+    <div class="form-group">
+      <label>Fecha de Nacimiento</label>
+      <input type="date" name="fechaNacimiento" [(ngModel)]="contacto.fechaNacimiento" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Género</label>
+      <select name="genero" [(ngModel)]="contacto.genero" class="form-control">
+        <option value="Masculino">Masculino</option>
+        <option value="Femenino">Femenino</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Ocupación</label>
+      <input type="text" name="ocupacion" [(ngModel)]="contacto.ocupacion" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Ciudad</label>
+      <input type="text" name="ciudad" [(ngModel)]="contacto.ciudad" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Dirección Completa</label>
+      <input type="text" name="direccion" [(ngModel)]="contacto.direccion" class="form-control" />
+    </div>
+
+    <h3>🚨 Contacto de Emergencia</h3>
+
+    <div class="form-group">
+      <label>Nombre Completo</label>
+      <input type="text" name="contactoEmergenciaNombre" [(ngModel)]="contacto.contactoEmergenciaNombre" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Teléfono de Contacto</label>
+      <input type="text" name="contactoEmergenciaTelefono" [(ngModel)]="contacto.contactoEmergenciaTelefono" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Parentesco / Relación</label>
+      <input type="text" name="contactoEmergenciaParentesco" [(ngModel)]="contacto.contactoEmergenciaParentesco" class="form-control" />
+    </div>
+
+    <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn btn-primary">
+        {{ isEditing ? 'Actualizar Cambios' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+</form>

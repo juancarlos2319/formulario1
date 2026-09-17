@@ -1,40 +1,26 @@
-<div class="form-wrapper">
-  <h2>Contactos de Emergencia</h2>
-  <p class="subtitle">Registra 2 personas de contacto para completar tu perfil</p>
+<div class="contactos-container">
+  <h2>Lista de Contactos</h2>
 
-  <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
-    <div class="card-section">
-      <h3>Contacto 1</h3>
-      <div class="field">
-        <label>Nombre Completo</label>
-        <input type="text" formControlName="c1_nombre" placeholder="Ej. Carlos Pérez">
-      </div>
-      <div class="field">
-        <label>Teléfono (10 dígitos)</label>
-        <input type="tel" formControlName="c1_telefono" placeholder="5512345678">
-      </div>
-      <div class="field">
-        <label>Parentesco / Relación</label>
-        <input type="text" formControlName="c1_parentesco" placeholder="Ej. Padre, Esposo(a)">
-      </div>
+  @if (contactos.length > 0) {
+    <div class="contactos-grid">
+      @for (contacto of contactos; track contacto.id) {
+        <div class="contacto-card">
+          <div class="contacto-header">
+            <h3>{{ contacto.nombre }} {{ contacto.apellidoPaterno }} {{ contacto.apellidoMaterno }}</h3>
+            <p>{{ contacto.email }}</p>
+          </div>
+          <div class="contacto-body">
+            <p><strong>Teléfono:</strong> {{ contacto.telefono }}</p>
+            <p><strong>Ciudad:</strong> {{ contacto.ciudad }}</p>
+          </div>
+          <div class="contacto-actions">
+            <button class="btn-edit" (click)="onEditar(contacto)">Editar</button>
+            <button class="btn-delete" (click)="onEliminar(contacto.id)">Eliminar</button>
+          </div>
+        </div>
+      }
     </div>
-
-    <div class="card-section">
-      <h3>Contacto 2</h3>
-      <div class="field">
-        <label>Nombre Completo</label>
-        <input type="text" formControlName="c2_nombre" placeholder="Ej. Ana Gómez">
-      </div>
-      <div class="field">
-        <label>Teléfono (10 dígitos)</label>
-        <input type="tel" formControlName="c2_telefono" placeholder="5587654321">
-      </div>
-      <div class="field">
-        <label>Parentesco / Relación</label>
-        <input type="text" formControlName="c2_parentesco" placeholder="Ej. Hermana, Amigo(a)">
-      </div>
-    </div>
-
-    <button type="submit" class="btn-submit">Guardar y Finalizar</button>
-  </form>
+  } @else {
+    <p>No hay contactos registrados.</p>
+  }
 </div>

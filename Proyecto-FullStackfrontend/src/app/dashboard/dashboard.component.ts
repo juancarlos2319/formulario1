@@ -1,54 +1,57 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { RegistroService } from '../services/registro.service';
-import { Usuario } from '../services/usuario.interface';
+import { TarjetaUsuarioComponent } from './tarjeta-usuario/tarjeta-usuario.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterModule, TarjetaUsuarioComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private registroService = inject(RegistroService);
+  contactos: any[] = [];
 
-  usuarios: Usuario[] = [];
-  cargando = true;
-  mensajeError = '';
+  constructor(
+    private registroService: RegistroService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.cargarUsuarios();
+    this.cargarContactos();
   }
 
-  cargarUsuarios(): void {
-    this.cargando = true;
-    this.registroService.obtenerFormularios().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-        this.cargando = false;
-      },
-      error: () => {
-        this.mensajeError = 'Error al cargar el listado de registros.';
-        this.cargando = false;
-      }
+  cargarContactos(): void {
+    const servicio: any = this.registroService;
+    const metodoObtener = servicio.obtenerPersonas 
+      ? servicio.obtenerPersonas() 
+      : (servicio.obtenerUsuarios ? servicio.obtenerUsuarios() : servicio.obtenerContactos());
+
+    metodoObtener.subscribe({
+      next: (data: any) => (this.contactos = data),
+      error: (err: any) => console.error('Error al cargar contactos:', err)
     });
   }
 
-  eliminar(id: number | undefined): void {
-    if (!id) return;
-    if (confirm('¿Estás seguro de que deseas dar de baja a esta persona?')) {
-      this.registroService.eliminarFormulario(id).subscribe({
-        next: () => this.cargarUsuarios(),
-        error: () => alert('No se pudo completar la eliminación.')
-      });
+  editarContacto(contacto: any): void {
+    if (contacto?.id) {
+      this.router.navigate(['/registro', contacto.id]);
     }
   }
 
-  obtenerIniciales(nombre: string = '', apellido: string = ''): string {
-    const n = nombre ? nombre.charAt(0) : '';
-    const a = apellido ? apellido.charAt(0) : '';
-    return (n + a).toUpperCase();
+  borrarContacto(id: number): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+      const servicio: any = this.registroService;
+      const metodoEliminar = servicio.eliminarPersona 
+        ? servicio.eliminarPersona(id) 
+        : (servicio.eliminarUsuario ? servicio.eliminarUsuario(id) : servicio.eliminarContacto(id));
+
+      metodoEliminar.subscribe({
+        next: () => this.cargarContactos(),
+        error: (err: any) => console.error('Error al eliminar:', err)
+      });
+    }
   }
 }

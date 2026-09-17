@@ -1,32 +1,38 @@
-<div class="user-card">
+<div class="card">
   <div class="card-header">
     <div class="avatar">
-      {{ usuario.nombre ? usuario.nombre.charAt(0) : '' }}{{ usuario.apellido ? usuario.apellido.charAt(0) : '' }}
+      {{ usuario?.nombre?.charAt(0) }}{{ usuario?.apellidoPaterno?.charAt(0) }}
     </div>
-    <div>
-      <h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3>
-      <span class="badge">{{ usuario.ocupacion || 'Perfil Activo' }}</span>
+    <div class="user-info">
+      <h3>{{ usuario?.nombre }} {{ usuario?.apellidoPaterno }} {{ usuario?.apellidoMaterno }}</h3>
+      <p class="role">{{ usuario?.ocupacion || 'Administrador del Sistema' }}</p>
     </div>
   </div>
 
   <div class="card-body">
-    <p><strong>Email:</strong> {{ usuario.email }}</p>
-    <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
-    <p><strong>Ciudad:</strong> {{ usuario.ciudad }}</p>
-    <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
-    <p><strong>Género:</strong> {{ usuario.genero }}</p>
-    <p><strong>Fecha Nacimiento:</strong> {{ usuario.fechaNacimiento }}</p>
+    <p><strong>Email:</strong> {{ usuario?.email }}</p>
+    <p><strong>Teléfono:</strong> {{ usuario?.telefono }}</p>
+    <p><strong>Ciudad:</strong> {{ usuario?.ciudad }}</p>
+    <p><strong>Dirección:</strong> {{ usuario?.direccion }}</p>
+    <p><strong>Género:</strong> {{ usuario?.genero }}</p>
+    <p><strong>Fecha Nacimiento:</strong> {{ usuario?.fechaNacimiento }}</p>
 
-    <div class="emergency-box" *ngIf="usuario.contactoEmergenciaNombre">
-      <h4>🚨 Contacto de Emergencia</h4>
-      <p><strong>Nombre:</strong> {{ usuario.contactoEmergenciaNombre }}</p>
-      <p><strong>Teléfono:</strong> {{ usuario.contactoEmergenciaTelefono }}</p>
-      <p><strong>Relación:</strong> {{ usuario.contactoEmergenciaParentesco }}</p>
-    </div>
+    @if (usuario?.contactoEmergenciaNombre) {
+      <div class="emergency-contact">
+        <h4>🚨 Contacto de Emergencia</h4>
+        <p><strong>Nombre:</strong> {{ usuario?.contactoEmergenciaNombre }}</p>
+        <p><strong>Teléfono:</strong> {{ usuario?.contactoEmergenciaTelefono }}</p>
+        <p><strong>Relación:</strong> {{ usuario?.contactoEmergenciaParentesco }}</p>
+      </div>
+    }
   </div>
 
-  <div class="card-footer">
-    <button class="btn-edit" (click)="onEditar()">Editar</button>
-    <button class="btn-delete" (click)="onEliminar()">Eliminar</button>
+  <div class="card-actions">
+    <button type="button" class="btn-action" (click)="onEditarClick()">
+      Editar
+    </button>
+    <button type="button" class="btn-action" (click)="onEliminarClick()">
+      Eliminar
+    </button>
   </div>
 </div>
