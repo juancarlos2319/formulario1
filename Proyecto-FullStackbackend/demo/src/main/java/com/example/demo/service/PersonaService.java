@@ -27,6 +27,12 @@ public class PersonaService {
     }
 
     public FormularioDTO guardar(FormularioDTO dto) {
+        // Regla de Negocio: Máximo 20 personas activas
+        long personasActivas = personaRepository.countByFechaBajaIsNull();
+        if (personasActivas >= 20) {
+            throw new RuntimeException("Límite alcanzado: No se pueden registrar más de 20 personas activas en el sistema.");
+        }
+
         Persona persona = convertirAEntidad(dto);
         Persona guardada = personaRepository.save(persona);
         return convertirADTO(guardada);
@@ -43,7 +49,7 @@ public class PersonaService {
         persona.setDireccion(dto.getDireccion());
         persona.setCiudad(dto.getCiudad());
 
-        if (dto.getOcupacion() != null) {
+        if (dto.getOcupacion() != null && !dto.getOcupacion().trim().isEmpty()) {
             CatalogoOcupacion ocupacion = ocupacionRepository.findByNombre(dto.getOcupacion())
                     .orElseGet(() -> {
                         CatalogoOcupacion nueva = new CatalogoOcupacion();
@@ -99,11 +105,11 @@ public class PersonaService {
             dto.setContactoEmergenciaParentesco(p.getContactoEmergencia().getParentesco());
         }
 
-        if (!p.getCorreos().isEmpty()) {
+        if (p.getCorreos() != null && !p.getCorreos().isEmpty()) {
             dto.setEmail(p.getCorreos().get(0).getCorreo());
         }
 
-        if (!p.getTelefonos().isEmpty()) {
+        if (p.getTelefonos() != null && !p.getTelefonos().isEmpty()) {
             dto.setTelefono(p.getTelefonos().get(0).getTelefono());
         }
 
@@ -119,15 +125,18 @@ public class PersonaService {
         p.setDireccion(dto.getDireccion());
         p.setCiudad(dto.getCiudad());
 
-        if (dto.getOcupacion() != null) {
-            CatalogoOcupacion ocupacion = ocupacionRepository.findByNombre(dto.getOcupacion())
-                    .orElseGet(() -> {
-                        CatalogoOcupacion nueva = new CatalogoOcupacion();
-                        nueva.setNombre(dto.getOcupacion());
-                        return ocupacionRepository.save(nueva);
-                    });
-            p.setOcupacion(ocupacion);
+        // Validación explícita de ocupación obligatoria
+        if (dto.getOcupacion() == null || dto.getOcupacion().trim().isEmpty()) {
+            throw new RuntimeException("La ocupación es obligatoria para registrar a la persona.");
         }
+
+        CatalogoOcupacion ocupacion = ocupacionRepository.findByNombre(dto.getOcupacion())
+                .orElseGet(() -> {
+                    CatalogoOcupacion nueva = new CatalogoOcupacion();
+                    nueva.setNombre(dto.getOcupacion());
+                    return ocupacionRepository.save(nueva);
+                });
+        p.setOcupacion(ocupacion);
 
         if (dto.getContactoEmergenciaNombre() != null) {
             ContactoEmergencia ce = new ContactoEmergencia();
