@@ -1,26 +1,55 @@
 <div class="hero-container">
   <div class="hero-card">
-    <span class="badge">Bienvenido al Portal</span>
-    <h1>Gestión Inteligente de Usuarios</h1>
-    <p>Registra tu información personal, administra tus contactos de emergencia y consulta tu expediente en tiempo real.</p>
+    <span class="badge">Portal de Administración</span>
+    <h1>Iniciar Sesión</h1>
+    <p>Ingresa tus credenciales de administrador para gestionar los formularios y personas registradas.</p>
 
-    <div class="actions">
-      <a routerLink="/registro" class="btn-primary">Iniciar Registro</a>
-      <a routerLink="/dashboard" class="btn-secondary">Ver Dashboard</a>
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
     </div>
+
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control"
+          [(ngModel)]="credentials.username"
+          placeholder="admin1 o admin2"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          [(ngModel)]="credentials.password"
+          placeholder="admin123"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary btn-block">Ingresar al Sistema</button>
+    </form>
 
     <div class="features-grid">
       <div class="feature-item">
-        <h3>100% Seguro</h3>
-        <p>Validación de formularios en tiempo real.</p>
+        <h3>Control Activo</h3>
+        <p>Máximo 20 personas</p>
       </div>
       <div class="feature-item">
-        <h3>Sin Complicaciones</h3>
-        <p>Flujo ágil dividido en pasos claros.</p>
+        <h3>Contactos</h3>
+        <p>Hasta 2 emails / telfs</p>
       </div>
       <div class="feature-item">
-        <h3>Panel Activo</h3>
-        <p>Visualización interactiva de tu perfil.</p>
+        <h3>Seguridad</h3>
+        <p>Token JWT & AuthGuard</p>
       </div>
     </div>
   </div>

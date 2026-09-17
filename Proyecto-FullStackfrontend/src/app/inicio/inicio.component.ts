@@ -1,11 +1,30 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './inicio.component.html',
-  styleUrl: './inicio.component.css'
+  styleUrls: ['./inicio.component.css']
 })
-export class InicioComponent {}
+export class InicioComponent {
+  credentials = { username: '', password: '' };
+  errorMessage = '';
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onLogin(): void {
+    this.authService.login(this.credentials).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.errorMessage = 'Usuario o contraseña incorrectos.';
+      }
+    });
+  }
+}
