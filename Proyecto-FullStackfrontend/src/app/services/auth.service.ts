@@ -11,14 +11,15 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(res => {
-        if (res.token) {
-          localStorage.setItem('jwt_token', res.token);
-        }
-      })
-    );
-  }
+  return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials).pipe(
+    tap(res => {
+      // Extrae la propiedad "token" emitida por el ResponseEntity.ok(Map.of("token", token))
+      if (res.token) {
+        localStorage.setItem('jwt_token', res.token);
+      }
+    })
+  );
+}
 
   logout(): void {
     localStorage.removeItem('jwt_token');
