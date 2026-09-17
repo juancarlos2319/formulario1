@@ -1,0 +1,54 @@
+<div class="dashboard-container">
+  <div class="header-actions">
+    <div>
+      <h2>Personas Registradas</h2>
+      <p class="counter">Activas: <strong>{{ usuarios.length }} / 20</strong></p>
+    </div>
+    <a routerLink="/registro" class="btn-primary" *ngIf="usuarios.length < 20">+ Nuevo Registro</a>
+  </div>
+
+  <div *ngIf="usuarios.length >= 20" class="alert-warning">
+    Se ha alcanzado el límite máximo de 20 personas activas.
+  </div>
+
+  <div *ngIf="cargando" class="loading">Cargando datos...</div>
+
+  <!-- Contenedor en Cuadrícula de Tarjetas -->
+  <div *ngIf="!cargando && usuarios.length > 0" class="cards-grid">
+    <div *ngFor="let u of usuarios" class="card-usuario">
+      
+      <div class="avatar-circle">
+        {{ obtenerIniciales(u.nombre, u.apellido) }}
+      </div>
+
+      <h3 class="user-name">{{ u.nombre }} {{ u.apellido }}</h3>
+      <p class="user-occupation">{{ u.ocupacion }}</p>
+
+      <div class="user-info">
+        <p><strong>Email:</strong> {{ u.email }}</p>
+        <p><strong>Teléfono:</strong> {{ u.telefono }}</p>
+        <p><strong>Ciudad:</strong> {{ u.ciudad }}</p>
+        <p *ngIf="u.direccion"><strong>Dirección:</strong> {{ u.direccion }}</p>
+        <p *ngIf="u.genero"><strong>Género:</strong> {{ u.genero }}</p>
+        <p *ngIf="u.fechaNacimiento"><strong>Fecha Nacimiento:</strong> {{ u.fechaNacimiento }}</p>
+      </div>
+
+      <!-- Cuadro de Contacto de Emergencia -->
+      <div class="emergency-box" *ngIf="u.contactoEmergenciaNombre">
+        <p class="emergency-title">🚨 Contacto de Emergencia</p>
+        <p><strong>Nombre:</strong> {{ u.contactoEmergenciaNombre }}</p>
+        <p><strong>Teléfono:</strong> {{ u.contactoEmergenciaTelefono }}</p>
+        <p><strong>Relación:</strong> {{ u.contactoEmergenciaParentesco }}</p>
+      </div>
+
+      <div class="card-actions">
+        <a [routerLink]="['/registro', u.id]" class="btn-secondary-sm">Editar persona</a>
+        <a [routerLink]="['/contactos', u.id]" class="btn-secondary-sm">Editar contactos</a>
+        <button (click)="eliminar(u.id)" class="btn-danger-sm">Eliminar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <p *ngIf="!cargando && usuarios.length === 0">No hay registros activos en el sistema.</p>
+</div>

@@ -1,0 +1,56 @@
+<div class="hero-container">
+  <div class="hero-card">
+    <span class="badge">Portal de Administración</span>
+    <h1>Iniciar Sesión</h1>
+    <p>Ingresa tus credenciales de administrador para gestionar los formularios y personas registradas.</p>
+
+    <div *ngIf="errorMessage" class="error-alert">
+      {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <div class="form-group">
+        <label for="username">Usuario</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="form-control"
+          [(ngModel)]="credentials.username"
+          placeholder="admin1 o admin2"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          [(ngModel)]="credentials.password"
+          placeholder="admin123"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary btn-block">Ingresar al Sistema</button>
+    </form>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <h3>Control Activo</h3>
+        <p>Máximo 20 personas</p>
+      </div>
+      <div class="feature-item">
+        <h3>Contactos</h3>
+        <p>Hasta 2 emails / telfs</p>
+      </div>
+      <div class="feature-item">
+        <h3>Seguridad</h3>
+        <p>Token JWT & AuthGuard</p>
+      </div>
+    </div>
+  </div>
+</div>

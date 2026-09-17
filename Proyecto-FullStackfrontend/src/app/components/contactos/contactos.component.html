@@ -1,0 +1,49 @@
+<div class="form-wrapper">
+  <h2>Contactos de Emergencia</h2>
+  <p class="subtitle">Registra o edita los dos contactos de emergencia de la persona.</p>
+  <p *ngIf="mensajeError" role="alert">{{ mensajeError }}</p>
+
+  <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
+    <div class="card-section">
+      <h3>Contacto 1</h3>
+      <div class="field">
+        <label>Nombre Completo</label>
+        <input type="text" formControlName="c1_nombre" placeholder="Ej. Carlos Pérez">
+      </div>
+      <div class="field">
+        <label>Teléfono (10 dígitos)</label>
+        <input type="tel" formControlName="c1_telefono" placeholder="5512345678">
+      </div>
+      <div class="field">
+        <label>Parentesco / Relación</label>
+        <select formControlName="c1_parentesco">
+          <option value="">Selecciona el parentesco</option>
+          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <h3>Contacto 2</h3>
+      <div class="field">
+        <label>Nombre Completo</label>
+        <input type="text" formControlName="c2_nombre" placeholder="Ej. Ana Gómez">
+      </div>
+      <div class="field">
+        <label>Teléfono (10 dígitos)</label>
+        <input type="tel" formControlName="c2_telefono" placeholder="5587654321">
+      </div>
+      <div class="field">
+        <label>Parentesco / Relación</label>
+        <select formControlName="c2_parentesco">
+          <option value="">Selecciona el parentesco</option>
+          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" [disabled]="cargando || guardando || contactosForm.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar y Finalizar' }}
+    </button>
+  </form>
+</div>

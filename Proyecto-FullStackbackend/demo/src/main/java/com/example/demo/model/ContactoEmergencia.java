@@ -9,7 +9,7 @@ public class ContactoEmergencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_persona", nullable = false)
     private Persona persona;
 

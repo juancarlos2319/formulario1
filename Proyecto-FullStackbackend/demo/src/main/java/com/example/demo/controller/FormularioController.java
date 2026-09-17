@@ -18,6 +18,17 @@ import java.util.List;
 )
 public class FormularioController {
 
+    @GetMapping("/{id}/contactos")
+    public List<com.example.demo.dto.ContactoDTO> obtenerContactos(@PathVariable Long id) {
+        return personaService.obtenerContactos(id);
+    }
+
+    @PutMapping("/{id}/contactos")
+    public List<com.example.demo.dto.ContactoDTO> guardarContactos(
+            @PathVariable Long id, @RequestBody List<com.example.demo.dto.ContactoDTO> contactos) {
+        return personaService.guardarContactos(id, contactos);
+    }
+
     @Autowired
     private PersonaService personaService;
 

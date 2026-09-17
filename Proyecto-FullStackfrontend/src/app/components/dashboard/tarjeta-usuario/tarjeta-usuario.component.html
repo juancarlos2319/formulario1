@@ -1,0 +1,32 @@
+<div class="user-card">
+  <div class="card-header">
+    <div class="avatar">
+      {{ usuario.nombre ? usuario.nombre.charAt(0) : '' }}{{ usuario.apellido ? usuario.apellido.charAt(0) : '' }}
+    </div>
+    <div>
+      <h3>{{ usuario.nombre }} {{ usuario.apellido }}</h3>
+      <span class="badge">{{ usuario.ocupacion || 'Perfil Activo' }}</span>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <p><strong>Email:</strong> {{ usuario.email }}</p>
+    <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+    <p><strong>Ciudad:</strong> {{ usuario.ciudad }}</p>
+    <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
+    <p><strong>Género:</strong> {{ usuario.genero }}</p>
+    <p><strong>Fecha Nacimiento:</strong> {{ usuario.fechaNacimiento }}</p>
+
+    <div class="emergency-box" *ngIf="usuario.contactoEmergenciaNombre">
+      <h4>🚨 Contacto de Emergencia</h4>
+      <p><strong>Nombre:</strong> {{ usuario.contactoEmergenciaNombre }}</p>
+      <p><strong>Teléfono:</strong> {{ usuario.contactoEmergenciaTelefono }}</p>
+      <p><strong>Relación:</strong> {{ usuario.contactoEmergenciaParentesco }}</p>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <button class="btn-edit" (click)="onEditar()">Editar</button>
+    <button class="btn-delete" (click)="onEliminar()">Eliminar</button>
+  </div>
+</div>

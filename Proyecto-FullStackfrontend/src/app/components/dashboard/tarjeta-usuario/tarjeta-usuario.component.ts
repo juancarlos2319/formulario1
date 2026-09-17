@@ -1,6 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// Sube dos niveles para salir de tarjeta-usuario y dashboard hasta llegar a services
+import { Usuario } from '../../../services/usuario.interface';
+
 @Component({
   selector: 'app-tarjeta-usuario',
   standalone: true,
@@ -9,17 +12,17 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./tarjeta-usuario.component.css']
 })
 export class TarjetaUsuarioComponent {
-  @Input() usuario: any;
+  @Input() usuario!: Usuario;
   @Output() eliminar = new EventEmitter<number>();
+  @Output() editar = new EventEmitter<Usuario>();
 
-  onEditarClick(): void {
-    const id = this.usuario?.id ?? 1;
-    window.location.href = `/registro/${id}`;
-  }
-
-  onEliminarClick(): void {
-    if (this.usuario?.id) {
+  onEliminar(): void {
+    if (this.usuario && this.usuario.id) {
       this.eliminar.emit(this.usuario.id);
     }
+  }
+
+  onEditar(): void {
+    this.editar.emit(this.usuario);
   }
 }

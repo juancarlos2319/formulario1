@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS persona (
 -- 3. Contacto de Emergencia (Relación 1 a 1)
 CREATE TABLE IF NOT EXISTS contacto_emergencia (
                                                    id BIGSERIAL PRIMARY KEY,
-                                                   id_persona BIGINT NOT NULL UNIQUE,
+                                                   id_persona BIGINT NOT NULL,
                                                    nombre VARCHAR(150) NOT NULL,
     telefono VARCHAR(30) NOT NULL,
     parentesco VARCHAR(50) NOT NULL,

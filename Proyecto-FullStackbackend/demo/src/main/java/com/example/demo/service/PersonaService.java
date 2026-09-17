@@ -14,6 +14,47 @@ import java.util.stream.Collectors;
 @Service
 public class PersonaService {
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<com.example.demo.dto.ContactoDTO> obtenerContactos(Long id) {
+        Persona persona = personaRepository.findById(id)
+                .filter(p -> p.getFechaBaja() == null)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Persona no encontrada"));
+        return persona.getContactosEmergencia().stream()
+                .map(c -> new com.example.demo.dto.ContactoDTO(c.getNombre(), c.getTelefono(), c.getParentesco()))
+                .toList();
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public List<com.example.demo.dto.ContactoDTO> guardarContactos(Long id, List<com.example.demo.dto.ContactoDTO> contactos) {
+        if (contactos == null || contactos.size() != 2 || contactos.stream().anyMatch(c ->
+                c == null || c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 150 ||
+                c.telefono() == null || !c.telefono().matches("[0-9]{10}") ||
+                c.parentesco() == null || c.parentesco().isBlank() || c.parentesco().length() > 50)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST, "Se requieren dos contactos completos con teléfonos de 10 dígitos");
+        }
+        Persona persona = personaRepository.findById(id)
+                .filter(p -> p.getFechaBaja() == null)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Persona no encontrada"));
+        var existentes = persona.getContactosEmergencia();
+        for (int i = 0; i < 2; i++) {
+            ContactoEmergencia contacto;
+            if (i < existentes.size()) contacto = existentes.get(i);
+            else {
+                contacto = new ContactoEmergencia();
+                contacto.setPersona(persona);
+                existentes.add(contacto);
+            }
+            contacto.setNombre(contactos.get(i).nombre().trim());
+            contacto.setTelefono(contactos.get(i).telefono());
+            contacto.setParentesco(contactos.get(i).parentesco().trim());
+        }
+        personaRepository.save(persona);
+        return contactos;
+    }
+
     @Autowired
     private PersonaRepository personaRepository;
 
@@ -59,11 +100,6 @@ public class PersonaService {
             persona.setOcupacion(ocupacion);
         }
 
-        if (persona.getContactoEmergencia() != null) {
-            persona.getContactoEmergencia().setNombre(dto.getContactoEmergenciaNombre());
-            persona.getContactoEmergencia().setTelefono(dto.getContactoEmergenciaTelefono());
-            persona.getContactoEmergencia().setParentesco(dto.getContactoEmergenciaParentesco());
-        }
 
         if (dto.getEmail() != null && !persona.getCorreos().isEmpty()) {
             persona.getCorreos().get(0).setCorreo(dto.getEmail());

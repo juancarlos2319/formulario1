@@ -37,8 +37,9 @@ public class Persona {
     @JoinColumn(name = "id_ocupacion", nullable = false)
     private CatalogoOcupacion ocupacion;
 
-    @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ContactoEmergencia contactoEmergencia;
+    @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<ContactoEmergencia> contactosEmergencia = new ArrayList<>();
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PersonaCorreo> correos = new ArrayList<>();
@@ -66,8 +67,12 @@ public class Persona {
     public void setFechaBaja(LocalDate fechaBaja) { this.fechaBaja = fechaBaja; }
     public CatalogoOcupacion getOcupacion() { return ocupacion; }
     public void setOcupacion(CatalogoOcupacion ocupacion) { this.ocupacion = ocupacion; }
-    public ContactoEmergencia getContactoEmergencia() { return contactoEmergencia; }
-    public void setContactoEmergencia(ContactoEmergencia contactoEmergencia) { this.contactoEmergencia = contactoEmergencia; }
+    public List<ContactoEmergencia> getContactosEmergencia() { return contactosEmergencia; }
+    public ContactoEmergencia getContactoEmergencia() { return contactosEmergencia.isEmpty() ? null : contactosEmergencia.get(0); }
+    public void setContactoEmergencia(ContactoEmergencia contacto) {
+        contactosEmergencia.clear();
+        if (contacto != null) contactosEmergencia.add(contacto);
+    }
     public List<PersonaCorreo> getCorreos() { return correos; }
     public void setCorreos(List<PersonaCorreo> correos) { this.correos = correos; }
     public List<PersonaTelefono> getTelefonos() { return telefonos; }
