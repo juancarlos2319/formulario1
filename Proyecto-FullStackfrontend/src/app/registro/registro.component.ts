@@ -17,7 +17,7 @@ export class RegistroComponent implements OnInit {
   private router = inject(Router);
 
   registroForm!: FormGroup;
-  ocupaciones: string[] = [];
+  ocupaciones: any[] = [];
   mensajeError = '';
 
   ngOnInit(): void {

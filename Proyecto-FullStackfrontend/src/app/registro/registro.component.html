@@ -30,7 +30,9 @@
           <label>Ocupación *</label>
           <select formControlName="ocupacion" class="form-control">
             <option value="">-- Selecciona --</option>
-            <option *ngFor="let o of ocupaciones" [value]="o">{{ o }}</option>
+            <option *ngFor="let o of ocupaciones" [value]="o.nombre || o">
+              {{ o.nombre || o }}
+            </option>
           </select>
         </div>
       </div>
