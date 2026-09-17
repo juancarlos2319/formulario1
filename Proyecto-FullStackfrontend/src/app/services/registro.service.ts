@@ -25,4 +25,7 @@ export class RegistroService {
   eliminarFormulario(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  obtenerOcupaciones(): Observable<string[]> {
+  return this.http.get<string[]>('http://localhost:8080/api/ocupaciones');
+}
 }
