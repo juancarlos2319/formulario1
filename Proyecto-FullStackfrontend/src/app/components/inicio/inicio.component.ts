@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,25 +15,32 @@ import { AuthService } from '../../services/auth.service';
 export class InicioComponent {
   credentials = { username: '', password: '' };
   errorMessage = '';
+  showPassword = false;
+  isLoading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
-  this.authService.login(this.credentials).subscribe({
-    next: (res) => {
-      console.log('1. Respuesta del backend:', res);
-      console.log('2. Token guardado en localStorage:', localStorage.getItem('jwt_token'));
-
-      this.router.navigate(['/dashboard']).then(navegado => {
-        if (!navegado) {
-          console.error('3. La navegación fue rechazada. Revisa si la ruta /dashboard existe o si un AuthGuard la bloqueó.');
-        }
-      });
-    },
-    error: (err) => {
-      console.error('Error HTTP al intentar loguear:', err);
-      this.errorMessage = 'Usuario o contraseña incorrectos.';
-    }
-  });
-}
+    if (this.isLoading || !this.credentials.username.trim() || !this.credentials.password) return;
+    this.errorMessage = '';
+    this.isLoading = true;
+    this.authService.login(this.credentials).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']).then(navigated => {
+          if (!navigated) this.errorMessage = 'No se pudo acceder al panel. Intenta iniciar sesión nuevamente.';
+        }).catch(() => {
+          this.errorMessage = 'No se pudo abrir el panel. Intenta nuevamente.';
+        });
+      },
+      error: (err) => {
+        this.errorMessage = err.status === 0
+          ? 'No se pudo conectar con el servidor. Intenta nuevamente en unos momentos.'
+          : err.status === 401 || err.status === 403
+            ? 'Usuario o contraseña incorrectos.'
+            : 'No se pudo iniciar sesión. Intenta nuevamente.';
+      }
+    });
+  }
 }

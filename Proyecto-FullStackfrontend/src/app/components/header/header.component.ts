@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class HeaderComponent {
   authService = inject(AuthService);
-  private router = inject(Router);
+  router = inject(Router);
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/inicio'], { replaceUrl: true });

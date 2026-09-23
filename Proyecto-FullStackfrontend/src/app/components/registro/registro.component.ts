@@ -2,12 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { DashboardNavComponent } from '../dashboard/dashboard-nav.component';
 import { RegistroService } from '../../services/registro.service';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, DashboardNavComponent],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css']
 })
@@ -166,8 +167,22 @@ export class RegistroComponent implements OnInit {
     });
   }
 
+  campoInvalido(nombre: string): boolean {
+    const campo = this.registroForm.get(nombre);
+    return !!campo && campo.invalid && campo.touched;
+  }
+
+  errorCampo(nombre: string): string {
+    const errores = this.registroForm.get(nombre)?.errors;
+    if (errores?.['required']) return 'Este campo es obligatorio.';
+    if (errores?.['minlength']) return 'Escribe al menos dos caracteres.';
+    if (errores?.['email']) return 'Escribe un correo electrónico válido.';
+    if (errores?.['pattern']) return nombre === 'cp' ? 'Ingresa cinco dígitos.' : 'Ingresa diez dígitos.';
+    return 'Revisa este campo.';
+  }
+
   onSubmit(): void {
-  if (this.cargandoPersona || this.guardando) return;
+  if (this.cargandoPersona || this.guardando || this.cargandoCP) return;
   if (this.registroForm.invalid) {
     this.registroForm.markAllAsTouched();
     return;

@@ -1,4 +1,4 @@
-<header class="navbar">
+<header class="navbar" *ngIf="authService.isLoggedIn() && !router.url.startsWith('/dashboard') && !router.url.startsWith('/registro')">
   <div class="logo"><span>Portal</span>System</div>
   <nav class="nav-links" *ngIf="authService.isLoggedIn()">
     <a routerLink="/registro" routerLinkActive="active">Registro</a>

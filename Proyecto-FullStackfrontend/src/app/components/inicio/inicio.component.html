@@ -1,56 +1,39 @@
-<div class="hero-container">
-  <div class="hero-card">
-    <span class="badge">Portal de Administración</span>
-    <h1>Iniciar Sesión</h1>
-    <p>Ingresa tus credenciales de administrador para gestionar los formularios y personas registradas.</p>
-
-    <div *ngIf="errorMessage" class="error-alert">
-      {{ errorMessage }}
+<div class="login-shell">
+  <section class="intro">
+    <div class="brand"><span class="brand-mark">P</span>Portal<span>System</span></div>
+    <div class="intro-copy">
+      <span class="eyebrow">TU ESPACIO DE ADMINISTRACIÓN</span>
+      <h1>Las personas,<br>en el centro<br>de todo.</h1>
+      <p>Organiza tus registros y mantén la información de tu comunidad en un solo lugar.</p>
+      <div class="feature"><span aria-hidden="true">✓</span><div><strong>Información organizada</strong><small>Personas, datos y contactos a tu alcance.</small></div></div>
+      <div class="feature"><span aria-hidden="true">✓</span><div><strong>Una gestión más sencilla</strong><small>Consulta y actualiza tus registros fácilmente.</small></div></div>
     </div>
-
-    <form (ngSubmit)="onLogin()" class="login-form">
-      <div class="form-group">
-        <label for="username">Usuario</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          class="form-control"
-          [(ngModel)]="credentials.username"
-          placeholder="admin1 o admin2"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          class="form-control"
-          [(ngModel)]="credentials.password"
-          placeholder="admin123"
-          required
-        />
-      </div>
-
-      <button type="submit" class="btn-primary btn-block">Ingresar al Sistema</button>
-    </form>
-
-    <div class="features-grid">
-      <div class="feature-item">
-        <h3>Control Activo</h3>
-        <p>Máximo 20 personas</p>
-      </div>
-      <div class="feature-item">
-        <h3>Contactos</h3>
-        <p>Hasta 2 emails / telfs</p>
-      </div>
-      <div class="feature-item">
-        <h3>Seguridad</h3>
-        <p>Token JWT & AuthGuard</p>
-      </div>
+    <span class="intro-footer">Conecta. Organiza. Administra.</span>
+  </section>
+  <section class="access" aria-labelledby="login-title">
+    <div class="login-card">
+      <span class="access-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span>
+      <span class="eyebrow">BIENVENIDO DE NUEVO</span>
+      <h2 id="login-title">Inicia sesión</h2>
+      <p class="description">Ingresa tus credenciales para acceder a tu panel de administración.</p>
+      <form #loginForm="ngForm" (ngSubmit)="onLogin()" [attr.aria-busy]="isLoading">
+        <div class="field">
+          <label for="username">Usuario</label>
+          <input id="username" name="username" [(ngModel)]="credentials.username" placeholder="Escribe tu usuario" autocomplete="username" autocapitalize="none" spellcheck="false" required [readOnly]="isLoading">
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <div class="password-field">
+            <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password" placeholder="Escribe tu contraseña" autocomplete="current-password" required [readOnly]="isLoading">
+            <button class="password-toggle" type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showPassword">{{ showPassword ? 'Ocultar' : 'Mostrar' }}</button>
+          </div>
+        </div>
+        <p *ngIf="errorMessage" class="error-alert" role="alert">{{ errorMessage }}</p>
+        <button class="submit" type="submit" [disabled]="loginForm.invalid || isLoading">{{ isLoading ? 'Ingresando…' : 'Iniciar sesión' }} <span aria-hidden="true">→</span></button>
+        <span class="sr-only" role="status">{{ isLoading ? 'Validando tus credenciales' : '' }}</span>
+      </form>
+      <p class="help">¿Necesitas acceso?<br><span>Contacta al administrador de tu organización.</span></p>
     </div>
-  </div>
+    <footer>PortalSystem · Administración de personas</footer>
+  </section>
 </div>
