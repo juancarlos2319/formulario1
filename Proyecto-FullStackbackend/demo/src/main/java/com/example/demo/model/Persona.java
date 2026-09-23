@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "persona")
 public class Persona {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -67,14 +68,25 @@ public class Persona {
     public void setFechaBaja(LocalDate fechaBaja) { this.fechaBaja = fechaBaja; }
     public CatalogoOcupacion getOcupacion() { return ocupacion; }
     public void setOcupacion(CatalogoOcupacion ocupacion) { this.ocupacion = ocupacion; }
+
     public List<ContactoEmergencia> getContactosEmergencia() { return contactosEmergencia; }
-    public ContactoEmergencia getContactoEmergencia() { return contactosEmergencia.isEmpty() ? null : contactosEmergencia.get(0); }
-    public void setContactoEmergencia(ContactoEmergencia contacto) {
-        contactosEmergencia.clear();
-        if (contacto != null) contactosEmergencia.add(contacto);
+    public void setContactosEmergencia(List<ContactoEmergencia> contactosEmergencia) {
+        this.contactosEmergencia = contactosEmergencia;
     }
+
+    public ContactoEmergencia getContactoEmergencia() {
+        return contactosEmergencia.isEmpty() ? null : contactosEmergencia.get(0);
+    }
+
+    public void addContactoEmergencia(ContactoEmergencia contacto) {
+        if (contacto != null) {
+            contacto.setPersona(this);
+            this.contactosEmergencia.add(contacto);
+        }
+    }
+
     public List<PersonaCorreo> getCorreos() { return correos; }
     public void setCorreos(List<PersonaCorreo> correos) { this.correos = correos; }
     public List<PersonaTelefono> getTelefonos() { return telefonos; }
     public void setTelefonos(List<PersonaTelefono> telefonos) { this.telefonos = telefonos; }
-}
+}   

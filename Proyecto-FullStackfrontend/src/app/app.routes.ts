@@ -1,17 +1,37 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './guards/auth.guard';
-import { InicioComponent } from './components/inicio/inicio.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { RegistroComponent } from './components/registro/registro.component';
-import { ContactosComponent } from './components/contactos/contactos.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-  { path: 'inicio', component: InicioComponent, canActivate: [guestGuard] },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'registro', component: RegistroComponent, canActivate: [authGuard] },
-  { path: 'registro/:id', component: RegistroComponent, canActivate: [authGuard] },
-  { path: 'contactos', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'contactos/:id', component: ContactosComponent, canActivate: [authGuard] },
-  { path: '**', redirectTo: 'inicio' }
+  {
+    path: 'inicio',
+    loadComponent: () =>
+      import('./components/inicio/inicio.component').then(
+        (m) => m.InicioComponent
+      )
+  },
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./components/registro/registro.component').then(
+        (m) => m.RegistroComponent
+      )
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./components/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      )
+  },
+  {
+    path: 'contactos/:id',
+    loadComponent: () =>
+      import('./components/contactos/contactos.component').then(
+        (m) => m.ContactosComponent
+      )
+  },
+  {
+    path: '',
+    redirectTo: 'registro',
+    pathMatch: 'full'
+  }
 ];
