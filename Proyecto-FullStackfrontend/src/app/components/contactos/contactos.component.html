@@ -1,75 +1,49 @@
-<div class="container my-5" style="max-width: 700px;">
-  
-  <!-- Alerta de Error -->
-  <div *ngIf="mensajeError" class="alert alert-danger shadow-sm rounded-3 mb-4 text-center">
-    {{ mensajeError }}
-  </div>
+<div class="form-wrapper">
+  <h2>Contactos de Emergencia</h2>
+  <p class="subtitle">Registra o edita los dos contactos de emergencia de la persona.</p>
+  <p *ngIf="mensajeError" role="alert">{{ mensajeError }}</p>
 
-  <!-- Alerta de Éxito -->
-  <div *ngIf="mensajeExito" class="alert alert-success shadow-sm rounded-3 mb-4 text-center">
-    {{ mensajeExito }}
-  </div>
-
-  <form (ngSubmit)="guardarContactos()">
-
-    <!-- Tarjeta Contacto 1 -->
-    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-      <h3 class="text-primary fw-bold mb-4">Contacto 1</h3>
-      
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Nombre Completo</label>
-        <input type="text" class="form-control form-control-lg bg-light" [(ngModel)]="contacto1.nombre" name="nombre1" required placeholder="Ej. Juan Pérez">
+  <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
+    <div class="card-section">
+      <h3>Contacto 1</h3>
+      <div class="field">
+        <label>Nombre Completo</label>
+        <input type="text" formControlName="c1_nombre" placeholder="Ej. Carlos Pérez">
       </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Teléfono (10 dígitos)</label>
-        <input type="text" class="form-control form-control-lg bg-light" [(ngModel)]="contacto1.telefono" name="telefono1" required placeholder="5512345678" maxlength="10">
+      <div class="field">
+        <label>Teléfono (10 dígitos)</label>
+        <input type="tel" formControlName="c1_telefono" placeholder="5512345678">
       </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Parentesco / Relación</label>
-        <select class="form-select form-select-lg bg-light" [(ngModel)]="contacto1.parentesco" name="parentesco1" required>
-          <option value="">Seleccione una opción...</option>
-          <option value="Padre / Madre">Padre / Madre</option>
-          <option value="Hermano / Hermana">Hermano / Hermana</option>
-          <option value="Amigo / Amiga">Amigo / Amiga</option>
-          <option value="Cónyuge / Pareja">Cónyuge / Pareja</option>
-          <option value="Otro">Otro</option>
+      <div class="field">
+        <label>Parentesco / Relación</label>
+        <select formControlName="c1_parentesco">
+          <option value="">Selecciona el parentesco</option>
+          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
         </select>
       </div>
     </div>
 
-    <!-- Tarjeta Contacto 2 -->
-    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-      <h3 class="text-primary fw-bold mb-4">Contacto 2</h3>
-      
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Nombre Completo</label>
-        <input type="text" class="form-control form-control-lg bg-light" [(ngModel)]="contacto2.nombre" name="nombre2" required placeholder="Ej. Maria López">
+    <div class="card-section">
+      <h3>Contacto 2</h3>
+      <div class="field">
+        <label>Nombre Completo</label>
+        <input type="text" formControlName="c2_nombre" placeholder="Ej. Ana Gómez">
       </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Teléfono (10 dígitos)</label>
-        <input type="text" class="form-control form-control-lg bg-light" [(ngModel)]="contacto2.telefono" name="telefono2" required placeholder="5512345677" maxlength="10">
+      <div class="field">
+        <label>Teléfono (10 dígitos)</label>
+        <input type="tel" formControlName="c2_telefono" placeholder="5587654321">
       </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-secondary">Parentesco / Relación</label>
-        <select class="form-select form-select-lg bg-light" [(ngModel)]="contacto2.parentesco" name="parentesco2" required>
-          <option value="">Seleccione una opción...</option>
-          <option value="Padre / Madre">Padre / Madre</option>
-          <option value="Hermano / Hermana">Hermano / Hermana</option>
-          <option value="Amigo / Amiga">Amigo / Amiga</option>
-          <option value="Cónyuge / Pareja">Cónyuge / Pareja</option>
-          <option value="Otro">Otro</option>
+      <div class="field">
+        <label>Parentesco / Relación</label>
+        <select formControlName="c2_parentesco">
+          <option value="">Selecciona el parentesco</option>
+          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
         </select>
       </div>
     </div>
 
-    <!-- Botón Principal -->
-    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-3 shadow-sm">
-      Guardar y Finalizar
+    <button type="submit" class="btn-submit" [disabled]="cargando || guardando || contactosForm.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar y Finalizar' }}
     </button>
-
   </form>
 </div>

@@ -1,95 +1,87 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
-
-export interface ContactoDTO {
-  nombre: string;
-  telefono: string;
-  parentesco: string;
-}
+import { RegistroService } from '../../services/registro.service';
 
 @Component({
   selector: 'app-contactos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './contactos.component.html',
-  styleUrls: ['./contactos.component.css']
+  styleUrl: './contactos.component.css'
 })
 export class ContactosComponent implements OnInit {
-  personaId!: number;
-  mensajeError: string = '';
-  mensajeExito: string = '';
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private registroService = inject(RegistroService);
+  personaId = 0;
+  cargando = true;
+  guardando = false;
+  mensajeError = '';
 
-  contacto1: ContactoDTO = {
-    nombre: '',
-    telefono: '',
-    parentesco: ''
-  };
+  parentescos: string[] = [
+    'Padre / Madre',
+    'Cónyuge / Pareja',
+    'Hijo / Hija',
+    'Hermano / Hermana',
+    'Familiar',
+    'Tutor Legal',
+    'Amigo / Amiga',
+    'Compañero / Compañera de Trabajo',
+    'Otro'
+  ];
 
-  contacto2: ContactoDTO = {
-    nombre: '',
-    telefono: '',
-    parentesco: ''
-  };
-
-  constructor(
-    private http: HttpClient,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  contactosForm: FormGroup = this.fb.group({
+    c1_nombre: ['', Validators.required],
+    c1_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+    c1_parentesco: ['', Validators.required],
+    c2_nombre: ['', Validators.required],
+    c2_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+    c2_parentesco: ['', Validators.required]
+  });
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      this.personaId = +idParam;
-      this.cargarContactos();
+    this.personaId = Number(this.route.snapshot.paramMap.get('id'));
+    if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
+      this.router.navigate(['/personas']);
+      return;
     }
-  }
-
-  cargarContactos(): void {
-    this.http.get<ContactoDTO[]>(`http://localhost:8080/api/formularios/${this.personaId}/contactos`)
-      .subscribe({
-        next: (data) => {
-          if (data && data.length >= 2) {
-            this.contacto1 = { ...data[0] };
-            this.contacto2 = { ...data[1] };
-          }
-        },
-        error: (err) => {
-          console.error('Error al cargar contactos:', err);
-        }
-      });
-  }
-
-  guardarContactos(): void {
-    this.mensajeError = '';
-    this.mensajeExito = '';
-
-    const payload: ContactoDTO[] = [
-      {
-        nombre: this.contacto1.nombre,
-        telefono: this.contacto1.telefono,
-        parentesco: this.contacto1.parentesco
+    this.registroService.obtenerContactos(this.personaId).subscribe({
+      next: contactos => {
+        contactos.forEach((contacto, index) => this.contactosForm.patchValue({
+          ['c' + (index + 1) + '_nombre']: contacto.nombre,
+          ['c' + (index + 1) + '_telefono']: contacto.telefono,
+          ['c' + (index + 1) + '_parentesco']: contacto.parentesco
+        }));
+        this.cargando = false;
       },
-      {
-        nombre: this.contacto2.nombre,
-        telefono: this.contacto2.telefono,
-        parentesco: this.contacto2.parentesco
-      }
-    ];
+      error: () => { this.mensajeError = 'No se pudieron cargar los contactos. Intenta abrir la página nuevamente.'; }
+    });
+  }
 
-    this.http.put(`http://localhost:8080/api/formularios/${this.personaId}/contactos`, payload)
-      .subscribe({
-        next: (res) => {
-          this.mensajeExito = '¡Contactos guardados exitosamente!';
-          alert('¡Contactos guardados exitosamente!');
-        },
-        error: (err) => {
-          console.error('Error al guardar contactos:', err);
-          this.mensajeError = 'Ocurrió un error al guardar los contactos. Revisa los datos ingresados.';
-        }
-      });
+  guardarContactos() {
+    if (this.cargando || this.guardando) return;
+    if (this.contactosForm.invalid) {
+      this.contactosForm.markAllAsTouched();
+      return;
+    }
+
+    this.guardando = true;
+    this.mensajeError = '';
+    const valores = this.contactosForm.getRawValue();
+    const contactos = [1, 2].map(i => ({
+      nombre: valores['c' + i + '_nombre'].trim(),
+      telefono: valores['c' + i + '_telefono'],
+      parentesco: valores['c' + i + '_parentesco']
+    }));
+    this.registroService.guardarContactos(this.personaId, contactos).subscribe({
+      next: () => this.router.navigate(['/personas']),
+      error: () => {
+        this.guardando = false;
+        this.mensajeError = 'No se guardaron los contactos. Revisa los datos e inténtalo nuevamente.';
+      }
+    });
   }
 }

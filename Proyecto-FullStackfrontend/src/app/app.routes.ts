@@ -1,4 +1,11 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from './guards/auth.guard';
+import { InicioComponent } from './components/inicio/inicio.component';
+import { AdminLayoutComponent } from './components/shared/admin-layout/admin-layout.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { PersonasComponent } from './components/personas/personas.component';
+import { RegistroComponent } from './components/registro/registro.component';
+import { ContactosComponent } from './components/contactos/contactos.component';
 
 export const routes: Routes = [
   {

@@ -1,54 +1,25 @@
-<div class="dashboard-container">
-  <div class="header-actions">
-    <div>
-      <h2>Personas Registradas</h2>
-      <p class="counter">Activas: <strong>{{ usuarios.length }} / 20</strong></p>
-    </div>
-    <a routerLink="/registro" class="btn-primary" *ngIf="usuarios.length < 20">+ Nuevo Registro</a>
-  </div>
+<section class="welcome"><div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div><a *ngIf="!cargando && !mensajeError && lugaresDisponibles > 0" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
 
-  <div *ngIf="usuarios.length >= 20" class="alert-warning">
-    Se ha alcanzado el límite máximo de 20 personas activas.
-  </div>
+      <div *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando">Reintentar</button></div>
+      <div *ngIf="cargando" class="notice" role="status">Cargando información de tu comunidad…</div>
+      <ng-container *ngIf="!cargando && (!mensajeError || usuarios.length > 0)">
+        <div *ngIf="lugaresDisponibles === 0" class="notice" role="status">Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</div>
+        <section class="stats" aria-label="Resumen de registros">
+          <article class="panel"><span class="tile">♙</span><p>Total de personas</p><strong>{{ usuarios.length }}</strong><small>Registros en el sistema</small></article>
+          <article class="panel"><span class="tile green">＠</span><p>Con correo electrónico</p><strong>{{ conEmail }}</strong><small>Personas con email registrado</small></article>
+          <article class="panel"><span class="tile orange">☎</span><p>Con teléfono</p><strong>{{ conTelefono }}</strong><small>Personas con teléfono registrado</small></article>
+          <article class="panel"><span class="tile blue">＋</span><p>Lugares disponibles</p><strong>{{ lugaresDisponibles }}</strong><small>Capacidad de 20 personas</small></article>
+        </section>
+        <section class="overview">
+          <article class="panel distribution"><h2>Tu comunidad por ocupación</h2><p class="muted">Las cinco ocupaciones con más registros</p>
+            <div *ngFor="let grupo of ocupaciones" class="bar-row"><div><span>{{ grupo.nombre }}</span><strong>{{ grupo.cantidad }}</strong></div><div class="track"><span [style.width.%]="grupo.porcentaje"></span></div></div>
+            <p *ngIf="!usuarios.length" class="empty">El resumen aparecerá cuando registres a tu primera persona.</p>
+          </article>
+          <article class="panel quick"><h2>Acciones rápidas</h2><p class="muted">Lo que necesitas, a un clic</p>
+            <a *ngIf="lugaresDisponibles > 0" routerLink="/registro"><span class="tile">＋</span><div><strong>Nueva persona</strong><small>Crear un registro completo</small></div><span>→</span></a>
+            <a routerLink="/personas"><span class="tile green">♙</span><div><strong>Consultar personas</strong><small>Busca, edita y gestiona contactos</small></div><span>→</span></a>
+            <button type="button" (click)="cargarUsuarios()"><span class="tile blue">↻</span><div><strong>Actualizar resumen</strong><small>Obtener la información más reciente</small></div><span>→</span></button>
+          </article>
+        </section>
 
-  <div *ngIf="cargando" class="loading">Cargando datos...</div>
-
-  <!-- Contenedor en Cuadrícula de Tarjetas -->
-  <div *ngIf="!cargando && usuarios.length > 0" class="cards-grid">
-    <div *ngFor="let u of usuarios" class="card-usuario">
-      
-      <div class="avatar-circle">
-        {{ obtenerIniciales(u.nombre, u.apellido) }}
-      </div>
-
-      <h3 class="user-name">{{ u.nombre }} {{ u.apellido }}</h3>
-      <p class="user-occupation">{{ u.ocupacion }}</p>
-
-      <div class="user-info">
-        <p><strong>Email:</strong> {{ u.email }}</p>
-        <p><strong>Teléfono:</strong> {{ u.telefono }}</p>
-        <p><strong>Ciudad:</strong> {{ u.ciudad }}</p>
-        <p *ngIf="u.direccion"><strong>Dirección:</strong> {{ u.direccion }}</p>
-        <p *ngIf="u.genero"><strong>Género:</strong> {{ u.genero }}</p>
-        <p *ngIf="u.fechaNacimiento"><strong>Fecha Nacimiento:</strong> {{ u.fechaNacimiento }}</p>
-      </div>
-
-      <!-- Cuadro de Contacto de Emergencia -->
-      <div class="emergency-box" *ngIf="u.contactoEmergenciaNombre">
-        <p class="emergency-title">🚨 Contacto de Emergencia</p>
-        <p><strong>Nombre:</strong> {{ u.contactoEmergenciaNombre }}</p>
-        <p><strong>Teléfono:</strong> {{ u.contactoEmergenciaTelefono }}</p>
-        <p><strong>Relación:</strong> {{ u.contactoEmergenciaParentesco }}</p>
-      </div>
-
-      <div class="card-actions">
-        <a [routerLink]="['/registro', u.id]" class="btn-secondary-sm">Editar persona</a>
-        <a [routerLink]="['/contactos', u.id]" class="btn-secondary-sm">Editar contactos</a>
-        <button (click)="eliminar(u.id)" class="btn-danger-sm">Eliminar</button>
-      </div>
-
-    </div>
-  </div>
-
-  <p *ngIf="!cargando && usuarios.length === 0">No hay registros activos en el sistema.</p>
-</div>
+      </ng-container>

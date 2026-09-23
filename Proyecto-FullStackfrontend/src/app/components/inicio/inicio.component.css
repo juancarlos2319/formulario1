@@ -1,140 +1,35 @@
-.hero-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2.5rem 1rem;
-}
-
-.hero-card {
-  max-width: 780px;
-  background: white;
-  padding: 3rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  text-align: center;
-}
-
-.badge {
-  background: #e0f2fe;
-  color: #0284c7;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-h1 {
-  font-size: 2.3rem;
-  color: #0f172a;
-  margin: 1.5rem 0 1rem;
-}
-
-p {
-  color: #64748b;
-  font-size: 1.05rem;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-}
-
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-.btn-primary {
-  background: #0284c7;
-  color: white;
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover {
-  background: #0369a1;
-}
-
-.btn-secondary {
-  background: #f1f5f9;
-  color: #334155;
-  padding: 0.8rem 1.8rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 2rem;
-}
-
-.feature-item h3 {
-  font-size: 1rem;
-  color: #1e293b;
-  margin-bottom: 0.4rem;
-}
-
-.feature-item p {
-  font-size: 0.85rem;
-  margin: 0;
-}
-/* --- Estilos del Formulario dentro de Hero Card --- */
-.login-form {
-  max-width: 400px;
-  margin: 0 auto 2.5rem;
-  text-align: left;
-}
-
-.form-group {
-  margin-bottom: 1.25rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 0.4rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #0284c7;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-}
-
-.btn-block {
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-}
-
-.error-alert {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin: 0 auto 1.5rem;
-  max-width: 400px;
-  font-size: 0.9rem;
-  text-align: center;
-}
+:host{display:block;font-family:'DM Sans',sans-serif;color:#27243a}
+*{box-sizing:border-box}
+.login-shell{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;background:#fff}
+.intro{display:flex;flex-direction:column;justify-content:space-between;padding:48px clamp(30px,5vw,88px);background:radial-gradient(ellipse at 0 100%,#e6dcfb,transparent 65%),#f0ecfa}
+.brand{display:flex;align-items:center;gap:9px;font:800 22px 'Manrope',sans-serif;letter-spacing:-.7px}
+.brand>span:last-child{color:#7358dc;margin-left:-9px}
+.brand-mark{display:grid;place-items:center;width:36px;height:36px;background:#7155d9;color:white;border-radius:11px;margin-right:4px;font-size:21px}
+.intro-copy{padding:64px 0;max-width:450px}
+.eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:1.7px;color:#765ac5}
+h1{font:800 clamp(38px,4.4vw,66px)/1.12 'Manrope',sans-serif;letter-spacing:-2.5px;margin:22px 0}
+.intro-copy>p{font-size:16px;line-height:1.8;color:#777085;max-width:360px;margin-bottom:35px}
+.feature{display:flex;align-items:center;gap:14px;margin-top:22px}
+.feature>span{display:grid;place-items:center;background:#ffffffa8;color:#7358dc;width:34px;height:34px;border-radius:10px}
+.feature strong,.feature small{display:block}.feature strong{font-size:13px}.feature small{font-size:12px;color:#80798e;margin-top:5px}
+.intro-footer{font-size:12px;color:#898094}
+.access{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 25px}
+.login-card{width:100%;max-width:390px;margin:auto 0}
+.access-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:#f0ecfc;color:#7155d9;margin-bottom:28px}
+.access-icon svg{width:26px;height:26px}
+h2{font:800 32px 'Manrope',sans-serif;letter-spacing:-1px;margin:12px 0}
+.description{font-size:14px;line-height:1.8;color:#888291;margin:0 0 32px}
+.field{margin-bottom:20px}label{display:block;font-size:13px;font-weight:600;margin-bottom:9px;color:#615b6e}
+input{width:100%;height:49px;border:1px solid #e3dfea;border-radius:10px;padding:0 14px;background:#fcfbfe;color:#373143;font:inherit;font-size:14px}
+input::placeholder{color:#aaa4b4}
+input:focus{outline:none;border-color:#8067df;box-shadow:0 0 0 3px #7357d918;background:white}
+.password-field{position:relative}.password-field input{padding-right:82px}
+button{font:inherit;cursor:pointer}.password-toggle{position:absolute;right:6px;top:6px;height:37px;border:0;border-radius:6px;background:transparent;color:#7358c5;font-size:12px;padding:0 9px}
+button:focus-visible{outline:3px solid #a68de9;outline-offset:3px}
+.submit{display:flex;justify-content:center;align-items:center;gap:13px;width:100%;height:49px;margin-top:27px;background:#7155d9;border:0;border-radius:10px;color:white;font-size:14px;font-weight:600;box-shadow:0 7px 18px #7256d930}
+.submit:hover:not(:disabled){background:#6247ca}.submit:disabled{opacity:.6;cursor:default}
+.help{text-align:center;font-size:12px;color:#615b6e;line-height:1.9;margin-top:30px}.help span{color:#96909e}
+.error-alert{padding:12px;border:1px solid #f3c7ce;background:#fff3f4;border-radius:9px;color:#a0364a;font-size:13px;line-height:1.5}
+footer{font-size:11px;color:#a29baa;margin-top:50px;text-align:center}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:760px){.login-shell{grid-template-columns:1fr}.intro{padding:24px}.intro-copy,.intro-footer{display:none}.access{padding:36px 24px;min-height:calc(100dvh - 84px)}h2{font-size:29px}}

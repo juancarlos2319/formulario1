@@ -1,8 +1,0 @@
-<header class="navbar">
-  <div class="logo"><span>Portal</span>System</div>
-  <nav class="nav-links" *ngIf="authService.isLoggedIn()">
-    <a routerLink="/registro" routerLinkActive="active">Registro</a>
-    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <button type="button" (click)="logout()">Cerrar sesión</button>
-  </nav>
-</header>
