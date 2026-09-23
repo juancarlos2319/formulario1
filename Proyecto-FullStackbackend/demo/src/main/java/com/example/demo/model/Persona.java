@@ -42,9 +42,11 @@ public class Persona {
     private List<ContactoEmergencia> contactosEmergencia = new ArrayList<>();
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<PersonaCorreo> correos = new ArrayList<>();
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<PersonaTelefono> telefonos = new ArrayList<>();
 
     public Persona() {}

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
 
@@ -32,6 +32,11 @@ export class RegistroComponent implements OnInit {
     this.initForm();
     this.cargarOcupaciones();
     const id = this.route.snapshot.paramMap.get('id');
+    if (id === null && this.registroService.borrador) {
+      const borrador = this.registroService.borrador;
+      this.registroForm.patchValue(borrador);
+      this.cargarDireccion(borrador.direccion, borrador.ciudad);
+    }
     if (id !== null) {
       this.personaId = Number(id);
       this.registroForm.get('aceptaTerminos')?.disable();
@@ -46,7 +51,12 @@ export class RegistroComponent implements OnInit {
             this.mensajeError = 'No se encontró la persona.';
             return;
           }
-          this.registroForm.patchValue({ ...persona, aceptaTerminos: true });
+          this.registroForm.patchValue({
+            ...persona,
+            correosAdicionales: [persona.correosAdicionales?.[0] ?? ''],
+            telefonosAdicionales: [persona.telefonosAdicionales?.[0] ?? ''],
+            aceptaTerminos: true
+          });
           this.cargarDireccion(persona.direccion, persona.ciudad);
           this.cargandoPersona = false;
         },
@@ -62,7 +72,7 @@ export class RegistroComponent implements OnInit {
       genero: ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
       ocupacion: ['', Validators.required],
-      
+
       // Campos detallados de Dirección
       cp: ['', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
       pais: [{ value: 'México', disabled: true }, Validators.required],
@@ -75,8 +85,8 @@ export class RegistroComponent implements OnInit {
       // Contacto Principal y Listas
       email: ['', [Validators.required, Validators.email]],
       telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      correosAdicionales: this.fb.array([]),
-      telefonosAdicionales: this.fb.array([]),
+      correosAdicionales: this.fb.array([this.fb.control('', [Validators.required, Validators.email])]),
+      telefonosAdicionales: this.fb.array([this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')])]),
 
       aceptaTerminos: [false, Validators.requiredTrue]
     });
@@ -103,12 +113,12 @@ export class RegistroComponent implements OnInit {
     this.registroService.consultarCP(cp).subscribe({
       next: (res: any) => {
         this.cargandoCP = false;
-        
+
         if (res && res.resultados && res.resultados.length > 0) {
           const primerResultado = res.resultados[0];
           const estado = primerResultado.estado;
           const municipio = primerResultado.municipio; // Devuelve "Coyuca de Benítez"
-          
+
           // Mapeamos los asentamientos/colonias correspondientes
           this.colonias = res.resultados.map((r: any) => r.asentamiento);
 
@@ -130,34 +140,6 @@ export class RegistroComponent implements OnInit {
     });
   }
 }
-
-  get correosAdicionales(): FormArray {
-    return this.registroForm.get('correosAdicionales') as FormArray;
-  }
-
-  get telefonosAdicionales(): FormArray {
-    return this.registroForm.get('telefonosAdicionales') as FormArray;
-  }
-
-  agregarCorreo(): void {
-    if (this.correosAdicionales.length < 1) {
-      this.correosAdicionales.push(this.fb.control('', [Validators.required, Validators.email]));
-    }
-  }
-
-  eliminarCorreo(index: number): void {
-    this.correosAdicionales.removeAt(index);
-  }
-
-  agregarTelefono(): void {
-    if (this.telefonosAdicionales.length < 1) {
-      this.telefonosAdicionales.push(this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')]));
-    }
-  }
-
-  eliminarTelefono(index: number): void {
-    this.telefonosAdicionales.removeAt(index);
-  }
 
   cargarOcupaciones(): void {
     this.registroService.obtenerOcupaciones().subscribe({
@@ -189,12 +171,18 @@ export class RegistroComponent implements OnInit {
 
   const rawVal = this.registroForm.getRawValue();
   const direccionFormateada = `${rawVal.calle} #${rawVal.numero}, Col. ${rawVal.colonia}, C.P. ${rawVal.cp}, ${rawVal.estado}`;
-  
+
   const payload = {
     ...rawVal,
     ciudad: rawVal.municipio,
     direccion: direccionFormateada
   };
+
+  if (!this.editando) {
+    this.registroService.borrador = payload;
+    this.router.navigate(['/contactos']);
+    return;
+  }
 
   this.guardando = true;
   this.mensajeError = '';

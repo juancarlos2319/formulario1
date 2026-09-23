@@ -4,6 +4,8 @@ export interface Usuario {
   apellido: string;
   email: string;
   telefono: string;
+  correosAdicionales?: string[];
+  telefonosAdicionales?: string[];
   fechaNacimiento: string;
   genero: string;
   direccion: string;

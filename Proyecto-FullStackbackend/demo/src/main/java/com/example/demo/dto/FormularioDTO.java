@@ -3,6 +3,17 @@ package com.example.demo.dto;
 import java.time.LocalDate;
 
 public class FormularioDTO {
+    private java.util.List<String> correosAdicionales = java.util.List.of();
+    private java.util.List<String> telefonosAdicionales = java.util.List.of();
+    private java.util.List<ContactoDTO> contactosEmergencia;
+
+    public java.util.List<String> getCorreosAdicionales() { return correosAdicionales; }
+    public void setCorreosAdicionales(java.util.List<String> valores) { correosAdicionales = valores; }
+    public java.util.List<String> getTelefonosAdicionales() { return telefonosAdicionales; }
+    public void setTelefonosAdicionales(java.util.List<String> valores) { telefonosAdicionales = valores; }
+    public java.util.List<ContactoDTO> getContactosEmergencia() { return contactosEmergencia; }
+    public void setContactosEmergencia(java.util.List<ContactoDTO> valores) { contactosEmergencia = valores; }
+
     private Long id;
     private String nombre;
     private String apellido;

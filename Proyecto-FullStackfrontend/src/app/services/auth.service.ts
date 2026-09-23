@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { RegistroService } from './registro.service';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
@@ -6,6 +7,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
+  private registroService = inject(RegistroService);
   private apiUrl = 'http://localhost:8080/api/auth';
 
   constructor(private http: HttpClient) {}
@@ -22,6 +24,7 @@ export class AuthService {
 }
 
   logout(): void {
+    this.registroService.limpiarBorrador();
     localStorage.removeItem('jwt_token');
   }
 

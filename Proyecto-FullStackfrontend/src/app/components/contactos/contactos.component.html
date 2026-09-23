@@ -1,48 +1,37 @@
 <div class="form-wrapper">
-  <h2>Contactos de Emergencia</h2>
-  <p class="subtitle">Registra o edita los dos contactos de emergencia de la persona.</p>
+  <h2>Contactos de emergencia</h2>
+  <p *ngIf="nuevo">Paso 2 de 2. La persona se guardará junto con sus contactos al finalizar. Si recargas la página, tendrás que comenzar nuevamente.</p>
+  <p class="subtitle">Completa los dos contactos. Todos los campos son obligatorios.</p>
+  <p *ngIf="cargando" role="status">Cargando contactos…</p>
   <p *ngIf="mensajeError" role="alert">{{ mensajeError }}</p>
-
+  <button *ngIf="errorCarga" type="button" (click)="cargarContactos()">Reintentar carga</button>
   <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
-    <div class="card-section">
-      <h3>Contacto 1</h3>
+    <fieldset class="card-section" *ngFor="let i of [1, 2]" [disabled]="cargando || guardando || errorCarga">
+      <legend>Contacto {{ i }}</legend>
       <div class="field">
-        <label>Nombre Completo</label>
-        <input type="text" formControlName="c1_nombre" placeholder="Ej. Carlos Pérez">
+        <label [for]="'c' + i + '_nombre'">Nombre completo *</label>
+        <input [id]="'c' + i + '_nombre'" type="text" [formControlName]="'c' + i + '_nombre'"
+          [attr.aria-describedby]="'nombre-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_nombre')">
+        <small [id]="'nombre-error-' + i">{{ errorCampo('c' + i + '_nombre') }}</small>
       </div>
       <div class="field">
-        <label>Teléfono (10 dígitos)</label>
-        <input type="tel" formControlName="c1_telefono" placeholder="5512345678">
+        <label [for]="'c' + i + '_telefono'">Teléfono (10 dígitos) *</label>
+        <input [id]="'c' + i + '_telefono'" type="tel" inputmode="numeric" [formControlName]="'c' + i + '_telefono'" placeholder="5512345678"
+          [attr.aria-describedby]="'telefono-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_telefono')">
+        <small [id]="'telefono-error-' + i">{{ errorCampo('c' + i + '_telefono') }}</small>
       </div>
       <div class="field">
-        <label>Parentesco / Relación</label>
-        <select formControlName="c1_parentesco">
+        <label [for]="'c' + i + '_parentesco'">Parentesco / Relación *</label>
+        <select [id]="'c' + i + '_parentesco'" [formControlName]="'c' + i + '_parentesco'"
+          [attr.aria-describedby]="'parentesco-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_parentesco')">
           <option value="">Selecciona el parentesco</option>
           <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
         </select>
+        <small [id]="'parentesco-error-' + i">{{ errorCampo('c' + i + '_parentesco') }}</small>
       </div>
-    </div>
-
-    <div class="card-section">
-      <h3>Contacto 2</h3>
-      <div class="field">
-        <label>Nombre Completo</label>
-        <input type="text" formControlName="c2_nombre" placeholder="Ej. Ana Gómez">
-      </div>
-      <div class="field">
-        <label>Teléfono (10 dígitos)</label>
-        <input type="tel" formControlName="c2_telefono" placeholder="5587654321">
-      </div>
-      <div class="field">
-        <label>Parentesco / Relación</label>
-        <select formControlName="c2_parentesco">
-          <option value="">Selecciona el parentesco</option>
-          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
-        </select>
-      </div>
-    </div>
-
-    <button type="submit" class="btn-submit" [disabled]="cargando || guardando || contactosForm.invalid">
+    </fieldset>
+    <button *ngIf="nuevo" type="button" (click)="volver()" [disabled]="guardando">← Volver a los datos</button>
+    <button type="submit" class="btn-submit" [disabled]="cargando || guardando || errorCarga">
       {{ guardando ? 'Guardando...' : 'Guardar y Finalizar' }}
     </button>
   </form>

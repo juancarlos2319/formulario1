@@ -3,7 +3,7 @@
         <aside class="guide" aria-label="Proceso de registro">
           <h2>{{ editando ? 'Cada detalle cuenta' : 'Empecemos por lo esencial' }}</h2>
           <p>La información organizada te ayuda a estar más cerca de tu comunidad.</p>
-          <ol><li class="current"><strong>Datos de la persona</strong><small>Información personal, dirección y contacto.</small></li><li *ngIf="!editando"><strong>Contacto de emergencia</strong><small>Lo agregarás después de guardar a la persona.</small></li></ol>
+          <ol><li class="current"><strong>Datos de la persona</strong><small>Información personal, dirección y contacto.</small></li><li *ngIf="!editando"><strong>Contacto de emergencia</strong><small>Completa ambos pasos antes de guardar a la persona.</small></li></ol>
           <p>Los campos con <strong>*</strong> son obligatorios.</p>
         </aside>
         <div class="form-container">
@@ -109,7 +109,7 @@
 
     <!-- Contactos -->
     <fieldset [disabled]="guardando || cargandoPersona">
-      <legend><span class="section-number">03</span> Datos de contacto</legend><p class="section-help">Puedes agregar hasta dos correos y dos teléfonos.</p>
+      <legend><span class="section-number">03</span> Datos de contacto</legend><p class="section-help">Registra dos correos y dos teléfonos. Todos son obligatorios.</p>
       <div class="form-row">
         <div class="form-group">
           <label for="email">Email Principal *</label>
@@ -123,20 +123,19 @@
         </div>
       </div>
 
-      <div formArrayName="correosAdicionales" class="dynamic-section">
-        <div *ngFor="let correo of correosAdicionales.controls; let i = index" class="dynamic-row">
-          <input [formControlName]="i" type="email" aria-label="Email secundario" placeholder="Email secundario" class="form-control" />
-          <button type="button" [disabled]="guardando" (click)="eliminarCorreo(i)" class="btn-remove">Quitar</button>
+      <div class="form-row">
+        <div class="form-group" formArrayName="correosAdicionales">
+          <label for="email-secundario">Email secundario *</label>
+          <input id="email-secundario" type="email" [formControlName]="0" class="form-control" required
+            [attr.aria-invalid]="campoInvalido('correosAdicionales.0')" aria-describedby="email-secundario-error">
+          <small id="email-secundario-error" class="field-error" *ngIf="campoInvalido('correosAdicionales.0')">{{ errorCampo('correosAdicionales.0') }}</small>
         </div>
-        <button type="button" (click)="agregarCorreo()" *ngIf="correosAdicionales.length < 1" class="btn-add">+ Agregar Correo Secundario</button>
-      </div>
-
-      <div formArrayName="telefonosAdicionales" class="dynamic-section">
-        <div *ngFor="let tel of telefonosAdicionales.controls; let i = index" class="dynamic-row">
-          <input [formControlName]="i" type="tel" inputmode="numeric" maxlength="10" aria-label="Teléfono secundario" placeholder="Teléfono secundario" class="form-control" />
-          <button type="button" [disabled]="guardando" (click)="eliminarTelefono(i)" class="btn-remove">Quitar</button>
+        <div class="form-group" formArrayName="telefonosAdicionales">
+          <label for="telefono-secundario">Teléfono secundario (10 dígitos) *</label>
+          <input id="telefono-secundario" type="tel" inputmode="numeric" maxlength="10" [formControlName]="0" class="form-control" required
+            [attr.aria-invalid]="campoInvalido('telefonosAdicionales.0')" aria-describedby="telefono-secundario-error">
+          <small id="telefono-secundario-error" class="field-error" *ngIf="campoInvalido('telefonosAdicionales.0')">{{ errorCampo('telefonosAdicionales.0') }}</small>
         </div>
-        <button type="button" (click)="agregarTelefono()" *ngIf="telefonosAdicionales.length < 1" class="btn-add">+ Agregar Teléfono Secundario</button>
       </div>
     </fieldset>
 
@@ -152,7 +151,7 @@
     <div class="form-actions">
       <a *ngIf="!guardando" routerLink="/dashboard" class="btn-secondary">Cancelar</a>
       <button type="submit" [disabled]="cargandoPersona || guardando || cargandoCP" class="btn-primary">
-        {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Guardar y continuar →') }}
+        {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
       </button>
     </div>
   </form>

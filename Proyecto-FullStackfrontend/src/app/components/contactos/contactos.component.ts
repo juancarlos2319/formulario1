@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 import { RegistroService } from '../../services/registro.service';
 
 @Component({
@@ -17,8 +18,10 @@ export class ContactosComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private registroService = inject(RegistroService);
   personaId = 0;
+  nuevo = false;
   cargando = true;
   guardando = false;
+  errorCarga = false;
   mensajeError = '';
 
   parentescos: string[] = [
@@ -43,11 +46,33 @@ export class ContactosComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.personaId = Number(this.route.snapshot.paramMap.get('id'));
+    const id = this.route.snapshot.paramMap.get('id');
+    this.nuevo = id === null;
+    if (this.nuevo) {
+      if (!this.registroService.borrador) {
+        this.router.navigate(['/registro']);
+        return;
+      }
+      this.registroService.contactosBorrador.forEach((c, index) => this.contactosForm.patchValue({
+        ['c' + (index + 1) + '_nombre']: c.nombre,
+        ['c' + (index + 1) + '_telefono']: c.telefono,
+        ['c' + (index + 1) + '_parentesco']: c.parentesco
+      }));
+      this.cargando = false;
+      return;
+    }
+    this.personaId = Number(id);
     if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
       this.router.navigate(['/personas']);
       return;
     }
+    this.cargarContactos();
+  }
+
+  cargarContactos(): void {
+    this.cargando = true;
+    this.errorCarga = false;
+    this.mensajeError = '';
     this.registroService.obtenerContactos(this.personaId).subscribe({
       next: contactos => {
         contactos.forEach((contacto, index) => this.contactosForm.patchValue({
@@ -57,14 +82,35 @@ export class ContactosComponent implements OnInit {
         }));
         this.cargando = false;
       },
-      error: () => { this.mensajeError = 'No se pudieron cargar los contactos. Intenta abrir la página nuevamente.'; }
+      error: () => {
+        this.cargando = false;
+        this.errorCarga = true;
+        this.mensajeError = 'No se pudieron cargar los contactos. Reintenta antes de guardar.';
+      }
     });
   }
 
+  volver(): void {
+    const valores = this.contactosForm.getRawValue();
+    this.registroService.contactosBorrador = [1, 2].map(i => ({
+      nombre: valores['c' + i + '_nombre'],
+      telefono: valores['c' + i + '_telefono'],
+      parentesco: valores['c' + i + '_parentesco']
+    }));
+    this.router.navigate(['/registro']);
+  }
+
+  errorCampo(nombre: string): string {
+    const campo = this.contactosForm.get(nombre);
+    if (!campo?.touched || !campo.errors) return '';
+    return campo.hasError('pattern') ? 'Escribe exactamente 10 dígitos, sin espacios ni prefijo +52.' : 'Este campo es obligatorio.';
+  }
+
   guardarContactos() {
-    if (this.cargando || this.guardando) return;
+    if (this.cargando || this.guardando || this.errorCarga) return;
     if (this.contactosForm.invalid) {
       this.contactosForm.markAllAsTouched();
+      this.mensajeError = 'Revisa los campos marcados de ambos contactos.';
       return;
     }
 
@@ -76,11 +122,20 @@ export class ContactosComponent implements OnInit {
       telefono: valores['c' + i + '_telefono'],
       parentesco: valores['c' + i + '_parentesco']
     }));
-    this.registroService.guardarContactos(this.personaId, contactos).subscribe({
-      next: () => this.router.navigate(['/personas']),
-      error: () => {
+    if (this.nuevo) this.registroService.contactosBorrador = contactos;
+    const solicitud: Observable<unknown> = this.nuevo
+      ? this.registroService.guardarRegistroCompleto(contactos)
+      : this.registroService.guardarContactos(this.personaId, contactos);
+    solicitud.subscribe({
+      next: () => {
         this.guardando = false;
-        this.mensajeError = 'No se guardaron los contactos. Revisa los datos e inténtalo nuevamente.';
+        if (this.nuevo) this.registroService.limpiarBorrador();
+        this.router.navigate(['/personas']);
+      },
+      error: (err) => {
+        this.guardando = false;
+        this.mensajeError = typeof err.error === 'string' ? err.error
+          : (this.nuevo ? 'No se guardó el registro. Revisa los datos e intenta nuevamente.' : 'No se guardaron los contactos. Intenta nuevamente.');
       }
     });
   }

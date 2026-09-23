@@ -13,6 +13,19 @@ export interface ContactoEmergencia {
   providedIn: 'root'
 })
 export class RegistroService {
+  // Borrador en memoria: no se persiste hasta completar ambos pasos.
+  borrador: Usuario | null = null;
+  contactosBorrador: ContactoEmergencia[] = [];
+
+  limpiarBorrador(): void {
+    this.borrador = null;
+    this.contactosBorrador = [];
+  }
+
+  guardarRegistroCompleto(contactos: ContactoEmergencia[]): Observable<Usuario> {
+    return this.http.post<Usuario>(this.apiUrl, { ...this.borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() });
+  }
+
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/formularios';
 

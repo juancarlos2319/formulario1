@@ -20,7 +20,7 @@ export const routes: Routes = [
       { path: 'personas', component: PersonasComponent, data: { titulo: 'Personas' } },
       { path: 'registro', component: RegistroComponent, data: { titulo: 'Registro' } },
       { path: 'registro/:id', component: RegistroComponent, data: { titulo: 'Editar persona' } },
-      { path: 'contactos', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'contactos', component: ContactosComponent, data: { titulo: 'Contactos de emergencia' } },
       { path: 'contactos/:id', component: ContactosComponent, data: { titulo: 'Contactos de emergencia' } }
     ]
   },
