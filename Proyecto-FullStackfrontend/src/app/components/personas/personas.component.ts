@@ -4,12 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
 import { Usuario } from '../../services/usuario.interface';
-import { DashboardNavComponent } from '../dashboard/dashboard-nav.component';
 
 @Component({
   selector: 'app-personas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DashboardNavComponent],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './personas.component.html',
   styleUrls: ['../shared/admin-pages.css', './personas.component.css']
 })

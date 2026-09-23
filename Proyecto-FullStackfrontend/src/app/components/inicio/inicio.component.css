@@ -1,4 +1,4 @@
-:host{display:block;margin:-1rem;font-family:'DM Sans',sans-serif;color:#27243a}
+:host{display:block;font-family:'DM Sans',sans-serif;color:#27243a}
 *{box-sizing:border-box}
 .login-shell{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;background:#fff}
 .intro{display:flex;flex-direction:column;justify-content:space-between;padding:48px clamp(30px,5vw,88px);background:radial-gradient(ellipse at 0 100%,#e6dcfb,transparent 65%),#f0ecfa}

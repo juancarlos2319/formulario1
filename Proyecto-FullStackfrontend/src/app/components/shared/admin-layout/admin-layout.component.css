@@ -1,0 +1,6 @@
+:host{display:block;min-height:100vh;background:#f8f8fb;color:#302a42;font:14px 'DM Sans',sans-serif}
+.main{margin-left:242px}header{height:76px;background:white;border-bottom:1px solid #ecebf2;display:flex;align-items:center;justify-content:space-between;padding:0 32px;font-size:12px;gap:12px}
+.muted{color:#928a9d}.tag{background:#f0ecfc;padding:7px 12px;border-radius:20px;color:#7155d9}
+main{padding:30px;max-width:1600px;margin:auto;box-sizing:border-box}
+footer{text-align:center;font-size:11px;color:#a298ad;padding:0 15px 28px}
+@media(max-width:760px){.main{margin:0}header{height:55px;padding:0 18px}main{padding:20px 15px}}

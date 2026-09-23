@@ -1,16 +1,15 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-dashboard-nav',
+  selector: 'app-sidebar',
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './dashboard-nav.component.html',
-  styleUrls: ['./dashboard-nav.component.css']
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css']
 })
-export class DashboardNavComponent {
-  @Input() total: number | null = null;
+export class SidebarComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 

@@ -2,13 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
-import { DashboardNavComponent } from './dashboard-nav.component';
 import { Usuario } from '../../services/usuario.interface';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, DashboardNavComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrls: ['../shared/admin-pages.css', './dashboard.component.css']
 })

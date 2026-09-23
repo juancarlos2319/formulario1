@@ -1,9 +1,4 @@
-<div class="dashboard-shell">
-  <app-dashboard-nav [total]="cargando ? null : usuarios.length"></app-dashboard-nav>
-  <div class="main">
-    <header class="topbar"><span>Mi espacio <span class="muted">/ Personas</span></span><a routerLink="/dashboard">← Volver al resumen</a></header>
-    <div class="content">
-      <section class="welcome"><div><p class="eyebrow">TU COMUNIDAD</p><h1>Personas registradas</h1><p>Busca, consulta y actualiza los datos de tu comunidad.</p></div><a *ngIf="!cargando && !mensajeError && usuarios.length < 20" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
+<section class="welcome"><div><p class="eyebrow">TU COMUNIDAD</p><h1>Personas registradas</h1><p>Busca, consulta y actualiza los datos de tu comunidad.</p></div><a *ngIf="!cargando && !mensajeError && usuarios.length < 20" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
       <div *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando || eliminando !== null">Reintentar</button></div>
       <div *ngIf="cargando" class="notice" role="status">Cargando personas…</div>
       <ng-container *ngIf="!cargando && (!mensajeError || usuarios.length > 0)">
@@ -22,7 +17,3 @@
           <div *ngIf="!usuariosFiltrados.length" class="empty"><h3>{{ usuarios.length ? 'No encontramos coincidencias' : 'Tu comunidad empieza aquí' }}</h3><p>{{ usuarios.length ? 'Prueba con otro nombre, teléfono o correo.' : 'Registra a tu primera persona para comenzar.' }}</p><button *ngIf="busqueda" type="button" (click)="busqueda = ''">Limpiar búsqueda</button></div>
         </section>
       </ng-container>
-      <footer>PortalSystem · Administración de personas</footer>
-    </div>
-  </div>
-</div>

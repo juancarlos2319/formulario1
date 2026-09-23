@@ -1,9 +1,4 @@
-<div class="registration-shell">
-  <app-dashboard-nav></app-dashboard-nav>
-  <div class="registration-main">
-    <header class="topbar"><span>Mi espacio <span>/ {{ editando ? 'Editar persona' : 'Registro' }}</span></span><a routerLink="/dashboard">← Volver al resumen</a></header>
-    <div class="page">
-      <div class="page-heading"><p class="eyebrow">ADMINISTRACIÓN DE PERSONAS</p><h1>{{ editando ? 'Actualiza su información' : 'Una nueva persona en tu comunidad' }}</h1><p>{{ editando ? 'Revisa y modifica los datos del registro.' : 'Completa sus datos y continúa con el contacto de emergencia.' }}</p></div>
+<div class="page-heading"><p class="eyebrow">ADMINISTRACIÓN DE PERSONAS</p><h1>{{ editando ? 'Actualiza su información' : 'Una nueva persona en tu comunidad' }}</h1><p>{{ editando ? 'Revisa y modifica los datos del registro.' : 'Completa sus datos y continúa con el contacto de emergencia.' }}</p></div>
       <div class="registration-layout">
         <aside class="guide" aria-label="Proceso de registro">
           <h2>{{ editando ? 'Cada detalle cuenta' : 'Empecemos por lo esencial' }}</h2>
@@ -163,7 +158,3 @@
   </form>
 </div>
       </div>
-      <footer>PortalSystem · Administración de personas</footer>
-    </div>
-  </div>
-</div>

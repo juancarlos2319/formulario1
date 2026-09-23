@@ -1,9 +1,4 @@
-<div class="dashboard-shell">
-  <app-dashboard-nav [total]="cargando ? null : usuarios.length"></app-dashboard-nav>
-  <div class="main">
-    <header class="topbar"><span>Mi espacio <span class="muted">/ Resumen</span></span><span class="tag">Administración</span></header>
-    <div class="content">
-      <section class="welcome"><div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div><a *ngIf="!cargando && !mensajeError && lugaresDisponibles > 0" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
+<section class="welcome"><div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div><a *ngIf="!cargando && !mensajeError && lugaresDisponibles > 0" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
 
       <div *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando">Reintentar</button></div>
       <div *ngIf="cargando" class="notice" role="status">Cargando información de tu comunidad…</div>
@@ -28,7 +23,3 @@
         </section>
 
       </ng-container>
-      <footer>PortalSystem · Administración de personas</footer>
-    </div>
-  </div>
-</div>
