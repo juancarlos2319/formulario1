@@ -2,11 +2,13 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'dashboard',
+    pathMatch: 'full'
+  },
+  {
     path: 'inicio',
-    loadComponent: () =>
-      import('./components/inicio/inicio.component').then(
-        (m) => m.InicioComponent
-      )
+    redirectTo: 'dashboard'
   },
   {
     path: 'registro',
@@ -30,8 +32,7 @@ export const routes: Routes = [
       )
   },
   {
-    path: '',
-    redirectTo: 'registro',
-    pathMatch: 'full'
+    path: '**',
+    redirectTo: 'dashboard'
   }
 ];
