@@ -45,7 +45,7 @@ export class ContactosComponent implements OnInit {
   ngOnInit(): void {
     this.personaId = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/personas']);
       return;
     }
     this.registroService.obtenerContactos(this.personaId).subscribe({
@@ -77,7 +77,7 @@ export class ContactosComponent implements OnInit {
       parentesco: valores['c' + i + '_parentesco']
     }));
     this.registroService.guardarContactos(this.personaId, contactos).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => this.router.navigate(['/personas']),
       error: () => {
         this.guardando = false;
         this.mensajeError = 'No se guardaron los contactos. Revisa los datos e inténtalo nuevamente.';

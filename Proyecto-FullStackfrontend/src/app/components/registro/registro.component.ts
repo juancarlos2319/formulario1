@@ -206,7 +206,7 @@ export class RegistroComponent implements OnInit {
     next: (res) => {
       this.guardando = false;
       if (this.editando) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/personas']);
         return;
       }
       // Redirige directamente al formulario de contactos pasando el ID generado

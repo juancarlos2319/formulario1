@@ -22,23 +22,11 @@
           </article>
           <article class="panel quick"><h2>Acciones rápidas</h2><p class="muted">Lo que necesitas, a un clic</p>
             <a *ngIf="lugaresDisponibles > 0" routerLink="/registro"><span class="tile">＋</span><div><strong>Nueva persona</strong><small>Crear un registro completo</small></div><span>→</span></a>
-            <a href="#personas" (click)="verPersonas($event)"><span class="tile green">♙</span><div><strong>Consultar personas</strong><small>Busca, edita y gestiona contactos</small></div><span>→</span></a>
-            <button type="button" (click)="cargarUsuarios()" [disabled]="eliminando !== null"><span class="tile blue">↻</span><div><strong>Actualizar listado</strong><small>Obtener la información más reciente</small></div><span>→</span></button>
+            <a routerLink="/personas"><span class="tile green">♙</span><div><strong>Consultar personas</strong><small>Busca, edita y gestiona contactos</small></div><span>→</span></a>
+            <button type="button" (click)="cargarUsuarios()"><span class="tile blue">↻</span><div><strong>Actualizar resumen</strong><small>Obtener la información más reciente</small></div><span>→</span></button>
           </article>
         </section>
-        <section class="panel people" id="personas" aria-labelledby="people-title">
-          <div class="table-heading"><div><h2 id="people-title">Personas registradas</h2><p class="muted">{{ usuariosFiltrados.length }} de {{ usuarios.length }} registros</p></div><label class="search"><span class="sr-only">Buscar personas</span><input type="search" [(ngModel)]="busqueda" placeholder="Buscar nombre, email, teléfono…" aria-label="Buscar por nombre, correo, teléfono, ocupación o ciudad"></label></div>
-          <div class="table-wrap" *ngIf="usuariosFiltrados.length">
-            <table><thead><tr><th scope="col">PERSONA</th><th scope="col">TELÉFONO</th><th scope="col">OCUPACIÓN</th><th scope="col">CIUDAD</th><th scope="col">ACCIONES</th></tr></thead>
-              <tbody><ng-container *ngFor="let u of usuariosFiltrados">
-                <tr><td><div class="person"><span class="avatar">{{ obtenerIniciales(u.nombre,u.apellido) }}</span><div><strong>{{ u.nombre }} {{ u.apellido }}</strong><small>{{ u.email || 'Sin correo' }}</small></div></div></td><td>{{ u.telefono || 'Sin teléfono' }}</td><td>{{ u.ocupacion || 'Sin ocupación' }}</td><td>{{ u.ciudad || 'Sin ciudad' }}</td>
-                  <td><div class="row-actions"><button type="button" (click)="detalle = detalle === u ? null : u" [attr.aria-expanded]="detalle === u" [attr.aria-label]="'Ver detalles de ' + u.nombre">Detalles</button><a *ngIf="u.id != null" [routerLink]="['/registro',u.id]">Editar</a><a *ngIf="u.id != null" [routerLink]="['/contactos',u.id]">Contactos</a><button type="button" class="danger" (click)="eliminar(u.id)" [disabled]="u.id == null || eliminando !== null" [attr.aria-label]="'Eliminar a ' + u.nombre">{{ eliminando === u.id ? 'Eliminando…' : 'Eliminar' }}</button></div></td></tr>
-                <tr *ngIf="detalle === u"><td colspan="5" class="details"><dl><div><dt>Dirección</dt><dd>{{ u.direccion || 'No registrada' }}</dd></div><div><dt>Género</dt><dd>{{ u.genero || 'No registrado' }}</dd></div><div><dt>Fecha de nacimiento</dt><dd>{{ u.fechaNacimiento || 'No registrada' }}</dd></div><div><dt>Contacto de emergencia</dt><dd>{{ u.contactoEmergenciaNombre || 'No registrado' }}<span *ngIf="u.contactoEmergenciaTelefono"> · {{ u.contactoEmergenciaTelefono }}</span><span *ngIf="u.contactoEmergenciaParentesco"> · {{ u.contactoEmergenciaParentesco }}</span></dd></div></dl></td></tr>
-              </ng-container></tbody>
-            </table>
-          </div>
-          <div *ngIf="!usuariosFiltrados.length" class="empty"><h3>{{ usuarios.length ? 'No encontramos coincidencias' : 'Tu comunidad empieza aquí' }}</h3><p>{{ usuarios.length ? 'Prueba con otro nombre, teléfono o correo.' : 'Registra a tu primera persona para comenzar.' }}</p><button *ngIf="busqueda" type="button" (click)="busqueda = ''">Limpiar búsqueda</button></div>
-        </section>
+
       </ng-container>
       <footer>PortalSystem · Administración de personas</footer>
     </div>
