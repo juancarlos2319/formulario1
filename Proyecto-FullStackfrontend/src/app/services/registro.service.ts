@@ -8,6 +8,7 @@ import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergenci
   providedIn: 'root'
 })
 export class RegistroService {
+  private readonly borradorKey = 'registro_borrador';
   // Borrador en memoria: no se persiste hasta completar ambos pasos.
   borrador: Usuario | null = null;
   contactosBorrador: ContactoEmergencia[] = [];
@@ -15,10 +16,33 @@ export class RegistroService {
   limpiarBorrador(): void {
     this.borrador = null;
     this.contactosBorrador = [];
+    sessionStorage.removeItem(this.borradorKey);
+  }
+
+  guardarBorrador(datos: Usuario): void {
+    this.borrador = datos;
+    sessionStorage.setItem(this.borradorKey, JSON.stringify(datos));
+  }
+
+  obtenerBorrador(): Usuario | null {
+    if (this.borrador) return this.borrador;
+    const almacenado = sessionStorage.getItem(this.borradorKey);
+    if (!almacenado) return null;
+    try {
+      this.borrador = JSON.parse(almacenado) as Usuario;
+      return this.borrador;
+    } catch {
+      sessionStorage.removeItem(this.borradorKey);
+      return null;
+    }
   }
 
   guardarRegistroCompleto(contactos: ContactoEmergencia[]): Observable<Usuario> {
-    return this.http.post<Usuario>(this.apiUrl, { ...this.borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() })
+    const borrador = this.obtenerBorrador();
+    if (!borrador) {
+      return throwError(() => new Error('Primero completa los datos de la persona registrada.'));
+    }
+    return this.http.post<Usuario>(this.apiUrl, { ...borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar el registro y sus contactos')));
   }
 

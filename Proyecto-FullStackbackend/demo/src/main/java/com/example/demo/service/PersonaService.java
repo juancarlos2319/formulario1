@@ -65,8 +65,9 @@ public class PersonaService {
         }
 
         Persona persona = convertirAEntidad(dto);
-        reemplazarContactos(persona, dto.getContactosEmergencia());
         Persona guardada = personaRepository.saveAndFlush(persona);
+        reemplazarContactos(guardada, dto.getContactosEmergencia());
+        personaRepository.saveAndFlush(guardada);
         return convertirADTO(guardada);
     }
 

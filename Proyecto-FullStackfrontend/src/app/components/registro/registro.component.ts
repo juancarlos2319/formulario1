@@ -34,8 +34,8 @@ export class RegistroComponent implements OnInit {
     this.initForm();
     this.cargarOcupaciones();
     const id = this.route.snapshot.paramMap.get('id');
-    if (id === null && this.registroService.borrador) {
-      const borrador = this.registroService.borrador;
+    const borrador = this.registroService.obtenerBorrador();
+    if (id === null && borrador) {
       this.registroForm.patchValue(borrador);
       this.cargarDireccion(borrador.direccion, borrador.ciudad);
     }
@@ -181,7 +181,7 @@ export class RegistroComponent implements OnInit {
   };
 
   if (!this.editando) {
-    this.registroService.borrador = payload;
+    this.registroService.guardarBorrador(payload);
     this.router.navigate(['/contactos']);
     return;
   }

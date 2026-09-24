@@ -38,6 +38,11 @@ export class ContactosComponent implements OnInit {
       this.personaId = +idParam;
       this.cargarContactos();
     } else {
+      if (!this.registroService.obtenerBorrador()) {
+        this.mensajeError = 'Primero completa los datos de la persona registrada.';
+        this.router.navigate(['/registro']);
+        return;
+      }
       this.agregarContacto();
     }
   }
