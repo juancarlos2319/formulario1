@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
@@ -91,7 +91,26 @@ export class RegistroComponent implements OnInit {
       telefonosAdicionales: this.fb.array([this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')])]),
 
       aceptaTerminos: [false, Validators.requiredTrue]
-    });
+    }, { validators: this.datosContactoDistintos });
+  }
+
+  private datosContactoDistintos(control: AbstractControl): ValidationErrors | null {
+    const email = control.get('email')?.value?.trim().toLowerCase();
+    const emailSecundario = control.get('correosAdicionales.0')?.value?.trim().toLowerCase();
+    const telefono = control.get('telefono')?.value?.trim();
+    const telefonoSecundario = control.get('telefonosAdicionales.0')?.value?.trim();
+    const errores: ValidationErrors = {};
+
+    if (email && emailSecundario && email === emailSecundario) errores['emailRepetido'] = true;
+    if (telefono && telefonoSecundario && telefono === telefonoSecundario) errores['telefonoRepetido'] = true;
+    return Object.keys(errores).length ? errores : null;
+  }
+
+  contactoRepetido(tipo: 'email' | 'telefono'): boolean {
+    const campoPrincipal = this.registroForm.get(tipo);
+    const campoSecundario = this.registroForm.get(tipo === 'email' ? 'correosAdicionales.0' : 'telefonosAdicionales.0');
+    const error = tipo === 'email' ? 'emailRepetido' : 'telefonoRepetido';
+    return this.registroForm.hasError(error) && !!(campoPrincipal?.touched || campoSecundario?.touched);
   }
 
   private cargarDireccion(direccion: string, ciudad: string): void {

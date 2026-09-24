@@ -115,11 +115,13 @@
           <label for="email">Email Principal *</label>
           <input autocomplete="email" id="email" type="email" formControlName="email" class="form-control" [attr.aria-invalid]="campoInvalido('email')" [attr.aria-describedby]="campoInvalido('email') ? 'email-error' : null" />
           <small class="field-error" id="email-error" *ngIf="campoInvalido('email')">{{ errorCampo('email') }}</small>
+          <small class="field-error" *ngIf="contactoRepetido('email')">El correo principal y el secundario deben ser diferentes.</small>
         </div>
         <div class="form-group">
           <label for="telefono">Teléfono Principal (10 dígitos) *</label>
           <input id="telefono" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" formControlName="telefono" class="form-control" [attr.aria-invalid]="campoInvalido('telefono')" [attr.aria-describedby]="campoInvalido('telefono') ? 'telefono-error' : null" />
           <small class="field-error" id="telefono-error" *ngIf="campoInvalido('telefono')">{{ errorCampo('telefono') }}</small>
+          <small class="field-error" *ngIf="contactoRepetido('telefono')">El telefono principal y el secundario deben ser diferentes.</small>
         </div>
       </div>
 
@@ -129,12 +131,14 @@
           <input id="email-secundario" type="email" [formControlName]="0" class="form-control" required
             [attr.aria-invalid]="campoInvalido('correosAdicionales.0')" aria-describedby="email-secundario-error">
           <small id="email-secundario-error" class="field-error" *ngIf="campoInvalido('correosAdicionales.0')">{{ errorCampo('correosAdicionales.0') }}</small>
+          <small class="field-error" *ngIf="contactoRepetido('email')">El correo secundario debe ser diferente.</small>
         </div>
         <div class="form-group" formArrayName="telefonosAdicionales">
           <label for="telefono-secundario">Teléfono secundario (10 dígitos) *</label>
           <input id="telefono-secundario" type="tel" inputmode="numeric" maxlength="10" [formControlName]="0" class="form-control" required
             [attr.aria-invalid]="campoInvalido('telefonosAdicionales.0')" aria-describedby="telefono-secundario-error">
           <small id="telefono-secundario-error" class="field-error" *ngIf="campoInvalido('telefonosAdicionales.0')">{{ errorCampo('telefonosAdicionales.0') }}</small>
+          <small class="field-error" *ngIf="contactoRepetido('telefono')">El telefono secundario debe ser diferente.</small>
         </div>
       </div>
     </fieldset>
