@@ -53,6 +53,9 @@ export class ContactosComponent implements OnInit {
       idContacto: [datos?.idContacto ?? null],
       nombre: [datos?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
       apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
+      fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
+      genero: [datos?.genero ?? '', Validators.required],
+      email: [datos?.email ?? '', [Validators.required, Validators.email]],
       telefono: [datos?.telefono ?? '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
@@ -86,6 +89,7 @@ export class ContactosComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cargar contactos:', err);
+          this.mensajeError = err instanceof Error ? err.message : 'No se pudieron cargar los contactos.';
           if (this.contactos.length === 0) {
             this.agregarContacto();
           }
@@ -111,13 +115,15 @@ export class ContactosComponent implements OnInit {
     solicitud
       .subscribe({
         next: () => {
-          this.mensajeExito = '¡Contactos guardados exitosamente!';
+          this.mensajeExito = 'Contactos guardados correctamente.';
           this.registroService.limpiarBorrador();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          this.router.navigate(['/personas']);
         },
         error: (err) => {
           console.error('Error al guardar contactos:', err);
-          this.mensajeError = 'Ocurrió un error al guardar los contactos. Revisa los datos ingresados.';
+          this.mensajeError = err instanceof Error
+            ? err.message
+            : 'Ocurrio un error al guardar los contactos. Revisa los datos ingresados.';
         }
       });
   }
@@ -125,7 +131,7 @@ export class ContactosComponent implements OnInit {
   private cargarParentescos(): void {
     this.registroService.obtenerParentescos().subscribe({
       next: (parentescos) => this.parentescos = parentescos,
-      error: () => this.mensajeError = 'No se pudieron cargar los parentescos.'
+      error: (err) => this.mensajeError = err instanceof Error ? err.message : 'No se pudieron cargar los parentescos.'
     });
   }
 }

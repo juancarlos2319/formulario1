@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
-    List<Persona> findByTitularTrueAndFechaBajaIsNull();
-    long countByTitularTrueAndFechaBajaIsNull();
+    List<Persona> findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
+    long countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
 }

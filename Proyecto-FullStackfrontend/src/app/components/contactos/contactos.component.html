@@ -37,6 +37,25 @@
         </div>
 
         <div class="field">
+          <label [for]="'fechaNacimiento_' + i">Fecha de nacimiento *</label>
+          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento">
+        </div>
+
+        <div class="field">
+          <label [for]="'genero_' + i">Genero *</label>
+          <select [id]="'genero_' + i" formControlName="genero">
+            <option value="">Selecciona un genero</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label [for]="'email_' + i">Correo electronico *</label>
+          <input [id]="'email_' + i" type="email" formControlName="email" placeholder="correo@ejemplo.com">
+        </div>
+
+        <div class="field">
           <label [for]="'telefono_' + i">Teléfono (10 dígitos) *</label>
           <input [id]="'telefono_' + i" type="tel" formControlName="telefono" placeholder="5512345678">
         </div>

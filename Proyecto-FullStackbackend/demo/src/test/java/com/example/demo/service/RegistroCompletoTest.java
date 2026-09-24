@@ -41,7 +41,7 @@ class RegistroCompletoTest {
     }
 
     private ContactoDTO nuevo(String nombre) {
-        return new ContactoDTO(null, nombre, "Pérez", "5511111111", 9L, null);
+        return new ContactoDTO(null, nombre, "PÃƒÂ©rez", "5511111111", 9L, null);
     }
     private ContactoDTO existente(long id) {
         return new ContactoDTO(id, null, null, null, 9L, null);
@@ -78,7 +78,7 @@ class RegistroCompletoTest {
         FormularioDTO resultado = service.guardar(datos(1));
         assertEquals(1, resultado.getContactosEmergencia().size());
         assertNotNull(resultado.getContactosEmergencia().getFirst().idContacto());
-        assertEquals("Pérez", resultado.getContactosEmergencia().getFirst().apellido());
+        assertEquals("PÃƒÂ©rez", resultado.getContactosEmergencia().getFirst().apellido());
         assertEquals("Amigo(a)", resultado.getContactosEmergencia().getFirst().parentesco());
     }
     @Test void permiteMasDeDosContactosSinContarlosComoTitulares() {
@@ -86,16 +86,16 @@ class RegistroCompletoTest {
         assertEquals(4, resultado.getContactosEmergencia().size());
         verify(personas, times(4)).save(argThat(p -> !p.isTitular() && p.getTelefonos().size() == 1));
         verify(personas).saveAndFlush(argThat(p -> p.isTitular() && p.getCorreos().size() == 2));
-        verify(personas).countByTitularTrueAndFechaBajaIsNull();
+        verify(personas).countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
         assertEquals(List.of("secundario@example.com"), resultado.getCorreosAdicionales());
     }
-    @Test void compartePersonaEntreTitularesSinModificarSusDatos() {
+    @Test void compartePersonaEntreTitularesYActualizaSusDatos() {
         Persona a = persona(1, true), b = persona(2, true), c = persona(3, false);
         service.guardarContactos(1L, List.of(existente(3)));
         service.guardarContactos(2L, List.of(new ContactoDTO(3L, "No sobrescribir", "Otro", "0000000000", 9L, null)));
         assertSame(c, a.getContactosEmergencia().getFirst().getContacto());
         assertSame(c, b.getContactosEmergencia().getFirst().getContacto());
-        assertEquals("Nombre 3", c.getNombre());
+        assertEquals("No sobrescribir", c.getNombre());
         verify(personas, never()).save(c);
     }
     @Test void reemplazarQuitaSoloRelacionYSostieneLasConservadas() {
@@ -122,7 +122,7 @@ class RegistroCompletoTest {
     @Test void rechazaParentescoInexistente() {
         persona(1,true);
         assertThrows(ResponseStatusException.class, () -> service.guardarContactos(1L,
-                List.of(new ContactoDTO(null,"Ana","Pérez","5511111111",99L,null))));
+                List.of(new ContactoDTO(null,"Ana","PÃƒÂ©rez","5511111111",99L,null))));
         verify(personas, never()).save(any());
     }
     @Test void exigeApellidoParaNuevaPersonaContacto() {
@@ -137,12 +137,12 @@ class RegistroCompletoTest {
     }
     @Test void listaSoloTitulares() {
         Persona titular = persona(1,true);
-        when(personas.findByTitularTrueAndFechaBajaIsNull()).thenReturn(List.of(titular));
+        when(personas.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(List.of(titular));
         assertEquals(1,service.obtenerTodos().size());
-        verify(personas).findByTitularTrueAndFechaBajaIsNull();
+        verify(personas).findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
     }
     @Test void limiteVeinteTitulares() {
-        when(personas.countByTitularTrueAndFechaBajaIsNull()).thenReturn(20L);
+        when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(20L);
         assertThrows(RuntimeException.class, () -> service.guardar(datos(1)));
         verify(personas, never()).save(any());
     }
@@ -152,3 +152,4 @@ class RegistroCompletoTest {
         verify(personas, never()).save(any());
     }
 }
+

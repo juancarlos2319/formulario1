@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 
 export interface ResultadoCodigoPostal {
   asentamiento: string;
@@ -20,6 +20,9 @@ export class CodigoPostalService {
   consultar(codigoPostal: string): Observable<RespuestaCodigoPostal> {
     return this.http.get<RespuestaCodigoPostal>(this.apiUrl, {
       params: { cp: codigoPostal }
-    });
+    }).pipe(catchError((error: HttpErrorResponse) => {
+      console.error('CodigoPostalService: fallo al consultar el codigo postal.', error);
+      return throwError(() => new Error('No se pudo consultar el codigo postal.'));
+    }));
   }
 }
