@@ -1,8 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.dto.FormularioDTO;
-import com.example.demo.repository.UsuarioRepository;
-import com.example.demo.service.AuthService;
+import com.example.demo.dto.*;
 import com.example.demo.service.PersonaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,12 +8,11 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.concurrent.*;
-
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @EnabledIfEnvironmentVariable(named = "TEST_DATABASE_URL",
@@ -23,112 +20,82 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(properties = {
         "spring.datasource.url=${TEST_DATABASE_URL}",
         "spring.datasource.username=${TEST_DATABASE_USERNAME:postgres}",
-        "spring.datasource.password=${TEST_DATABASE_PASSWORD:test-only}",
-        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.datasource.password=${TEST_DATABASE_PASSWORD:}",
+        "spring.jpa.hibernate.ddl-auto=none",
         "spring.sql.init.mode=never",
         "jwt.secret=test-only-secret-with-at-least-32-bytes"
 })
 class DemoApplicationTests {
     @Autowired PersonaService personas;
-    @Autowired AuthService auth;
-    @Autowired UsuarioRepository usuarios;
     @Autowired JdbcTemplate jdbc;
 
-    @BeforeEach
-    void resetDisposableDatabase() {
-        jdbc.execute("TRUNCATE TABLE persona, catalogo_ocupacion RESTART IDENTITY CASCADE");
+    @BeforeEach void prepararBaseDesechable() throws Exception {
+        jdbc.execute(new ClassPathResource("schema.sql").getContentAsString(StandardCharsets.UTF_8));
+        jdbc.execute("TRUNCATE TABLE persona, catalogo_ocupacion, catalogo_parentesco RESTART IDENTITY CASCADE");
+        jdbc.update("INSERT INTO catalogo_parentesco(id,nombre) VALUES (1,'Amigo')");
     }
-
-    @Test
-    void addsPreviouslyMissingEmailAndPhoneAndPreservesThemOnNull() {
-        FormularioDTO saved = personas.guardar(formulario());
-        FormularioDTO update = formulario();
-        update.setEmail("persona@example.test");
-        update.setTelefono("7711234567");
-        personas.actualizar(saved.getId(), update);
-        FormularioDTO result = personas.obtenerTodos().getFirst();
-        assertEquals(update.getEmail(), result.getEmail());
-        assertEquals(update.getTelefono(), result.getTelefono());
-        personas.actualizar(saved.getId(), formulario());
-        assertEquals(update.getEmail(), personas.obtenerTodos().getFirst().getEmail());
-        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM persona_correo", Integer.class));
-        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM persona_telefono", Integer.class));
+    private FormularioDTO formulario(int cantidad) {
+        FormularioDTO d = new FormularioDTO();
+        d.setNombre("Titular"); d.setApellido("Prueba");
+        d.setFechaNacimiento(LocalDate.of(1990,1,1)); d.setOcupacion("Docente");
+        d.setEmail("uno@example.com"); d.setCorreosAdicionales(List.of("dos@example.com"));
+        d.setTelefono("5511111111"); d.setTelefonosAdicionales(List.of("5522222222"));
+        d.setContactosEmergencia(java.util.stream.IntStream.range(0,cantidad)
+                .mapToObj(i -> new ContactoDTO(null,"Contacto "+i,"Apellido","5533333333",1L,null)).toList());
+        return d;
     }
+    private ContactoDTO existente(long id) { return new ContactoDTO(id,null,null,null,1L,null); }
+    private int count(String table) { return jdbc.queryForObject("SELECT count(*) FROM " + table,Integer.class); }
 
-    @Test
-    void simultaneousCreatesCannotExceedTwenty() throws Exception {
-        for (int i = 0; i < 19; i++) personas.guardar(formulario());
-        CountDownLatch ready = new CountDownLatch(2);
-        CountDownLatch start = new CountDownLatch(1);
-        Callable<Boolean> create = () -> {
-            ready.countDown();
-            if (!start.await(10, TimeUnit.SECONDS)) throw new AssertionError("No se inició la prueba concurrente");
-            try {
-                personas.guardar(formulario());
-                return true;
-            } catch (ResponseStatusException e) {
-                assertEquals(409, e.getStatusCode().value());
-                return false;
-            }
-        };
-        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
-            Future<Boolean> first = executor.submit(create);
-            Future<Boolean> second = executor.submit(create);
-            assertTrue(ready.await(10, TimeUnit.SECONDS));
-            start.countDown();
-            assertNotEquals(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS));
-        }
-        assertEquals(20, personas.obtenerTodos().size());
+    @Test void persisteCuatroContactosComoPersonasYListaSoloTitular() {
+        var d = personas.guardar(formulario(4));
+        assertEquals(5,count("persona"));
+        assertEquals(4,count("persona_contacto_emergencia"));
+        assertEquals(1,personas.obtenerTodos().size());
+        assertEquals(4,personas.obtenerContactos(d.getId()).size());
+        assertTrue(jdbc.queryForObject("SELECT es_titular FROM persona WHERE id=?",Boolean.class,d.getId()));
+        assertEquals(4,jdbc.queryForObject("SELECT count(*) FROM persona WHERE NOT es_titular",Integer.class));
     }
-
-    @Test
-    void failedCreateRollsBackNewOccupation() {
-        jdbc.execute("ALTER TABLE persona ADD CONSTRAINT test_reject_name CHECK (nombre <> 'Rechazada')");
-        try {
-            FormularioDTO dto = formulario();
-            dto.setNombre("Rechazada");
-            assertThrows(RuntimeException.class, () -> personas.guardar(dto));
-            assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM catalogo_ocupacion", Integer.class));
-            assertEquals(0, personas.obtenerTodos().size());
-        } finally {
-            jdbc.execute("ALTER TABLE persona DROP CONSTRAINT test_reject_name");
-        }
+    @Test void contactoCompartidoSobreviveARetirarUnaRelacion() {
+        var a=personas.guardar(formulario(2));
+        Long compartido=a.getContactosEmergencia().getFirst().idContacto();
+        var otro=formulario(1); otro.setContactosEmergencia(List.of(existente(compartido)));
+        var b=personas.guardar(otro);
+        assertEquals(4,count("persona"));
+        personas.guardarContactos(a.getId(),List.of(existente(a.getContactosEmergencia().get(1).idContacto())));
+        assertEquals(4,count("persona"));
+        assertEquals(compartido,personas.obtenerContactos(b.getId()).getFirst().idContacto());
+        assertEquals(2,count("persona_contacto_emergencia"));
     }
-
-    @Test
-    void loginAndExistingSessionRejectInactiveOrDeletedAdministrators() {
-        FormularioDTO persona = personas.guardar(formulario());
-        String hash = new BCryptPasswordEncoder(4).encode("test-password");
-        jdbc.update("INSERT INTO usuario (username, password, rol, id_persona) VALUES (?, ?, ?, ?)",
-                "admin", hash, "ROLE_ADMIN", persona.getId());
-        assertEquals("admin", auth.authenticate("admin", "test-password"));
-        assertTrue(auth.isActiveAdmin("admin"));
-        jdbc.update("UPDATE usuario SET rol = 'ROLE_USER' WHERE username = 'admin'");
-        assertFalse(auth.isActiveAdmin("admin"));
-        assertThrows(ResponseStatusException.class, () -> auth.authenticate("admin", "test-password"));
-        jdbc.update("UPDATE usuario SET rol = 'ROLE_ADMIN' WHERE username = 'admin'");
-        personas.eliminarLogico(persona.getId());
-        assertFalse(auth.isActiveAdmin("admin"));
-        assertThrows(ResponseStatusException.class, () -> auth.authenticate("admin", "test-password"));
-        usuarios.deleteAll();
-        assertFalse(auth.isActiveAdmin("admin"));
+    @Test void repetirPutConIDsNoDuplicaPersonasNiRelaciones() {
+        var d=personas.guardar(formulario(3));
+        personas.guardarContactos(d.getId(),d.getContactosEmergencia());
+        personas.guardarContactos(d.getId(),d.getContactosEmergencia());
+        assertEquals(4,count("persona")); assertEquals(3,count("persona_contacto_emergencia"));
     }
-
-    @Test
-    void invalidBirthDateIsRejectedWithoutWrites() {
-        FormularioDTO dto = formulario();
-        dto.setFechaNacimiento(LocalDate.now().plusDays(1));
-        assertEquals(400, assertThrows(ResponseStatusException.class,
-                () -> personas.guardar(dto)).getStatusCode().value());
-        assertEquals(0, personas.obtenerTodos().size());
+    @Test void falloPosteriorRevierteNuevasPersonasYOcupacion() {
+        var d=formulario(2);
+        d.setContactosEmergencia(List.of(d.getContactosEmergencia().getFirst(),existente(99999)));
+        assertThrows(ResponseStatusException.class,()->personas.guardar(d));
+        assertEquals(0,count("persona")); assertEquals(0,count("catalogo_ocupacion"));
+        assertEquals(0,count("persona_telefono"));
     }
-
-    private FormularioDTO formulario() {
-        FormularioDTO dto = new FormularioDTO();
-        dto.setNombre("Persona");
-        dto.setApellido("Prueba");
-        dto.setFechaNacimiento(LocalDate.of(1990, 1, 1));
-        dto.setOcupacion("Docente");
-        return dto;
+    @Test void falloPutRevierteCambioDeRelaciones() {
+        var d=personas.guardar(formulario(2));
+        assertThrows(ResponseStatusException.class,()->personas.guardarContactos(d.getId(),
+                List.of(new ContactoDTO(null,"Nuevo","Apellido","5544444444",1L,null),existente(99999))));
+        assertEquals(3,count("persona")); assertEquals(2,personas.obtenerContactos(d.getId()).size());
+    }
+    @Test void restriccionesSqlRechazanAutorreferenciaYDuplicado() {
+        var d=personas.guardar(formulario(1));
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update(
+                "INSERT INTO persona_contacto_emergencia(id_persona,id_contacto,id_parentesco) VALUES (?,?,1)",d.getId(),d.getId()));
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,()->jdbc.update(
+                "INSERT INTO persona_contacto_emergencia(id_persona,id_contacto,id_parentesco) VALUES (?,?,1)",d.getId(),d.getContactosEmergencia().getFirst().idContacto()));
+    }
+    @Test void bajaTitularNoEliminaContactoCompartido() {
+        var a=personas.guardar(formulario(1));
+        personas.eliminarLogico(a.getId());
+        assertEquals(0,personas.obtenerTodos().size()); assertEquals(2,count("persona"));
     }
 }

@@ -16,38 +16,20 @@ public class PersonaService {
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.ContactoDTO> obtenerContactos(Long id) {
-        Persona persona = personaRepository.findById(id)
-                .filter(p -> p.getFechaBaja() == null)
-                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-                        org.springframework.http.HttpStatus.NOT_FOUND, "Persona no encontrada"));
-        return persona.getContactosEmergencia().stream()
-                .map(c -> new com.example.demo.dto.ContactoDTO(c.getNombre(), c.getTelefono(), c.getParentesco()))
-                .toList();
+        return titularActivo(id).getContactosEmergencia().stream().map(this::contactoADTO).toList();
     }
 
     @org.springframework.transaction.annotation.Transactional
     public List<com.example.demo.dto.ContactoDTO> guardarContactos(Long id, List<com.example.demo.dto.ContactoDTO> contactos) {
         validarContactos(contactos);
-        Persona persona = personaRepository.findById(id)
-                .filter(p -> p.getFechaBaja() == null)
-                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
-                        org.springframework.http.HttpStatus.NOT_FOUND, "Persona no encontrada"));
-        var existentes = persona.getContactosEmergencia();
-        for (int i = 0; i < 2; i++) {
-            ContactoEmergencia contacto;
-            if (i < existentes.size()) contacto = existentes.get(i);
-            else {
-                contacto = new ContactoEmergencia();
-                contacto.setPersona(persona);
-                existentes.add(contacto);
-            }
-            contacto.setNombre(contactos.get(i).nombre().trim());
-            contacto.setTelefono(contactos.get(i).telefono());
-            contacto.setParentesco(contactos.get(i).parentesco().trim());
-        }
-        personaRepository.save(persona);
-        return contactos;
+        Persona titular = titularActivo(id);
+        reemplazarContactos(titular, contactos);
+        personaRepository.saveAndFlush(titular);
+        return titular.getContactosEmergencia().stream().map(this::contactoADTO).toList();
     }
+
+    @Autowired
+    private com.example.demo.repository.CatalogoParentescoRepository parentescoRepository;
 
     @Autowired
     private PersonaRepository personaRepository;
@@ -55,40 +37,36 @@ public class PersonaService {
     @Autowired
     private CatalogoOcupacionRepository ocupacionRepository;
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<FormularioDTO> obtenerTodos() {
-        return personaRepository.findByFechaBajaIsNull().stream()
+        return personaRepository.findByTitularTrueAndFechaBajaIsNull().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     @org.springframework.transaction.annotation.Transactional
     public FormularioDTO guardar(FormularioDTO dto) {
+        validarTitular(dto);
         validarContactos(dto.getContactosEmergencia());
         validarComunicacion(dto);
         // Regla de Negocio: Máximo 20 personas activas
-        long personasActivas = personaRepository.countByFechaBajaIsNull();
+        long personasActivas = personaRepository.countByTitularTrueAndFechaBajaIsNull();
         if (personasActivas >= 20) {
             throw new RuntimeException("Límite alcanzado: No se pueden registrar más de 20 personas activas en el sistema.");
         }
 
         Persona persona = convertirAEntidad(dto);
-        for (var datos : dto.getContactosEmergencia()) {
-            ContactoEmergencia contacto = new ContactoEmergencia();
-            contacto.setPersona(persona);
-            contacto.setNombre(datos.nombre().trim());
-            contacto.setTelefono(datos.telefono());
-            contacto.setParentesco(datos.parentesco().trim());
-            persona.getContactosEmergencia().add(contacto);
-        }
+        persona.setTitular(true);
+        reemplazarContactos(persona, dto.getContactosEmergencia());
         Persona guardada = personaRepository.saveAndFlush(persona);
         return convertirADTO(guardada);
     }
 
     @org.springframework.transaction.annotation.Transactional
     public FormularioDTO actualizar(Long id, FormularioDTO dto) {
+        validarTitular(dto);
         validarComunicacion(dto);
-        Persona persona = personaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro no encontrado con el ID: " + id));
+        Persona persona = titularActivo(id);
 
         persona.setNombre(dto.getNombre());
         persona.setApellido(dto.getApellido());
@@ -114,9 +92,9 @@ public class PersonaService {
         return convertirADTO(actualizada);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void eliminarLogico(Long id) {
-        Persona persona = personaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro no encontrado con el ID: " + id));
+        Persona persona = titularActivo(id);
         persona.setFechaBaja(LocalDate.now());
         personaRepository.save(persona);
     }
@@ -136,10 +114,13 @@ public class PersonaService {
             dto.setOcupacion(p.getOcupacion().getNombre());
         }
 
-        if (p.getContactoEmergencia() != null) {
-            dto.setContactoEmergenciaNombre(p.getContactoEmergencia().getNombre());
-            dto.setContactoEmergenciaTelefono(p.getContactoEmergencia().getTelefono());
-            dto.setContactoEmergenciaParentesco(p.getContactoEmergencia().getParentesco());
+        List<com.example.demo.dto.ContactoDTO> contactos = p.getContactosEmergencia().stream()
+                .map(this::contactoADTO).toList();
+        dto.setContactosEmergencia(contactos);
+        if (!contactos.isEmpty()) {
+            dto.setContactoEmergenciaNombre(contactos.get(0).nombre());
+            dto.setContactoEmergenciaTelefono(contactos.get(0).telefono());
+            dto.setContactoEmergenciaParentesco(contactos.get(0).parentesco());
         }
 
         if (p.getCorreos() != null && !p.getCorreos().isEmpty()) {
@@ -182,14 +163,98 @@ public class PersonaService {
         return p;
     }
 
-    private void validarContactos(List<com.example.demo.dto.ContactoDTO> contactos) {
-        if (contactos == null || contactos.size() != 2 || contactos.stream().anyMatch(c ->
-                c == null || c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 150 ||
-                c.telefono() == null || !c.telefono().matches("[0-9]{10}") ||
-                c.parentesco() == null || c.parentesco().isBlank() || c.parentesco().length() > 50)) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.BAD_REQUEST, "Se requieren dos contactos completos con teléfonos de 10 dígitos");
+    private void validarTitular(FormularioDTO dto) {
+        if (dto == null || dto.getNombre() == null || dto.getNombre().isBlank() || dto.getNombre().length() > 100 ||
+                dto.getApellido() == null || dto.getApellido().isBlank() || dto.getApellido().length() > 100 ||
+                dto.getFechaNacimiento() == null) {
+            throw invalido("El titular requiere nombre, apellido (hasta 100 caracteres) y fecha de nacimiento");
         }
+    }
+
+    private Persona titularActivo(Long id) {
+        return personaRepository.findById(id)
+                .filter(p -> p.isTitular() && p.getFechaBaja() == null)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Titular no encontrado"));
+    }
+
+    private org.springframework.web.server.ResponseStatusException invalido(String mensaje) {
+        return new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST, mensaje);
+    }
+
+    private void validarContactos(List<com.example.demo.dto.ContactoDTO> contactos) {
+        if (contactos == null || contactos.isEmpty()) throw invalido("Se requiere al menos un contacto de emergencia");
+        java.util.Set<Long> ids = new java.util.HashSet<>();
+        for (var c : contactos) {
+            if (c == null) throw invalido("El contacto no puede ser nulo");
+            if (c.idContacto() != null) {
+                if (c.idContacto() <= 0 || !ids.add(c.idContacto()))
+                    throw invalido("Los contactos existentes deben tener IDs positivos y no repetidos");
+            } else if (c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 100 ||
+                    c.apellido() == null || c.apellido().isBlank() || c.apellido().length() > 100 ||
+                    c.telefono() == null || !c.telefono().matches("[0-9]{10}")) {
+                throw invalido("El nuevo contacto requiere nombre y apellido de hasta 100 caracteres y teléfono de 10 dígitos");
+            }
+            if (c.idParentesco() != null) {
+                if (c.idParentesco() <= 0) throw invalido("ID de parentesco inválido");
+            } else if (c.parentesco() == null || c.parentesco().isBlank() || c.parentesco().length() > 50) {
+                throw invalido("Se requiere un parentesco del catálogo");
+            }
+        }
+    }
+
+    private CatalogoParentesco resolverParentesco(com.example.demo.dto.ContactoDTO dto) {
+        return (dto.idParentesco() != null ? parentescoRepository.findById(dto.idParentesco()) :
+                parentescoRepository.findByNombre(dto.parentesco().trim()))
+                .orElseThrow(() -> invalido("Parentesco inexistente"));
+    }
+
+    private void reemplazarContactos(Persona titular, List<com.example.demo.dto.ContactoDTO> datos) {
+        var conservadas = new java.util.ArrayList<ContactoEmergencia>();
+        for (var dto : datos) {
+            if (dto.idContacto() != null && dto.idContacto().equals(titular.getId()))
+                throw invalido("Una persona no puede ser su propio contacto");
+            CatalogoParentesco parentesco = resolverParentesco(dto);
+            Persona contacto;
+            if (dto.idContacto() != null) {
+                contacto = personaRepository.findById(dto.idContacto())
+                        .filter(p -> p.getFechaBaja() == null)
+                        .orElseThrow(() -> invalido("La persona de contacto no existe o está dada de baja"));
+                // Un ID reutiliza la persona; no modifica sus datos compartidos desde esta relación.
+            } else {
+                contacto = new Persona();
+                contacto.setTitular(false);
+                contacto.setNombre(dto.nombre().trim());
+                contacto.setApellido(dto.apellido().trim());
+                PersonaTelefono telefono = new PersonaTelefono();
+                telefono.setPersona(contacto);
+                telefono.setTelefono(dto.telefono());
+                contacto.getTelefonos().add(telefono);
+                contacto = personaRepository.save(contacto);
+            }
+            Persona personaContacto = contacto;
+            ContactoEmergencia relacion = titular.getContactosEmergencia().stream()
+                    .filter(r -> dto.idContacto() != null && dto.idContacto().equals(r.getContacto().getId()))
+                    .findFirst().orElseGet(() -> {
+                        ContactoEmergencia nueva = new ContactoEmergencia();
+                        nueva.setPersona(titular);
+                        nueva.setContacto(personaContacto);
+                        titular.getContactosEmergencia().add(nueva);
+                        return nueva;
+                    });
+            relacion.setParentesco(parentesco);
+            conservadas.add(relacion);
+        }
+        // orphanRemoval elimina únicamente relaciones, nunca personas compartidas.
+        titular.getContactosEmergencia().removeIf(r -> !conservadas.contains(r));
+    }
+
+    private com.example.demo.dto.ContactoDTO contactoADTO(ContactoEmergencia relacion) {
+        Persona contacto = relacion.getContacto();
+        String telefono = contacto.getTelefonos().isEmpty() ? null : contacto.getTelefonos().get(0).getTelefono();
+        return new com.example.demo.dto.ContactoDTO(contacto.getId(), contacto.getNombre(), contacto.getApellido(),
+                telefono, relacion.getParentesco().getId(), relacion.getParentesco().getNombre());
     }
 
     private void validarComunicacion(FormularioDTO dto) {

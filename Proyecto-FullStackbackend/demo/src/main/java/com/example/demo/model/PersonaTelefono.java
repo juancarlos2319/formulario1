@@ -13,7 +13,7 @@ public class PersonaTelefono {
     @JoinColumn(name = "id_persona", nullable = false)
     private Persona persona;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String telefono;
 
     public PersonaTelefono() {}

@@ -18,7 +18,7 @@ public class Persona {
     @Column(nullable = false, length = 100)
     private String apellido;
 
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
     @Column(length = 50)
@@ -33,8 +33,11 @@ public class Persona {
     @Column(name = "fecha_baja")
     private LocalDate fechaBaja;
 
+    @Column(name = "es_titular", nullable = false)
+    private boolean titular;
+
     @ManyToOne
-    @JoinColumn(name = "id_ocupacion", nullable = false)
+    @JoinColumn(name = "id_ocupacion")
     private CatalogoOcupacion ocupacion;
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -50,6 +53,9 @@ public class Persona {
     private List<PersonaTelefono> telefonos = new ArrayList<>();
 
     public Persona() {}
+
+    public boolean isTitular() { return titular; }
+    public void setTitular(boolean titular) { this.titular = titular; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

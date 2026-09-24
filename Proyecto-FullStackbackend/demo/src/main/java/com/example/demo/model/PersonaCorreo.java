@@ -13,7 +13,7 @@ public class PersonaCorreo {
     @JoinColumn(name = "id_persona", nullable = false)
     private Persona persona;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 150)
     private String correo;
 
     public PersonaCorreo() {}
