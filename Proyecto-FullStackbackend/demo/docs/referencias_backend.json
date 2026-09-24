@@ -1,0 +1,1406 @@
+[
+  {
+    "archivo": "src/main/java/com/example/demo/DemoApplication.java",
+    "lineas": 13,
+    "sha256": "93ed6cd1967aa82c8c31d57371b8d45d879593fd1359ba4c859c82691792d1c5",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@SpringBootApplication",
+        "explicacion": "Activa configuración automática y descubrimiento de componentes."
+      },
+      {
+        "linea": 10,
+        "ancla": "SpringApplication.run",
+        "explicacion": "Inicia el contexto de aplicación y el servidor."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/controller/AuthController.java",
+    "lineas": 61,
+    "sha256": "1d12c1bec983b913d3420ce43bf4b14a19f6fbd827548ff63491eb790951203b",
+    "referencias": [
+      {
+        "linea": 14,
+        "ancla": "@RequestMapping",
+        "explicacion": "Agrupa las rutas bajo /api/auth."
+      },
+      {
+        "linea": 27,
+        "ancla": "@PostMapping",
+        "explicacion": "Define POST /api/auth/login."
+      },
+      {
+        "linea": 29,
+        "ancla": "String username =",
+        "explicacion": "Lee username del cuerpo JSON; la línea siguiente lee password."
+      },
+      {
+        "linea": 34,
+        "ancla": "findByUsername",
+        "explicacion": "Busca la cuenta. El bloque siguiente responde 404 si no existe."
+      },
+      {
+        "linea": 43,
+        "ancla": "passwordEncoder.matches",
+        "explicacion": "Compara la contraseña recibida con BCrypt. Si falla se devuelve 401."
+      },
+      {
+        "linea": 53,
+        "ancla": "jwtUtil.generateToken",
+        "explicacion": "Emite un JWT con el nombre de usuario."
+      },
+      {
+        "linea": 55,
+        "ancla": "return ResponseEntity.ok",
+        "explicacion": "Devuelve message, username y token. No hay comprobación de rol ni de baja en el método."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/controller/FormularioController.java",
+    "lineas": 90,
+    "sha256": "b9188b48b182b6757877238bc6afef345c07f55cded2a7bf1b5846bfba820372",
+    "referencias": [
+      {
+        "linea": 13,
+        "ancla": "@RequestMapping",
+        "explicacion": "Prefijo /api/formularios."
+      },
+      {
+        "linea": 14,
+        "ancla": "@CrossOrigin",
+        "explicacion": "Permite el origen localhost:4200 y los métodos/encabezados declarados."
+      },
+      {
+        "linea": 21,
+        "ancla": "@GetMapping(\"/{id}/contactos\")",
+        "explicacion": "Consulta contactos de una persona identificada por la URL."
+      },
+      {
+        "linea": 26,
+        "ancla": "@PutMapping(\"/{id}/contactos\")",
+        "explicacion": "Recibe una lista de ContactoDTO para guardarla."
+      },
+      {
+        "linea": 36,
+        "ancla": "obtenerFormularios()",
+        "explicacion": "Lista activos; captura RuntimeException como 500 con texto."
+      },
+      {
+        "linea": 50,
+        "ancla": "guardarFormulario(",
+        "explicacion": "Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400."
+      },
+      {
+        "linea": 64,
+        "ancla": "actualizarFormulario(",
+        "explicacion": "Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación."
+      },
+      {
+        "linea": 78,
+        "ancla": "eliminarFormulario(",
+        "explicacion": "Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/controller/OcupacionController.java",
+    "lineas": 20,
+    "sha256": "6ea9621739b41ff0bb4d700d1a036d3b903c0b918c6e418ce42213dccc8b6201",
+    "referencias": [
+      {
+        "linea": 9,
+        "ancla": "@RequestMapping",
+        "explicacion": "Ruta /api/ocupaciones."
+      },
+      {
+        "linea": 16,
+        "ancla": "@GetMapping",
+        "explicacion": "Define la consulta GET."
+      },
+      {
+        "linea": 18,
+        "ancla": "findAll()",
+        "explicacion": "Lee y devuelve todas las ocupaciones con 200."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/service/PersonaService.java",
+    "lineas": 295,
+    "sha256": "be93da191fe49abf3fe87996595ed37926d335e0eb968f191146ef7d2c9ab29b",
+    "referencias": [
+      {
+        "linea": 18,
+        "ancla": "public List<com.example.demo.dto.ContactoDTO> obtenerContactos",
+        "explicacion": "Devuelve todas las relaciones del titular activo."
+      },
+      {
+        "linea": 23,
+        "ancla": "public List<com.example.demo.dto.ContactoDTO> guardarContactos",
+        "explicacion": "Sustituye la lista completa; exige al menos uno y no impone máximo."
+      },
+      {
+        "linea": 42,
+        "ancla": "findByTitularTrueAndFechaBajaIsNull",
+        "explicacion": "Lista exclusivamente titulares activos, no personas creadas solo como contacto."
+      },
+      {
+        "linea": 48,
+        "ancla": "public FormularioDTO guardar",
+        "explicacion": "Valida titular, contactos y comunicaciones antes del alta transaccional."
+      },
+      {
+        "linea": 53,
+        "ancla": "countByTitularTrueAndFechaBajaIsNull",
+        "explicacion": "El límite de 20 cuenta solo titulares; no hay bloqueo concurrente."
+      },
+      {
+        "linea": 59,
+        "ancla": "persona.setTitular(true)",
+        "explicacion": "Identifica el registro principal como titular."
+      },
+      {
+        "linea": 61,
+        "ancla": "saveAndFlush(persona)",
+        "explicacion": "Persiste persona y relaciones dentro de la misma transacción."
+      },
+      {
+        "linea": 66,
+        "ancla": "public FormularioDTO actualizar",
+        "explicacion": "Actualiza datos/comunicaciones de titular activo; los contactos se gestionan en su propia ruta."
+      },
+      {
+        "linea": 98,
+        "ancla": "setFechaBaja(LocalDate.now())",
+        "explicacion": "Baja lógica del titular, sin borrar personas ni relaciones compartidas."
+      },
+      {
+        "linea": 119,
+        "ancla": "dto.setContactosEmergencia(contactos)",
+        "explicacion": "Incluye la lista completa en la respuesta, además de los campos singulares del primero."
+      },
+      {
+        "linea": 134,
+        "ancla": "dto.setCorreosAdicionales",
+        "explicacion": "Devuelve comunicaciones secundarias; la siguiente línea hace lo mismo con teléfonos."
+      },
+      {
+        "linea": 166,
+        "ancla": "private void validarTitular",
+        "explicacion": "Exige nombre y apellido de hasta 100 caracteres y fecha de nacimiento a los titulares."
+      },
+      {
+        "linea": 174,
+        "ancla": "private Persona titularActivo",
+        "explicacion": "Rechaza personas dadas de baja o que solo sean contactos con 404."
+      },
+      {
+        "linea": 186,
+        "ancla": "private void validarContactos",
+        "explicacion": "Mínimo uno; rechaza IDs repetidos e inválidos. Las personas nuevas necesitan nombre, apellido y teléfono."
+      },
+      {
+        "linea": 207,
+        "ancla": "private CatalogoParentesco resolverParentesco",
+        "explicacion": "Busca parentesco existente por ID o nombre exacto; no crea catálogo desde el formulario."
+      },
+      {
+        "linea": 213,
+        "ancla": "private void reemplazarContactos",
+        "explicacion": "Reutiliza personas activas por ID o crea personas de contacto. Rechaza autorreferencias."
+      },
+      {
+        "linea": 227,
+        "ancla": "contacto.setTitular(false)",
+        "explicacion": "La persona nueva creada como contacto no cuenta como titular."
+      },
+      {
+        "linea": 250,
+        "ancla": "titular.getContactosEmergencia().removeIf",
+        "explicacion": "Quita relaciones omitidas; orphanRemoval elimina solo los vínculos, nunca personas compartidas."
+      },
+      {
+        "linea": 253,
+        "ancla": "private com.example.demo.dto.ContactoDTO contactoADTO",
+        "explicacion": "Devuelve ID de persona, nombre, apellido, teléfono y parentesco de la relación."
+      },
+      {
+        "linea": 260,
+        "ancla": "private void validarComunicacion",
+        "explicacion": "Mantiene dos correos y dos teléfonos completos para titulares."
+      },
+      {
+        "linea": 277,
+        "ancla": "private void actualizarComunicacion",
+        "explicacion": "Crea posiciones faltantes y actualiza comunicaciones principales/secundarias."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/config/SecurityConfig.java",
+    "lineas": 62,
+    "sha256": "cfbdd6652a82fb8b280c9f75122d8dac70e630c5400b14e8d41b475e88f1eebf",
+    "referencias": [
+      {
+        "linea": 19,
+        "ancla": "@EnableWebSecurity",
+        "explicacion": "Habilita esta configuración de seguridad."
+      },
+      {
+        "linea": 33,
+        "ancla": ".csrf(",
+        "explicacion": "Desactiva protección CSRF."
+      },
+      {
+        "linea": 34,
+        "ancla": ".cors(",
+        "explicacion": "Habilita integración CORS."
+      },
+      {
+        "linea": 35,
+        "ancla": "SessionCreationPolicy.STATELESS",
+        "explicacion": "No mantiene la autenticación en una sesión HTTP de Spring Security."
+      },
+      {
+        "linea": 38,
+        "ancla": ".requestMatchers(org.springframework.http.HttpMethod.OPTIONS",
+        "explicacion": "Permite OPTIONS."
+      },
+      {
+        "linea": 39,
+        "ancla": ".requestMatchers(\"/api/auth/**\")",
+        "explicacion": "Permite rutas de autenticación en esta cadena. ApiAuthFilter exceptúa exactamente login."
+      },
+      {
+        "linea": 42,
+        "ancla": ".anyRequest().authenticated()",
+        "explicacion": "El resto exige identidad autenticada, sin una condición de rol."
+      },
+      {
+        "linea": 45,
+        "ancla": ".addFilterBefore",
+        "explicacion": "Añade JwtFilter antes del filtro username/password. ApiAuthFilter se inyecta pero no se añade explícitamente aquí."
+      },
+      {
+        "linea": 52,
+        "ancla": "public UserDetailsService",
+        "explicacion": "Devuelve un servicio que rechaza consultas; el login se resuelve en el controlador."
+      },
+      {
+        "linea": 60,
+        "ancla": "return new BCryptPasswordEncoder",
+        "explicacion": "Proporciona el comparador/codificador BCrypt."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/security/JwtUtil.java",
+    "lineas": 42,
+    "sha256": "c196b452076e4841cdf2873a0cc253d030f88fde13d9946cbbef6d69b6c348b9",
+    "referencias": [
+      {
+        "linea": 17,
+        "ancla": "@Value",
+        "explicacion": "Lee jwt.secret desde configuración."
+      },
+      {
+        "linea": 19,
+        "ancla": "EXPIRATION_TIME =",
+        "explicacion": "Vigencia fija de 3600000 milisegundos: una hora."
+      },
+      {
+        "linea": 22,
+        "ancla": "Keys.hmacShaKeyFor",
+        "explicacion": "Crea la clave a partir de los bytes UTF-8 del secreto."
+      },
+      {
+        "linea": 27,
+        "ancla": ".setSubject",
+        "explicacion": "Coloca el username como sujeto."
+      },
+      {
+        "linea": 29,
+        "ancla": ".setExpiration",
+        "explicacion": "Calcula el vencimiento desde la hora actual."
+      },
+      {
+        "linea": 30,
+        "ancla": ".signWith",
+        "explicacion": "Firma con HS256."
+      },
+      {
+        "linea": 38,
+        "ancla": ".parseClaimsJws",
+        "explicacion": "Analiza y verifica firma y vencimiento; después obtiene el sujeto. Un token incorrecto produce excepción."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/security/JwtFilter.java",
+    "lineas": 50,
+    "sha256": "5895680a6e9e649a68b00d58de5907d78dedd5a98741a78e8837e57cc5f7867f",
+    "referencias": [
+      {
+        "linea": 17,
+        "ancla": "@Component",
+        "explicacion": "Registra el filtro como componente administrado por Spring."
+      },
+      {
+        "linea": 27,
+        "ancla": "String authHeader",
+        "explicacion": "Lee Authorization."
+      },
+      {
+        "linea": 32,
+        "ancla": "token = authHeader.substring(7)",
+        "explicacion": "Retira el prefijo Bearer y conserva el JWT."
+      },
+      {
+        "linea": 34,
+        "ancla": "username = jwtUtil.extractUsername",
+        "explicacion": "Verifica el token y obtiene el usuario. Los errores se capturan y registran en consola."
+      },
+      {
+        "linea": 40,
+        "ancla": "if (username != null",
+        "explicacion": "Crea autenticación solo si hay sujeto y el contexto aún no tiene una."
+      },
+      {
+        "linea": 43,
+        "ancla": "Collections.emptyList()",
+        "explicacion": "Construye autenticación sin autoridades/roles."
+      },
+      {
+        "linea": 45,
+        "ancla": "SecurityContextHolder.getContext().setAuthentication",
+        "explicacion": "Guarda la identidad en el contexto para las siguientes reglas de seguridad."
+      },
+      {
+        "linea": 48,
+        "ancla": "filterChain.doFilter",
+        "explicacion": "Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/security/ApiAuthFilter.java",
+    "lineas": 46,
+    "sha256": "3cce20a8a12f66d54c6e2b4031c62a652a4c9eb6d551bb7b7266b9581554ff1b",
+    "referencias": [
+      {
+        "linea": 11,
+        "ancla": "@Component",
+        "explicacion": "Puede registrarse como filtro del contenedor por Spring Boot, aunque no aparezca en addFilterBefore. No debe considerarse inactivo."
+      },
+      {
+        "linea": 14,
+        "ancla": "public ApiAuthFilter",
+        "explicacion": "Recibe JwtUtil por constructor."
+      },
+      {
+        "linea": 17,
+        "ancla": "protected void doFilterInternal",
+        "explicacion": "Recibe petición, respuesta y la cadena que puede continuar."
+      },
+      {
+        "linea": 19,
+        "ancla": "equals(request.getHeader(\"Origin\"))",
+        "explicacion": "Añade permisos CORS solo para el origen localhost:4200."
+      },
+      {
+        "linea": 23,
+        "ancla": "response.addHeader(\"Vary\"",
+        "explicacion": "Indica a cachés que la respuesta depende del origen."
+      },
+      {
+        "linea": 25,
+        "ancla": "request.getHeader(\"Access-Control-Request-Method\")",
+        "explicacion": "Reconoce preconsulta CORS del origen admitido; responde 204 y termina."
+      },
+      {
+        "linea": 30,
+        "ancla": "String path =",
+        "explicacion": "Obtiene la ruta solicitada."
+      },
+      {
+        "linea": 31,
+        "ancla": "path.startsWith(\"/api/\")",
+        "explicacion": "Revisa rutas API, exceptuando OPTIONS y exactamente /api/auth/login."
+      },
+      {
+        "linea": 35,
+        "ancla": "authorization.startsWith(\"Bearer \")",
+        "explicacion": "Exige encabezado y prefijo; a continuación analiza el JWT y exige sujeto no nulo."
+      },
+      {
+        "linea": 40,
+        "ancla": "response.setStatus(401)",
+        "explicacion": "Ante error devuelve 401 sin cuerpo y termina."
+      },
+      {
+        "linea": 44,
+        "ancla": "chain.doFilter",
+        "explicacion": "Continúa al siguiente filtro/controlador. Si Spring Security rechazó antes, la solicitud puede no llegar a este filtro."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/dto/FormularioDTO.java",
+    "lineas": 65,
+    "sha256": "8b607daa694ac4c19cd212d29a970bc3b5bbc714dd2b442e33185f2495a05535",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "private java.util.List<String> correosAdicionales",
+        "explicacion": "Exactamente un correo secundario exigido por el servicio."
+      },
+      {
+        "linea": 7,
+        "ancla": "private java.util.List<String> telefonosAdicionales",
+        "explicacion": "Exactamente un teléfono secundario."
+      },
+      {
+        "linea": 8,
+        "ancla": "private java.util.List<ContactoDTO> contactosEmergencia",
+        "explicacion": "Lista de mínimo un contacto, sin máximo; se recibe al crear y se rellena en respuestas."
+      },
+      {
+        "linea": 17,
+        "ancla": "private Long id",
+        "explicacion": "ID del titular."
+      },
+      {
+        "linea": 27,
+        "ancla": "aceptaTerminos = true",
+        "explicacion": "Valor no validado ni persistido actualmente."
+      },
+      {
+        "linea": 28,
+        "ancla": "private String contactoEmergenciaNombre",
+        "explicacion": "Campos singulares del primer contacto conservados por compatibilidad."
+      },
+      {
+        "linea": 35,
+        "ancla": "public Long getId()",
+        "explicacion": "Accesores para serialización y uso del servicio."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/dto/ContactoDTO.java",
+    "lineas": 5,
+    "sha256": "42e7ad88604c174f46c693c0b1a05fd8f3bca85c9599ced4789fc314614d39d9",
+    "referencias": [
+      {
+        "linea": 4,
+        "ancla": "public record",
+        "explicacion": "idContacto es el ID de persona, no el ID del vínculo. Sin ID se exigen nombre, apellido y teléfono; idParentesco o parentesco identifican el catálogo."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/Persona.java",
+    "lineas": 88,
+    "sha256": "990b73ea534f887c20ae1a959097967f7f2e63c2fae8137836d1ded7393afbd6",
+    "referencias": [
+      {
+        "linea": 9,
+        "ancla": "@Table",
+        "explicacion": "Mapea la tabla persona."
+      },
+      {
+        "linea": 21,
+        "ancla": "@Column(name = \"fecha_nacimiento\")",
+        "explicacion": "Permite fecha nula para personas creadas como contacto."
+      },
+      {
+        "linea": 36,
+        "ancla": "@Column(name = \"es_titular\"",
+        "explicacion": "Marca explícita para distinguir titular de contacto."
+      },
+      {
+        "linea": 40,
+        "ancla": "@JoinColumn(name = \"id_ocupacion\")",
+        "explicacion": "Ocupación opcional en persistencia; el alta del titular la exige en servicio."
+      },
+      {
+        "linea": 45,
+        "ancla": "private List<ContactoEmergencia>",
+        "explicacion": "Colección de vínculos salientes; cascada y eliminación de huérfanos solo sobre relaciones."
+      },
+      {
+        "linea": 49,
+        "ancla": "private List<PersonaCorreo>",
+        "explicacion": "Correos ordenados por ID: primero principal y restantes adicionales."
+      },
+      {
+        "linea": 53,
+        "ancla": "private List<PersonaTelefono>",
+        "explicacion": "Teléfonos ordenados del mismo modo."
+      },
+      {
+        "linea": 57,
+        "ancla": "public boolean isTitular",
+        "explicacion": "Consulta la distinción de rol de registro, independiente del rol del usuario de login."
+      },
+      {
+        "linea": 79,
+        "ancla": "public ContactoEmergencia getContactoEmergencia",
+        "explicacion": "Accesor singular conservado: devuelve la primera relación."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/CatalogoOcupacion.java",
+    "lineas": 21,
+    "sha256": "81a6d1ff108a1d5f828f6ffbc6a2e8f9ab79060c3d457764dfe50d00a6ef0816",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@Table",
+        "explicacion": "Identifica la tabla SQL."
+      },
+      {
+        "linea": 9,
+        "ancla": "@GeneratedValue",
+        "explicacion": "IDENTITY delega la generación de ID en la base."
+      },
+      {
+        "linea": 13,
+        "ancla": "private String nombre",
+        "explicacion": "Campo persistido; las anotaciones Column cercanas describen restricciones del mapeo."
+      },
+      {
+        "linea": 17,
+        "ancla": "public Long getId()",
+        "explicacion": "Inicio de accesores para leer/escribir campos; no contienen validación de negocio."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/PersonaCorreo.java",
+    "lineas": 27,
+    "sha256": "130ff10cee64f187194cd08e50ee3179b6e01829da64f0ee5fd3434f0e016fe2",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@Table",
+        "explicacion": "Mapea persona_correo."
+      },
+      {
+        "linea": 9,
+        "ancla": "@GeneratedValue",
+        "explicacion": "Identificador generado por base."
+      },
+      {
+        "linea": 13,
+        "ancla": "@JoinColumn",
+        "explicacion": "Vincula al padre por id_persona."
+      },
+      {
+        "linea": 16,
+        "ancla": "@Column(nullable = false, length = 150)",
+        "explicacion": "Longitud y obligatoriedad del correo."
+      },
+      {
+        "linea": 25,
+        "ancla": "public String getCorreo",
+        "explicacion": "Acceso al valor para construir el DTO."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/PersonaTelefono.java",
+    "lineas": 27,
+    "sha256": "351ff611dad1df483ab1e32ccdca7ab8853377d8567b26b44b3f0d9c0efc2325",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@Table",
+        "explicacion": "Mapea persona_telefono."
+      },
+      {
+        "linea": 9,
+        "ancla": "@GeneratedValue",
+        "explicacion": "Identificador generado por base."
+      },
+      {
+        "linea": 13,
+        "ancla": "@JoinColumn",
+        "explicacion": "Relación ManyToOne a persona."
+      },
+      {
+        "linea": 16,
+        "ancla": "@Column(nullable = false, length = 30)",
+        "explicacion": "Longitud alineada con schema.sql."
+      },
+      {
+        "linea": 25,
+        "ancla": "public String getTelefono",
+        "explicacion": "Devuelve el número."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/ContactoEmergencia.java",
+    "lineas": 36,
+    "sha256": "fcd82530e62f2f185574f00969d38f6c44cf0c0a26538ac383f36383a6c7a004",
+    "referencias": [
+      {
+        "linea": 8,
+        "ancla": "@Table",
+        "explicacion": "Mapea persona_contacto_emergencia; UNIQUE evita repetir el par titular/contacto."
+      },
+      {
+        "linea": 7,
+        "ancla": "@org.hibernate.annotations.Check",
+        "explicacion": "Impide autorreferencia también al generar el esquema JPA."
+      },
+      {
+        "linea": 16,
+        "ancla": "@JoinColumn(name = \"id_persona\"",
+        "explicacion": "Referencia al titular."
+      },
+      {
+        "linea": 21,
+        "ancla": "@JoinColumn(name = \"id_contacto\"",
+        "explicacion": "Referencia a la persona compartida, sin cascada de borrado."
+      },
+      {
+        "linea": 25,
+        "ancla": "@JoinColumn(name = \"id_parentesco\"",
+        "explicacion": "Referencia al catálogo de parentescos."
+      },
+      {
+        "linea": 32,
+        "ancla": "public Persona getContacto",
+        "explicacion": "Acceso a los datos de la persona de contacto."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/Usuario.java",
+    "lineas": 33,
+    "sha256": "d491ac5da4b51d12b2956afd3d6e365fc0cbe8ade953c4eb907dc50cd9d379c8",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@Table",
+        "explicacion": "Identifica la tabla SQL."
+      },
+      {
+        "linea": 10,
+        "ancla": "@GeneratedValue",
+        "explicacion": "IDENTITY delega la generación de ID en la base."
+      },
+      {
+        "linea": 17,
+        "ancla": "private String password",
+        "explicacion": "Campo persistido; las anotaciones Column cercanas describen restricciones del mapeo."
+      },
+      {
+        "linea": 19,
+        "ancla": "private String rol",
+        "explicacion": "Guarda el rol pero el login/filtros actuales no lo verifican."
+      },
+      {
+        "linea": 22,
+        "ancla": "public Long getId()",
+        "explicacion": "Inicio de accesores para leer/escribir campos; no contienen validación de negocio."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/repository/PersonaRepository.java",
+    "lineas": 12,
+    "sha256": "98809ee490cfbd386516fc3b4e81018f3e0f510fe066dbf76d4b7dbb63716681",
+    "referencias": [
+      {
+        "linea": 9,
+        "ancla": "extends JpaRepository",
+        "explicacion": "Hereda persistencia y búsqueda por ID para titulares y contactos."
+      },
+      {
+        "linea": 10,
+        "ancla": "findByTitularTrueAndFechaBajaIsNull",
+        "explicacion": "Lista solo titulares activos."
+      },
+      {
+        "linea": 11,
+        "ancla": "countByTitularTrueAndFechaBajaIsNull",
+        "explicacion": "Cuenta solo titulares activos, excluyendo contactos del límite de 20."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/repository/CatalogoOcupacionRepository.java",
+    "lineas": 11,
+    "sha256": "fbf52acec4231c8b2da4cf6b18b0a232c7d7c5b0a81a1fc58ddcf764550558f1",
+    "referencias": [
+      {
+        "linea": 9,
+        "ancla": "extends JpaRepository",
+        "explicacion": "Hereda save, saveAndFlush, findById, findAll y otras operaciones; el ID es Long."
+      },
+      {
+        "linea": 10,
+        "ancla": "findByNombre",
+        "explicacion": "Spring Data deriva la consulta del nombre del método."
+      },
+      {
+        "linea": 10,
+        "ancla": "Optional<",
+        "explicacion": "Expresa que la búsqueda puede no encontrar coincidencia."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/repository/UsuarioRepository.java",
+    "lineas": 9,
+    "sha256": "7b2f46fe169254d451a8922ea5a3d72f7750ee3981ce27680be4b4e8476c1a13",
+    "referencias": [
+      {
+        "linea": 7,
+        "ancla": "extends JpaRepository",
+        "explicacion": "Hereda save, saveAndFlush, findById, findAll y otras operaciones; el ID es Long."
+      },
+      {
+        "linea": 8,
+        "ancla": "findByUsername",
+        "explicacion": "Spring Data deriva la consulta del nombre del método."
+      },
+      {
+        "linea": 8,
+        "ancla": "Optional<",
+        "explicacion": "Expresa que la búsqueda puede no encontrar coincidencia."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/resources/application.properties",
+    "lineas": 11,
+    "sha256": "e554a6d068c355f0845cd3f8dddaf01e6e0947fb0b8b9bce34866554f61665c2",
+    "referencias": [
+      {
+        "linea": 1,
+        "ancla": "spring.application.name",
+        "explicacion": "Nombre de aplicación."
+      },
+      {
+        "linea": 2,
+        "ancla": "spring.datasource.url",
+        "explicacion": "Conexión PostgreSQL a nomina_db."
+      },
+      {
+        "linea": 3,
+        "ancla": "spring.datasource.username",
+        "explicacion": "Usuario de la conexión."
+      },
+      {
+        "linea": 4,
+        "ancla": "spring.datasource.password",
+        "explicacion": "Contraseña configurada directamente; valor omitido en esta copia."
+      },
+      {
+        "linea": 6,
+        "ancla": "jwt.secret",
+        "explicacion": "Clave de firma configurada directamente; valor omitido."
+      },
+      {
+        "linea": 9,
+        "ancla": "ddl-auto",
+        "explicacion": "update solicita ajustar el esquema JPA; no equivale a ejecutar data.sql."
+      },
+      {
+        "linea": 10,
+        "ancla": "show-sql",
+        "explicacion": "Muestra consultas SQL."
+      },
+      {
+        "linea": 11,
+        "ancla": "hibernate.dialect",
+        "explicacion": "Dialecto PostgreSQL. No aparece habilitación de inicialización SQL automática."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/resources/schema.sql",
+    "lineas": 75,
+    "sha256": "25c32aa1a28ba952d54e734cd1174865e24f81e9d9e137e256e725e33712642b",
+    "referencias": [
+      {
+        "linea": 12,
+        "ancla": "CREATE TABLE IF NOT EXISTS catalogo_parentesco",
+        "explicacion": "Catálogo de parentescos."
+      },
+      {
+        "linea": 19,
+        "ancla": "CREATE TABLE IF NOT EXISTS persona (",
+        "explicacion": "Datos de titulares y contactos; fecha/ocupación pueden ser nulas."
+      },
+      {
+        "linea": 29,
+        "ancla": "es_titular BOOLEAN",
+        "explicacion": "Marca explícita; contactos por defecto."
+      },
+      {
+        "linea": 36,
+        "ancla": "CREATE TABLE IF NOT EXISTS persona_contacto_emergencia",
+        "explicacion": "Unión entre titular y contacto con parentesco."
+      },
+      {
+        "linea": 44,
+        "ancla": "uq_pce_par",
+        "explicacion": "Restricción que evita repetir el par."
+      },
+      {
+        "linea": 45,
+        "ancla": "ck_pce_distintos",
+        "explicacion": "Prohíbe una persona como contacto de sí misma."
+      },
+      {
+        "linea": 49,
+        "ancla": "CREATE INDEX IF NOT EXISTS idx_pce_contacto",
+        "explicacion": "Facilita búsqueda de relaciones entrantes."
+      },
+      {
+        "linea": 52,
+        "ancla": "CREATE TABLE IF NOT EXISTS persona_correo",
+        "explicacion": "Correos de hasta 150 caracteres."
+      },
+      {
+        "linea": 60,
+        "ancla": "CREATE TABLE IF NOT EXISTS persona_telefono",
+        "explicacion": "Teléfonos de hasta 30 caracteres."
+      },
+      {
+        "linea": 68,
+        "ancla": "CREATE TABLE IF NOT EXISTS usuario",
+        "explicacion": "Cuenta con id_persona obligatorio, todavía no mapeado en la entidad Usuario."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/resources/data.sql",
+    "lineas": 71,
+    "sha256": "91daabf645c3e7f6651ea4ce230c7757e38d782eebad70c2ec9d0732cbdc93b1",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "INSERT INTO catalogo_ocupacion",
+        "explicacion": "Siete ocupaciones iniciales."
+      },
+      {
+        "linea": 19,
+        "ancla": "INSERT INTO catalogo_parentesco",
+        "explicacion": "Once parentescos iniciales."
+      },
+      {
+        "linea": 36,
+        "ancla": "INSERT INTO persona (",
+        "explicacion": "Incluye es_titular: true para administradores y false para contactos."
+      },
+      {
+        "linea": 46,
+        "ancla": "INSERT INTO persona_correo",
+        "explicacion": "Correos iniciales; repetir la semilla puede duplicarlos."
+      },
+      {
+        "linea": 52,
+        "ancla": "INSERT INTO persona_telefono",
+        "explicacion": "Teléfonos de titulares y contactos."
+      },
+      {
+        "linea": 60,
+        "ancla": "INSERT INTO persona_contacto_emergencia",
+        "explicacion": "Vínculos titular/contacto/parentesco; evita duplicar el mismo par."
+      },
+      {
+        "linea": 66,
+        "ancla": "INSERT INTO usuario",
+        "explicacion": "Cuentas con hashes BCrypt; no se verificaron contraseñas."
+      },
+      {
+        "linea": 71,
+        "ancla": "SELECT setval('usuario_id_seq'",
+        "explicacion": "Ajusta la secuencia de usuarios después de IDs explícitos."
+      }
+    ]
+  },
+  {
+    "archivo": "pom.xml",
+    "lineas": 137,
+    "sha256": "08d655df6a9f0862c150f8b0007b89281bdd1e619e5a3e9954d937313f7b35fb",
+    "referencias": [
+      {
+        "linea": 7,
+        "ancla": "<artifactId>spring-boot-starter-parent",
+        "explicacion": "Hereda configuración de Spring Boot; la siguiente línea fija la versión 4.1.1."
+      },
+      {
+        "linea": 30,
+        "ancla": "<java.version>",
+        "explicacion": "Java 21."
+      },
+      {
+        "linea": 43,
+        "ancla": "<artifactId>spring-boot-starter-webmvc",
+        "explicacion": "Soporte de controladores HTTP."
+      },
+      {
+        "linea": 73,
+        "ancla": "<artifactId>postgresql",
+        "explicacion": "Driver de base de datos en ejecución."
+      },
+      {
+        "linea": 78,
+        "ancla": "<artifactId>spring-boot-starter-data-jpa",
+        "explicacion": "Persistencia JPA y repositorios."
+      },
+      {
+        "linea": 82,
+        "ancla": "<artifactId>jjwt-api",
+        "explicacion": "API JWT; después aparecen implementación y Jackson."
+      },
+      {
+        "linea": 99,
+        "ancla": "<artifactId>spring-boot-starter-security",
+        "explicacion": "Dependencia de seguridad."
+      },
+      {
+        "linea": 107,
+        "ancla": "<artifactId>asciidoctor-maven-plugin",
+        "explicacion": "Procesa documentación en prepare-package."
+      },
+      {
+        "linea": 132,
+        "ancla": "<artifactId>spring-boot-maven-plugin",
+        "explicacion": "Empaquetado y ejecución de la aplicación Spring Boot."
+      }
+    ]
+  },
+  {
+    "archivo": "scripts/HashPassword.java",
+    "lineas": 30,
+    "sha256": "d0f81902d234fd2b4e542774b6b8356a02373c85e1abefb546eb36f5c942c08b",
+    "referencias": [
+      {
+        "linea": 10,
+        "ancla": "System.console()",
+        "explicacion": "Exige una consola interactiva."
+      },
+      {
+        "linea": 14,
+        "ancla": "console.readPassword(\"Nueva",
+        "explicacion": "Lee contraseña sin mostrarla; después solicita confirmación."
+      },
+      {
+        "linea": 17,
+        "ancla": "!Arrays.equals",
+        "explicacion": "Rechaza valores ausentes o diferentes."
+      },
+      {
+        "linea": 21,
+        "ancla": "value.isBlank()",
+        "explicacion": "Exige mínimo 12 caracteres y máximo 72 bytes UTF-8."
+      },
+      {
+        "linea": 24,
+        "ancla": "BCryptPasswordEncoder(12)",
+        "explicacion": "Genera e imprime BCrypt con coste 12."
+      },
+      {
+        "linea": 26,
+        "ancla": "Arrays.fill(password",
+        "explicacion": "Limpia arrays en finally; no borra el String creado previamente."
+      }
+    ]
+  },
+  {
+    "archivo": "src/test/java/com/example/demo/service/RegistroCompletoTest.java",
+    "lineas": 154,
+    "sha256": "41507ece604af0d96c9f01c0f6106c2f994edf501a2dbbc34ad13731470d1443",
+    "referencias": [
+      {
+        "linea": 23,
+        "ancla": "@BeforeEach",
+        "explicacion": "Inyecta mocks y configura respuestas de catálogo/guardado."
+      },
+      {
+        "linea": 77,
+        "ancla": "void permiteUnContactoYDevuelveIdentidadCompleta",
+        "explicacion": "Comprueba mínimo uno y respuesta con IDs/apellido."
+      },
+      {
+        "linea": 84,
+        "ancla": "void permiteMasDeDosContactosSinContarlosComoTitulares",
+        "explicacion": "Comprueba cuatro contactos excluidos de la categoría titular."
+      },
+      {
+        "linea": 92,
+        "ancla": "void compartePersonaEntreTitularesSinModificarSusDatos",
+        "explicacion": "Reutiliza una persona y conserva sus datos compartidos."
+      },
+      {
+        "linea": 101,
+        "ancla": "void reemplazarQuitaSoloRelacionYSostieneLasConservadas",
+        "explicacion": "Quita vínculos sin borrar personas."
+      },
+      {
+        "linea": 108,
+        "ancla": "void rechazaAutorreferencia",
+        "explicacion": "Rechaza contacto igual al titular."
+      },
+      {
+        "linea": 113,
+        "ancla": "void rechazaIDsDuplicados",
+        "explicacion": "Rechaza repetición de IDs en una lista."
+      },
+      {
+        "linea": 133,
+        "ancla": "void contactoNoSePuedeEditarComoTitular",
+        "explicacion": "Evita operar sobre contactos a través de las rutas de titular."
+      },
+      {
+        "linea": 144,
+        "ancla": "void limiteVeinteTitulares",
+        "explicacion": "Comprueba el límite de altas."
+      }
+    ]
+  },
+  {
+    "archivo": "src/test/java/com/example/demo/DemoApplicationTests.java",
+    "lineas": 101,
+    "sha256": "c7ca2e7bbcc9dbb810687754e6d31dfa507cda811d6a10de3d4de7efd053fc2e",
+    "referencias": [
+      {
+        "linea": 18,
+        "ancla": "@EnabledIfEnvironmentVariable",
+        "explicacion": "Solo habilita una base local desechable nomina_backend_test con puerto explícito."
+      },
+      {
+        "linea": 24,
+        "ancla": "spring.jpa.hibernate.ddl-auto=none",
+        "explicacion": "Prueba contra el esquema SQL real, no contra uno inventado por Hibernate."
+      },
+      {
+        "linea": 32,
+        "ancla": "@BeforeEach",
+        "explicacion": "Crea tablas si faltan y vacía datos de la base de prueba."
+      },
+      {
+        "linea": 50,
+        "ancla": "void persisteCuatroContactosComoPersonasYListaSoloTitular",
+        "explicacion": "Comprueba la persistencia de cuatro personas de contacto y un titular."
+      },
+      {
+        "linea": 59,
+        "ancla": "void contactoCompartidoSobreviveARetirarUnaRelacion",
+        "explicacion": "Verifica que borrar un vínculo no borra al contacto compartido."
+      },
+      {
+        "linea": 70,
+        "ancla": "void repetirPutConIDsNoDuplicaPersonasNiRelaciones",
+        "explicacion": "Comprueba repetición segura cuando se conservan los IDs."
+      },
+      {
+        "linea": 76,
+        "ancla": "void falloPosteriorRevierteNuevasPersonasYOcupacion",
+        "explicacion": "Comprueba rollback del alta completa."
+      },
+      {
+        "linea": 83,
+        "ancla": "void falloPutRevierteCambioDeRelaciones",
+        "explicacion": "Comprueba rollback durante sustitución de contactos."
+      },
+      {
+        "linea": 89,
+        "ancla": "void restriccionesSqlRechazanAutorreferenciaYDuplicado",
+        "explicacion": "Verifica CHECK y UNIQUE en PostgreSQL."
+      },
+      {
+        "linea": 96,
+        "ancla": "void bajaTitularNoEliminaContactoCompartido",
+        "explicacion": "Baja lógica sin borrado de personas."
+      }
+    ]
+  },
+  {
+    "archivo": ".mvn/wrapper/maven-wrapper.properties",
+    "lineas": 3,
+    "sha256": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706",
+    "referencias": [
+      {
+        "linea": 1,
+        "ancla": "wrapperVersion",
+        "explicacion": "Versión del wrapper."
+      },
+      {
+        "linea": 2,
+        "ancla": "distributionType",
+        "explicacion": "Modo only-script."
+      },
+      {
+        "linea": 3,
+        "ancla": "distributionUrl",
+        "explicacion": "URL de la distribución Maven."
+      }
+    ]
+  },
+  {
+    "archivo": "mvnw.cmd",
+    "lineas": 189,
+    "sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
+    "referencias": [
+      {
+        "linea": 35,
+        "ancla": "@FOR /F",
+        "explicacion": "Ejecuta la sección PowerShell del archivo."
+      },
+      {
+        "linea": 54,
+        "ancla": "$distributionUrl =",
+        "explicacion": "Lee la URL de propiedades del wrapper."
+      },
+      {
+        "linea": 102,
+        "ancla": "if (Test-Path -Path \"$MAVEN_HOME\"",
+        "explicacion": "Reutiliza distribución existente en caché."
+      },
+      {
+        "linea": 135,
+        "ancla": "$webclient.DownloadFile",
+        "explicacion": "Descarga Maven si falta."
+      },
+      {
+        "linea": 138,
+        "ancla": "$distributionSha256Sum =",
+        "explicacion": "Lee checksum opcional y lo verifica si está configurado."
+      },
+      {
+        "linea": 150,
+        "ancla": "Expand-Archive",
+        "explicacion": "Extrae la distribución descargada."
+      },
+      {
+        "linea": 104,
+        "ancla": "Write-Output \"MVN_CMD=",
+        "explicacion": "Comunica la ruta de ejecución a batch."
+      }
+    ]
+  },
+  {
+    "archivo": "mvnw",
+    "lineas": 295,
+    "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+    "referencias": [
+      {
+        "linea": 45,
+        "ancla": "set_java_home()",
+        "explicacion": "Localiza Java."
+      },
+      {
+        "linea": 117,
+        "ancla": "done <\"$scriptDir/.mvn/wrapper",
+        "explicacion": "Lee configuración del wrapper."
+      },
+      {
+        "linea": 148,
+        "ancla": "exec_maven()",
+        "explicacion": "Función que invoca Maven."
+      },
+      {
+        "linea": 153,
+        "ancla": "if [ -d \"$MAVEN_HOME\" ]",
+        "explicacion": "Detecta distribución ya instalada."
+      },
+      {
+        "linea": 194,
+        "ancla": "command -v wget",
+        "explicacion": "Selecciona descarga por wget; después considera curl y Java."
+      },
+      {
+        "linea": 226,
+        "ancla": "if [ -n \"${distributionSha256Sum-}\" ]",
+        "explicacion": "Verifica checksum solo si está configurado."
+      },
+      {
+        "linea": 155,
+        "ancla": "exec_maven \"$@\"",
+        "explicacion": "Invoca Maven; la primera coincidencia pertenece a la rama de caché."
+      }
+    ]
+  },
+  {
+    "archivo": ".gitignore",
+    "lineas": 33,
+    "sha256": "089382e4d7944ab6cb6900a1269678ebff93c00d441ada788cd05a8da182b22b",
+    "referencias": [
+      {
+        "linea": 2,
+        "ancla": "target/",
+        "explicacion": "Excluye resultados de compilación."
+      },
+      {
+        "linea": 3,
+        "ancla": ".mvn/wrapper/maven-wrapper.jar",
+        "explicacion": "Excluye el binario del wrapper."
+      },
+      {
+        "linea": 17,
+        "ancla": ".idea",
+        "explicacion": "Excluye configuración IntelliJ."
+      },
+      {
+        "linea": 33,
+        "ancla": ".vscode/",
+        "explicacion": "Excluye configuración VS Code."
+      }
+    ]
+  },
+  {
+    "archivo": ".gitattributes",
+    "lineas": 3,
+    "sha256": "1c8cc8fb65937e0ee87a7ed50745c6f87fb78ded993fb796aa800c877cc6d517",
+    "referencias": [
+      {
+        "linea": 1,
+        "ancla": "/mvnw",
+        "explicacion": "Fuerza LF en el lanzador Unix."
+      },
+      {
+        "linea": 2,
+        "ancla": "*.cmd",
+        "explicacion": "Fuerza CRLF en comandos Windows."
+      }
+    ]
+  },
+  {
+    "archivo": "README.md",
+    "lineas": 626,
+    "sha256": "b8c36a02bac650d7c7a45e15a4ff08e0ef48e845d221464e60688b11192a8d6a",
+    "referencias": [
+      {
+        "linea": 7,
+        "ancla": "## Funcionamiento",
+        "explicacion": "Modelo de titulares, contactos y relaciones."
+      },
+      {
+        "linea": 17,
+        "ancla": "## Configuración",
+        "explicacion": "Arranque y conexión."
+      },
+      {
+        "linea": 27,
+        "ancla": "## Autenticación",
+        "explicacion": "Token nuevo de una hora y alcance del login."
+      },
+      {
+        "linea": 33,
+        "ancla": "## Rutas",
+        "explicacion": "Endpoints incluyendo catálogo de parentescos."
+      },
+      {
+        "linea": 49,
+        "ancla": "## Registro y actualización",
+        "explicacion": "JSON nuevo, IDs y sustitución de listas."
+      },
+      {
+        "linea": 94,
+        "ancla": "## SQL inicial",
+        "explicacion": "Preparación de una base nueva."
+      },
+      {
+        "linea": 110,
+        "ancla": "## Pruebas existentes",
+        "explicacion": "Resultados y ejecución en base desechable."
+      },
+      {
+        "linea": 127,
+        "ancla": "## Documentación PDF",
+        "explicacion": "Regeneración y alcance."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/model/CatalogoParentesco.java",
+    "lineas": 19,
+    "sha256": "976713f9536a4e7b45e69fd94b206f121a1d6b23a28c9d89e7124699beb6d0a0",
+    "referencias": [
+      {
+        "linea": 6,
+        "ancla": "@Table",
+        "explicacion": "Tabla catalogo_parentesco."
+      },
+      {
+        "linea": 9,
+        "ancla": "@GeneratedValue",
+        "explicacion": "ID generado."
+      },
+      {
+        "linea": 12,
+        "ancla": "@Column",
+        "explicacion": "Nombre obligatorio, único y de hasta 50 caracteres."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/repository/CatalogoParentescoRepository.java",
+    "lineas": 9,
+    "sha256": "60458d506b3087baf32c41c149cdedba57dd45f0a9586c2a3cca0920b79c5c27",
+    "referencias": [
+      {
+        "linea": 7,
+        "ancla": "extends JpaRepository",
+        "explicacion": "Hereda operaciones de catálogo."
+      },
+      {
+        "linea": 8,
+        "ancla": "findByNombre",
+        "explicacion": "Busca un nombre exacto para resolver el vínculo."
+      }
+    ]
+  },
+  {
+    "archivo": "src/main/java/com/example/demo/controller/ParentescoController.java",
+    "lineas": 22,
+    "sha256": "7aa9c5c58cbebc1ac8876babfa8cdfcae87caafb073c7463d03817b2371f0eb9",
+    "referencias": [
+      {
+        "linea": 9,
+        "ancla": "@RequestMapping",
+        "explicacion": "Ruta protegida /api/parentescos."
+      },
+      {
+        "linea": 18,
+        "ancla": "@GetMapping",
+        "explicacion": "Consulta HTTP GET."
+      },
+      {
+        "linea": 20,
+        "ancla": "return parentescos.findAll",
+        "explicacion": "Devuelve catálogo ordenado por ID."
+      }
+    ]
+  },
+  {
+    "archivo": "src/test/java/com/example/demo/security/JwtUtilTest.java",
+    "lineas": 21,
+    "sha256": "b4fa3c0d32d70d997b5b82cd7509a8c658f2dc2a637a92d59008e6bec8a0cfdb",
+    "referencias": [
+      {
+        "linea": 11,
+        "ancla": "void tokenDuraUnaHoraYConservaUsuario",
+        "explicacion": "Genera JWT y analiza sus fechas y usuario."
+      },
+      {
+        "linea": 18,
+        "ancla": "assertEquals(3600000L",
+        "explicacion": "Verifica una hora exacta entre emisión y vencimiento."
+      }
+    ]
+  }
+]

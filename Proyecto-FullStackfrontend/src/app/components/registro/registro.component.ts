@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
+import { CodigoPostalService } from '../../services/codigo-postal.service';
 
 @Component({
   selector: 'app-registro',
@@ -14,6 +15,7 @@ import { RegistroService } from '../../services/registro.service';
 export class RegistroComponent implements OnInit {
   private fb = inject(FormBuilder);
   private registroService = inject(RegistroService);
+  private codigoPostalService = inject(CodigoPostalService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   personaId: number | null = null;
@@ -110,8 +112,8 @@ export class RegistroComponent implements OnInit {
   const cp = this.registroForm.get('cp')?.value;
   if (cp && cp.length === 5) {
     this.cargandoCP = true;
-    this.registroService.consultarCP(cp).subscribe({
-      next: (res: any) => {
+    this.codigoPostalService.consultar(cp).subscribe({
+      next: (res) => {
         this.cargandoCP = false;
 
         if (res && res.resultados && res.resultados.length > 0) {
@@ -120,7 +122,7 @@ export class RegistroComponent implements OnInit {
           const municipio = primerResultado.municipio; // Devuelve "Coyuca de Benítez"
 
           // Mapeamos los asentamientos/colonias correspondientes
-          this.colonias = res.resultados.map((r: any) => r.asentamiento);
+          this.colonias = res.resultados.map((r) => r.asentamiento);
 
           // Asignamos a los campos bloqueados
           this.registroForm.patchValue({

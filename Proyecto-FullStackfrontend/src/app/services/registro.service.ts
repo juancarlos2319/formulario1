@@ -1,13 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Usuario } from './usuario.interface';
-
-export interface ContactoEmergencia {
-  nombre: string;
-  telefono: string;
-  parentesco: string;
-}
+import { Usuario } from '../interfaces/usuario.interface';
+import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergencia.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -73,8 +68,8 @@ export class RegistroService {
     return this.http.get<string[]>('http://localhost:8080/api/ocupaciones', { headers: this.getHeaders() });
   }
 
-  // API Externa: Esta NO lleva token por seguridad y compatibilidad de CORS
-  consultarCP(cp: string): Observable<any> {
-    return this.http.get(`https://www.correosmexico.com.mx/api/cp?cp=${cp}`);
+  obtenerParentescos(): Observable<Parentesco[]> {
+    return this.http.get<Parentesco[]>('http://localhost:8080/api/parentescos', { headers: this.getHeaders() });
   }
+
 }

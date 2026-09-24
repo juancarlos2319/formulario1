@@ -1,3 +1,5 @@
+import { ContactoEmergencia } from './contacto-emergencia.interface';
+
 export interface Usuario {
   id?: number;
   nombre: string;
@@ -13,9 +15,8 @@ export interface Usuario {
   ocupacion: string;
   aceptaTerminos?: boolean;
   activo?: boolean;
-
-  // Propiedades de contacto de emergencia
   contactoEmergenciaNombre?: string;
   contactoEmergenciaTelefono?: string;
   contactoEmergenciaParentesco?: string;
+  contactosEmergencia?: ContactoEmergencia[];
 }

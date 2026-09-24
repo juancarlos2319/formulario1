@@ -27,8 +27,13 @@
         </div>
 
         <div class="field">
-          <label [for]="'nombre_' + i">Nombre completo *</label>
-          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre completo">
+          <label [for]="'nombre_' + i">Nombre *</label>
+          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre">
+        </div>
+
+        <div class="field">
+          <label [for]="'apellido_' + i">Apellido *</label>
+          <input [id]="'apellido_' + i" type="text" formControlName="apellido" placeholder="Apellido">
         </div>
 
         <div class="field">
@@ -37,23 +42,11 @@
         </div>
 
         <div class="field">
-          <label [for]="'parentesco_' + i">Parentesco / Relación *</label>
-          <input [id]="'parentesco_' + i" type="text" formControlName="parentesco" placeholder="Ej. Padre, Madre...">
-        </div>
-
-        <div class="field">
-          <label [for]="'genero_' + i">Género</label>
-          <select [id]="'genero_' + i" formControlName="genero">
-            <option value="">-- Selecciona --</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
+          <label [for]="'parentesco_' + i">Parentesco *</label>
+          <select [id]="'parentesco_' + i" formControlName="idParentesco">
+            <option [ngValue]="null">Selecciona un parentesco</option>
+            <option *ngFor="let parentesco of parentescos" [ngValue]="parentesco.id">{{ parentesco.nombre }}</option>
           </select>
-        </div>
-
-        <div class="field">
-          <label [for]="'fechaNacimiento_' + i">Fecha de Nacimiento</label>
-          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento">
         </div>
       </fieldset>
     </div>

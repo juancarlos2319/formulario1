@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
-import { Usuario } from '../../services/usuario.interface';
+import { Usuario } from '../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-dashboard',

@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Sube dos niveles para salir de tarjeta-usuario y dashboard hasta llegar a services
-import { Usuario } from '../../../services/usuario.interface';
+import { Usuario } from '../../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-tarjeta-usuario',

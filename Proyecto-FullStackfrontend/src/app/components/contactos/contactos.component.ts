@@ -1,16 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-
-export interface ContactoDTO {
-  nombre: string;
-  telefono: string;
-  parentesco: string;
-  genero?: string;
-  fechaNacimiento?: string;
-}
+import { Observable } from 'rxjs';
+import { RegistroService } from '../../services/registro.service';
+import { Usuario } from '../../interfaces/usuario.interface';
+import { ContactoEmergencia, Parentesco } from '../../interfaces/contacto-emergencia.interface';
 
 @Component({
   selector: 'app-contactos',
@@ -24,27 +19,25 @@ export class ContactosComponent implements OnInit {
   personaId!: number;
   mensajeError: string = '';
   mensajeExito: string = '';
+  parentescos: Parentesco[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  private fb = inject(FormBuilder);
+  private registroService = inject(RegistroService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   ngOnInit(): void {
     // Formulario dinámico inicializado
     this.contactosForm = this.fb.group({
       contactos: this.fb.array([])
     });
+    this.cargarParentescos();
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.personaId = +idParam;
       this.cargarContactos();
     } else {
-      // Iniciar con 2 contactos vacíos dinámicos
-      this.agregarContacto();
       this.agregarContacto();
     }
   }
@@ -55,18 +48,18 @@ export class ContactosComponent implements OnInit {
   }
 
   // Crea la estructura de un contacto
-  crearContactoGroup(datos?: ContactoDTO): FormGroup {
+  crearContactoGroup(datos?: ContactoEmergencia): FormGroup {
     return this.fb.group({
-      nombre: [datos?.nombre || '', [Validators.required]],
-      telefono: [datos?.telefono || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      parentesco: [datos?.parentesco || '', [Validators.required]],
-      genero: [datos?.genero || ''],
-      fechaNacimiento: [datos?.fechaNacimiento || '']
+      idContacto: [datos?.idContacto ?? null],
+      nombre: [datos?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
+      apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
+      telefono: [datos?.telefono ?? '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
   }
 
   // Botón para agregar N contactos sin límite
-  agregarContacto(datos?: ContactoDTO): void {
+  agregarContacto(datos?: ContactoEmergencia): void {
     this.contactos.push(this.crearContactoGroup(datos));
   }
 
@@ -80,14 +73,13 @@ export class ContactosComponent implements OnInit {
   }
 
   cargarContactos(): void {
-    this.http.get<ContactoDTO[]>(`http://localhost:8080/api/formularios/${this.personaId}/contactos`)
+    this.registroService.obtenerContactos(this.personaId)
       .subscribe({
         next: (data) => {
           this.contactos.clear();
           if (data && data.length > 0) {
             data.forEach(contacto => this.agregarContacto(contacto));
           } else {
-            // Si la BD venía vacía, mostramos 2 por defecto
             this.agregarContacto();
             this.agregarContacto();
           }
@@ -95,7 +87,6 @@ export class ContactosComponent implements OnInit {
         error: (err) => {
           console.error('Error al cargar contactos:', err);
           if (this.contactos.length === 0) {
-            this.agregarContacto();
             this.agregarContacto();
           }
         }
@@ -112,23 +103,16 @@ export class ContactosComponent implements OnInit {
       return;
     }
 
-    let listaFormulario: ContactoDTO[] = this.contactosForm.value.contactos;
+    const payload = this.contactos.getRawValue() as ContactoEmergencia[];
+    const solicitud: Observable<ContactoEmergencia[] | Usuario> = this.personaId
+      ? this.registroService.guardarContactos(this.personaId, payload)
+      : this.registroService.guardarRegistroCompleto(payload);
 
-    // Adaptador para ser 100% compatible con la regla del Backend sin modificar Java:
-    let payload: ContactoDTO[] = [];
-
-    if (listaFormulario.length === 1) {
-      // Si el usuario solo llenó 1 contacto, duplicamos ese contacto como C2 para satisfacer al Backend
-      payload = [listaFormulario[0], { ...listaFormulario[0] }];
-    } else {
-      // Si llenó 2 o más, tomamos los contactos capturados
-      payload = listaFormulario;
-    }
-
-    this.http.put(`http://localhost:8080/api/formularios/${this.personaId}/contactos`, payload)
+    solicitud
       .subscribe({
-        next: (res) => {
+        next: () => {
           this.mensajeExito = '¡Contactos guardados exitosamente!';
+          this.registroService.limpiarBorrador();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         error: (err) => {
@@ -136,5 +120,12 @@ export class ContactosComponent implements OnInit {
           this.mensajeError = 'Ocurrió un error al guardar los contactos. Revisa los datos ingresados.';
         }
       });
+  }
+
+  private cargarParentescos(): void {
+    this.registroService.obtenerParentescos().subscribe({
+      next: (parentescos) => this.parentescos = parentescos,
+      error: () => this.mensajeError = 'No se pudieron cargar los parentescos.'
+    });
   }
 }

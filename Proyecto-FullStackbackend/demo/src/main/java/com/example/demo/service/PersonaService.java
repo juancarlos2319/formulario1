@@ -1,15 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.ContactoDTO;
 import com.example.demo.dto.FormularioDTO;
 import com.example.demo.model.*;
 import com.example.demo.repository.CatalogoOcupacionRepository;
 import com.example.demo.repository.PersonaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,40 +14,14 @@ import java.util.stream.Collectors;
 @Service
 public class PersonaService {
 
-<<<<<<< Updated upstream
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.ContactoDTO> obtenerContactos(Long id) {
         return titularActivo(id).getContactosEmergencia().stream().map(this::contactoADTO).toList();
-=======
-    @Autowired
-    private PersonaRepository personaRepository;
-
-    @Autowired
-    private CatalogoOcupacionRepository ocupacionRepository;
-
-    @Transactional(readOnly = true)
-    public List<ContactoDTO> obtenerContactos(Long id) {
-        Persona persona = personaRepository.findById(id)
-                .filter(p -> p.getFechaBaja() == null)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Persona no encontrada"));
-
-        return persona.getContactosEmergencia().stream()
-                .map(c -> new ContactoDTO(
-                        c.getNombre(),
-                        c.getTelefono(),
-                        c.getParentesco(),
-                        c.getGenero(),
-                        c.getFechaNacimiento()
-                ))
-                .toList();
->>>>>>> Stashed changes
     }
 
-    @Transactional
-    public List<ContactoDTO> guardarContactos(Long id, List<ContactoDTO> contactos) {
+    @org.springframework.transaction.annotation.Transactional
+    public List<com.example.demo.dto.ContactoDTO> guardarContactos(Long id, List<com.example.demo.dto.ContactoDTO> contactos) {
         validarContactos(contactos);
-<<<<<<< Updated upstream
         Persona titular = titularActivo(id);
         reemplazarContactos(titular, contactos);
         personaRepository.saveAndFlush(titular);
@@ -68,80 +38,31 @@ public class PersonaService {
     private CatalogoOcupacionRepository ocupacionRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-=======
-
-        Persona persona = personaRepository.findById(id)
-                .filter(p -> p.getFechaBaja() == null)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Persona no encontrada"));
-
-        var existentes = persona.getContactosEmergencia();
-
-        for (int i = 0; i < 2; i++) {
-            ContactoEmergencia contacto;
-            if (i < existentes.size()) {
-                contacto = existentes.get(i);
-            } else {
-                contacto = new ContactoEmergencia();
-                contacto.setPersona(persona);
-                existentes.add(contacto);
-            }
-            contacto.setNombre(contactos.get(i).nombre().trim());
-            contacto.setTelefono(contactos.get(i).telefono());
-            contacto.setParentesco(contactos.get(i).parentesco().trim());
-            contacto.setGenero(contactos.get(i).genero());
-            contacto.setFechaNacimiento(contactos.get(i).fechaNacimiento());
-        }
-
-        personaRepository.save(persona);
-        return contactos;
-    }
-
->>>>>>> Stashed changes
     public List<FormularioDTO> obtenerTodos() {
         return personaRepository.findByTitularTrueAndFechaBajaIsNull().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     public FormularioDTO guardar(FormularioDTO dto) {
         validarTitular(dto);
         validarContactos(dto.getContactosEmergencia());
         validarComunicacion(dto);
-<<<<<<< Updated upstream
         // Regla de Negocio: Máximo 20 personas activas
         long personasActivas = personaRepository.countByTitularTrueAndFechaBajaIsNull();
-=======
-
-        long personasActivas = personaRepository.countByFechaBajaIsNull();
->>>>>>> Stashed changes
         if (personasActivas >= 20) {
             throw new RuntimeException("Límite alcanzado: No se pueden registrar más de 20 personas activas en el sistema.");
         }
 
         Persona persona = convertirAEntidad(dto);
-<<<<<<< Updated upstream
         persona.setTitular(true);
         reemplazarContactos(persona, dto.getContactosEmergencia());
-=======
-        for (var datos : dto.getContactosEmergencia()) {
-            ContactoEmergencia contacto = new ContactoEmergencia();
-            contacto.setPersona(persona);
-            contacto.setNombre(datos.nombre().trim());
-            contacto.setTelefono(datos.telefono());
-            contacto.setParentesco(datos.parentesco().trim());
-            contacto.setGenero(datos.genero());
-            contacto.setFechaNacimiento(datos.fechaNacimiento());
-            persona.getContactosEmergencia().add(contacto);
-        }
-
->>>>>>> Stashed changes
         Persona guardada = personaRepository.saveAndFlush(persona);
         return convertirADTO(guardada);
     }
 
-    @Transactional
+    @org.springframework.transaction.annotation.Transactional
     public FormularioDTO actualizar(Long id, FormularioDTO dto) {
         validarTitular(dto);
         validarComunicacion(dto);
@@ -163,6 +84,7 @@ public class PersonaService {
                     });
             persona.setOcupacion(ocupacion);
         }
+
 
         actualizarComunicacion(persona, dto);
 
@@ -192,7 +114,6 @@ public class PersonaService {
             dto.setOcupacion(p.getOcupacion().getNombre());
         }
 
-<<<<<<< Updated upstream
         List<com.example.demo.dto.ContactoDTO> contactos = p.getContactosEmergencia().stream()
                 .map(this::contactoADTO).toList();
         dto.setContactosEmergencia(contactos);
@@ -202,8 +123,6 @@ public class PersonaService {
             dto.setContactoEmergenciaParentesco(contactos.get(0).parentesco());
         }
 
-=======
->>>>>>> Stashed changes
         if (p.getCorreos() != null && !p.getCorreos().isEmpty()) {
             dto.setEmail(p.getCorreos().get(0).getCorreo());
         }
@@ -226,6 +145,7 @@ public class PersonaService {
         p.setDireccion(dto.getDireccion());
         p.setCiudad(dto.getCiudad());
 
+        // Validación explícita de ocupación obligatoria
         if (dto.getOcupacion() == null || dto.getOcupacion().trim().isEmpty()) {
             throw new RuntimeException("La ocupación es obligatoria para registrar a la persona.");
         }
@@ -243,21 +163,11 @@ public class PersonaService {
         return p;
     }
 
-<<<<<<< Updated upstream
     private void validarTitular(FormularioDTO dto) {
         if (dto == null || dto.getNombre() == null || dto.getNombre().isBlank() || dto.getNombre().length() > 100 ||
                 dto.getApellido() == null || dto.getApellido().isBlank() || dto.getApellido().length() > 100 ||
                 dto.getFechaNacimiento() == null) {
             throw invalido("El titular requiere nombre, apellido (hasta 100 caracteres) y fecha de nacimiento");
-=======
-    private void validarContactos(List<ContactoDTO> contactos) {
-        if (contactos == null || contactos.size() != 2 || contactos.stream().anyMatch(c ->
-                c == null || c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 150 ||
-                        c.telefono() == null || !c.telefono().matches("[0-9]{10}") ||
-                        c.parentesco() == null || c.parentesco().isBlank() || c.parentesco().length() > 50)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Se requieren dos contactos completos con teléfonos de 10 dígitos");
->>>>>>> Stashed changes
         }
     }
 
@@ -349,7 +259,7 @@ public class PersonaService {
 
     private void validarComunicacion(FormularioDTO dto) {
         if (dto.getCorreosAdicionales() == null || dto.getCorreosAdicionales().size() != 1 ||
-                dto.getTelefonosAdicionales() == null || dto.getTelefonosAdicionales().size() != 1) {
+            dto.getTelefonosAdicionales() == null || dto.getTelefonosAdicionales().size() != 1) {
             throw new IllegalArgumentException("Se requieren un correo y un teléfono secundarios.");
         }
         for (String correo : new String[]{dto.getEmail(), dto.getCorreosAdicionales().get(0)}) {

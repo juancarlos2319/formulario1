@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
-import { Usuario } from '../../services/usuario.interface';
+import { Usuario } from '../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-personas',
