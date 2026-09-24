@@ -1,142 +1,140 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
-import { RegistroService } from '../../services/registro.service';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+
+export interface ContactoDTO {
+  nombre: string;
+  telefono: string;
+  parentesco: string;
+  genero?: string;
+  fechaNacimiento?: string;
+}
 
 @Component({
   selector: 'app-contactos',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './contactos.component.html',
-  styleUrl: './contactos.component.css'
+  styleUrls: ['./contactos.component.css']
 })
 export class ContactosComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private registroService = inject(RegistroService);
-  personaId = 0;
-  nuevo = false;
-  cargando = true;
-  guardando = false;
-  errorCarga = false;
-  mensajeError = '';
+  contactosForm!: FormGroup;
+  personaId!: number;
+  mensajeError: string = '';
+  mensajeExito: string = '';
 
-  parentescos: string[] = [
-    'Padre / Madre',
-    'Cónyuge / Pareja',
-    'Hijo / Hija',
-    'Hermano / Hermana',
-    'Familiar',
-    'Tutor Legal',
-    'Amigo / Amiga',
-    'Compañero / Compañera de Trabajo',
-    'Otro'
-  ];
-
-  contactosForm: FormGroup = this.fb.group({
-    c1_nombre: ['', Validators.required],
-    c1_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-    c1_parentesco: ['', Validators.required],
-    c2_nombre: ['', Validators.required],
-    c2_telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-    c2_parentesco: ['', Validators.required]
-  });
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.nuevo = id === null;
-    if (this.nuevo) {
-      if (!this.registroService.borrador) {
-        this.router.navigate(['/registro']);
-        return;
-      }
-      this.registroService.contactosBorrador.forEach((c, index) => this.contactosForm.patchValue({
-        ['c' + (index + 1) + '_nombre']: c.nombre,
-        ['c' + (index + 1) + '_telefono']: c.telefono,
-        ['c' + (index + 1) + '_parentesco']: c.parentesco
-      }));
-      this.cargando = false;
-      return;
+    // Formulario dinámico inicializado
+    this.contactosForm = this.fb.group({
+      contactos: this.fb.array([])
+    });
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.personaId = +idParam;
+      this.cargarContactos();
+    } else {
+      // Iniciar con 2 contactos vacíos dinámicos
+      this.agregarContacto();
+      this.agregarContacto();
     }
-    this.personaId = Number(id);
-    if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
-      this.router.navigate(['/personas']);
-      return;
+  }
+
+  // Getter conveniente para iterar con ngFor en la plantilla HTML
+  get contactos(): FormArray {
+    return this.contactosForm.get('contactos') as FormArray;
+  }
+
+  // Crea la estructura de un contacto
+  crearContactoGroup(datos?: ContactoDTO): FormGroup {
+    return this.fb.group({
+      nombre: [datos?.nombre || '', [Validators.required]],
+      telefono: [datos?.telefono || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      parentesco: [datos?.parentesco || '', [Validators.required]],
+      genero: [datos?.genero || ''],
+      fechaNacimiento: [datos?.fechaNacimiento || '']
+    });
+  }
+
+  // Botón para agregar N contactos sin límite
+  agregarContacto(datos?: ContactoDTO): void {
+    this.contactos.push(this.crearContactoGroup(datos));
+  }
+
+  // Permite borrar dinámicamente si hay más de 1 contacto en pantalla
+  eliminarContacto(index: number): void {
+    if (this.contactos.length > 1) {
+      this.contactos.removeAt(index);
+    } else {
+      alert('Debes mantener al menos un contacto en la lista.');
     }
-    this.cargarContactos();
   }
 
   cargarContactos(): void {
-    this.cargando = true;
-    this.errorCarga = false;
+    this.http.get<ContactoDTO[]>(`http://localhost:8080/api/formularios/${this.personaId}/contactos`)
+      .subscribe({
+        next: (data) => {
+          this.contactos.clear();
+          if (data && data.length > 0) {
+            data.forEach(contacto => this.agregarContacto(contacto));
+          } else {
+            // Si la BD venía vacía, mostramos 2 por defecto
+            this.agregarContacto();
+            this.agregarContacto();
+          }
+        },
+        error: (err) => {
+          console.error('Error al cargar contactos:', err);
+          if (this.contactos.length === 0) {
+            this.agregarContacto();
+            this.agregarContacto();
+          }
+        }
+      });
+  }
+
+  guardarContactos(): void {
     this.mensajeError = '';
-    this.registroService.obtenerContactos(this.personaId).subscribe({
-      next: contactos => {
-        contactos.forEach((contacto, index) => this.contactosForm.patchValue({
-          ['c' + (index + 1) + '_nombre']: contacto.nombre,
-          ['c' + (index + 1) + '_telefono']: contacto.telefono,
-          ['c' + (index + 1) + '_parentesco']: contacto.parentesco
-        }));
-        this.cargando = false;
-      },
-      error: () => {
-        this.cargando = false;
-        this.errorCarga = true;
-        this.mensajeError = 'No se pudieron cargar los contactos. Reintenta antes de guardar.';
-      }
-    });
-  }
+    this.mensajeExito = '';
 
-  volver(): void {
-    const valores = this.contactosForm.getRawValue();
-    this.registroService.contactosBorrador = [1, 2].map(i => ({
-      nombre: valores['c' + i + '_nombre'],
-      telefono: valores['c' + i + '_telefono'],
-      parentesco: valores['c' + i + '_parentesco']
-    }));
-    this.router.navigate(['/registro']);
-  }
-
-  errorCampo(nombre: string): string {
-    const campo = this.contactosForm.get(nombre);
-    if (!campo?.touched || !campo.errors) return '';
-    return campo.hasError('pattern') ? 'Escribe exactamente 10 dígitos, sin espacios ni prefijo +52.' : 'Este campo es obligatorio.';
-  }
-
-  guardarContactos() {
-    if (this.cargando || this.guardando || this.errorCarga) return;
     if (this.contactosForm.invalid) {
+      this.mensajeError = 'Por favor completa todos los campos requeridos (*).';
       this.contactosForm.markAllAsTouched();
-      this.mensajeError = 'Revisa los campos marcados de ambos contactos.';
       return;
     }
 
-    this.guardando = true;
-    this.mensajeError = '';
-    const valores = this.contactosForm.getRawValue();
-    const contactos = [1, 2].map(i => ({
-      nombre: valores['c' + i + '_nombre'].trim(),
-      telefono: valores['c' + i + '_telefono'],
-      parentesco: valores['c' + i + '_parentesco']
-    }));
-    if (this.nuevo) this.registroService.contactosBorrador = contactos;
-    const solicitud: Observable<unknown> = this.nuevo
-      ? this.registroService.guardarRegistroCompleto(contactos)
-      : this.registroService.guardarContactos(this.personaId, contactos);
-    solicitud.subscribe({
-      next: () => {
-        this.guardando = false;
-        if (this.nuevo) this.registroService.limpiarBorrador();
-        this.router.navigate(['/personas']);
-      },
-      error: (err) => {
-        this.guardando = false;
-        this.mensajeError = typeof err.error === 'string' ? err.error
-          : (this.nuevo ? 'No se guardó el registro. Revisa los datos e intenta nuevamente.' : 'No se guardaron los contactos. Intenta nuevamente.');
-      }
-    });
+    let listaFormulario: ContactoDTO[] = this.contactosForm.value.contactos;
+
+    // Adaptador para ser 100% compatible con la regla del Backend sin modificar Java:
+    let payload: ContactoDTO[] = [];
+
+    if (listaFormulario.length === 1) {
+      // Si el usuario solo llenó 1 contacto, duplicamos ese contacto como C2 para satisfacer al Backend
+      payload = [listaFormulario[0], { ...listaFormulario[0] }];
+    } else {
+      // Si llenó 2 o más, tomamos los contactos capturados
+      payload = listaFormulario;
+    }
+
+    this.http.put(`http://localhost:8080/api/formularios/${this.personaId}/contactos`, payload)
+      .subscribe({
+        next: (res) => {
+          this.mensajeExito = '¡Contactos guardados exitosamente!';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        error: (err) => {
+          console.error('Error al guardar contactos:', err);
+          this.mensajeError = 'Ocurrió un error al guardar los contactos. Revisa los datos ingresados.';
+        }
+      });
   }
 }

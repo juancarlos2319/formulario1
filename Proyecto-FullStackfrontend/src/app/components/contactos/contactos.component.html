@@ -1,38 +1,75 @@
 <div class="form-wrapper">
   <h2>Contactos de emergencia</h2>
-  <p *ngIf="nuevo">Paso 2 de 2. La persona se guardará junto con sus contactos al finalizar. Si recargas la página, tendrás que comenzar nuevamente.</p>
-  <p class="subtitle">Completa los dos contactos. Todos los campos son obligatorios.</p>
-  <p *ngIf="cargando" role="status">Cargando contactos…</p>
-  <p *ngIf="mensajeError" role="alert">{{ mensajeError }}</p>
-  <button *ngIf="errorCarga" type="button" (click)="cargarContactos()">Reintentar carga</button>
+  <p class="subtitle">Puedes agregar o eliminar los contactos que necesites mediante el botón inferior.</p>
+  
+  <p *ngIf="mensajeExito" style="color: green; font-weight: bold;">{{ mensajeExito }}</p>
+  <p *ngIf="mensajeError" style="color: red; font-weight: bold;">{{ mensajeError }}</p>
+
   <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
-    <fieldset class="card-section" *ngFor="let i of [1, 2]" [disabled]="cargando || guardando || errorCarga">
-      <legend>Contacto {{ i }}</legend>
-      <div class="field">
-        <label [for]="'c' + i + '_nombre'">Nombre completo *</label>
-        <input [id]="'c' + i + '_nombre'" type="text" [formControlName]="'c' + i + '_nombre'"
-          [attr.aria-describedby]="'nombre-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_nombre')">
-        <small [id]="'nombre-error-' + i">{{ errorCampo('c' + i + '_nombre') }}</small>
-      </div>
-      <div class="field">
-        <label [for]="'c' + i + '_telefono'">Teléfono (10 dígitos) *</label>
-        <input [id]="'c' + i + '_telefono'" type="tel" inputmode="numeric" [formControlName]="'c' + i + '_telefono'" placeholder="5512345678"
-          [attr.aria-describedby]="'telefono-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_telefono')">
-        <small [id]="'telefono-error-' + i">{{ errorCampo('c' + i + '_telefono') }}</small>
-      </div>
-      <div class="field">
-        <label [for]="'c' + i + '_parentesco'">Parentesco / Relación *</label>
-        <select [id]="'c' + i + '_parentesco'" [formControlName]="'c' + i + '_parentesco'"
-          [attr.aria-describedby]="'parentesco-error-' + i" [attr.aria-invalid]="!!errorCampo('c' + i + '_parentesco')">
-          <option value="">Selecciona el parentesco</option>
-          <option *ngFor="let parentesco of parentescos" [value]="parentesco">{{ parentesco }}</option>
-        </select>
-        <small [id]="'parentesco-error-' + i">{{ errorCampo('c' + i + '_parentesco') }}</small>
-      </div>
-    </fieldset>
-    <button *ngIf="nuevo" type="button" (click)="volver()" [disabled]="guardando">← Volver a los datos</button>
-    <button type="submit" class="btn-submit" [disabled]="cargando || guardando || errorCarga">
-      {{ guardando ? 'Guardando...' : 'Guardar y Finalizar' }}
+    
+    <div formArrayName="contactos">
+      <fieldset 
+        class="card-section" 
+        *ngFor="let contacto of contactos.controls; let i = index" 
+        [formGroupName]="i"
+        style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;"
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <legend style="font-weight: bold;">Contacto {{ i + 1 }}</legend>
+          <button 
+            type="button" 
+            (click)="eliminarContacto(i)" 
+            *ngIf="contactos.length > 1"
+            style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+          >
+            Eliminar
+          </button>
+        </div>
+
+        <div class="field">
+          <label [for]="'nombre_' + i">Nombre completo *</label>
+          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre completo">
+        </div>
+
+        <div class="field">
+          <label [for]="'telefono_' + i">Teléfono (10 dígitos) *</label>
+          <input [id]="'telefono_' + i" type="tel" formControlName="telefono" placeholder="5512345678">
+        </div>
+
+        <div class="field">
+          <label [for]="'parentesco_' + i">Parentesco / Relación *</label>
+          <input [id]="'parentesco_' + i" type="text" formControlName="parentesco" placeholder="Ej. Padre, Madre...">
+        </div>
+
+        <div class="field">
+          <label [for]="'genero_' + i">Género</label>
+          <select [id]="'genero_' + i" formControlName="genero">
+            <option value="">-- Selecciona --</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label [for]="'fechaNacimiento_' + i">Fecha de Nacimiento</label>
+          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento">
+        </div>
+      </fieldset>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <button 
+        type="button" 
+        (click)="agregarContacto()"
+        style="background-color: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;"
+      >
+        + Agregar otro contacto
+      </button>
+    </div>
+
+    <button type="submit" class="btn-submit">
+      Guardar y Finalizar
     </button>
   </form>
 </div>
