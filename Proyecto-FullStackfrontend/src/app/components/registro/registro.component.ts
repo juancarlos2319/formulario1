@@ -121,9 +121,18 @@ export class RegistroComponent implements OnInit {
       const [, calle, numero, colonia, cp, estado] = partes;
       this.colonias = [colonia];
       this.registroForm.patchValue({ calle, numero, colonia, cp, estado });
+      this.buscarCodigoPostal();
     } else {
+      const direccionAnterior = /^(.*?)\s+(\d+[A-Za-z]?(?:\s*[-/]\s*\w+)?)\s*$/.exec((direccion || '').trim());
+      if (direccionAnterior) {
+        const [, calle, numero] = direccionAnterior;
+        this.registroForm.patchValue({ calle, numero });
+        this.mensajeError = 'La dirección guardada no incluye código postal, colonia ni estado. Completa esos datos para consultar la ubicación.';
+        return;
+      }
+
       this.registroForm.patchValue({ calle: direccion || '' });
-      this.mensajeError = 'La dirección anterior no tiene los datos separados. Revisa la calle y completa el código postal, colonia y número antes de guardar.';
+      this.mensajeError = 'La dirección guardada no tiene un formato reconocido. Completa calle, número, código postal, colonia y estado.';
     }
   }
 
@@ -142,13 +151,15 @@ export class RegistroComponent implements OnInit {
 
           // Mapeamos los asentamientos/colonias correspondientes
           this.colonias = res.resultados.map((r) => r.asentamiento);
+          const coloniaActual = this.registroForm.get('colonia')?.value;
+          const colonia = this.colonias.includes(coloniaActual) ? coloniaActual : this.colonias[0] || '';
 
           // Asignamos a los campos bloqueados
           this.registroForm.patchValue({
             pais: 'México',
             estado: estado,
             municipio: municipio,
-            colonia: this.colonias[0] || ''
+            colonia
           });
         } else {
           alert('Código Postal no encontrado.');
@@ -171,7 +182,7 @@ export class RegistroComponent implements OnInit {
 
   campoInvalido(nombre: string): boolean {
     const campo = this.registroForm.get(nombre);
-    return !!campo && campo.invalid && campo.touched;
+    return !!campo && campo.invalid && (campo.touched || campo.dirty);
   }
 
   errorCampo(nombre: string): string {

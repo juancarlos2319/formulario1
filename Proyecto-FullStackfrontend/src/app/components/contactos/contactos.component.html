@@ -28,44 +28,51 @@
 
         <div class="field">
           <label [for]="'nombre_' + i">Nombre *</label>
-          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre">
+          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombre')" [attr.aria-describedby]="campoInvalido(i, 'nombre') ? 'nombre-error_' + i : null">
+          <small class="field-error" [id]="'nombre-error_' + i" *ngIf="campoInvalido(i, 'nombre')">{{ errorCampo(i, 'nombre') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'apellido_' + i">Apellido *</label>
-          <input [id]="'apellido_' + i" type="text" formControlName="apellido" placeholder="Apellido">
+          <input [id]="'apellido_' + i" type="text" formControlName="apellido" placeholder="Apellido" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellido')" [attr.aria-describedby]="campoInvalido(i, 'apellido') ? 'apellido-error_' + i : null">
+          <small class="field-error" [id]="'apellido-error_' + i" *ngIf="campoInvalido(i, 'apellido')">{{ errorCampo(i, 'apellido') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'fechaNacimiento_' + i">Fecha de nacimiento *</label>
-          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento">
+          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento" [attr.aria-invalid]="campoInvalido(i, 'fechaNacimiento')" [attr.aria-describedby]="campoInvalido(i, 'fechaNacimiento') ? 'fecha-error_' + i : null">
+          <small class="field-error" [id]="'fecha-error_' + i" *ngIf="campoInvalido(i, 'fechaNacimiento')">{{ errorCampo(i, 'fechaNacimiento') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'genero_' + i">Genero *</label>
-          <select [id]="'genero_' + i" formControlName="genero">
+          <select [id]="'genero_' + i" formControlName="genero" [attr.aria-invalid]="campoInvalido(i, 'genero')" [attr.aria-describedby]="campoInvalido(i, 'genero') ? 'genero-error_' + i : null">
             <option value="">Selecciona un genero</option>
             <option value="Masculino">Masculino</option>
             <option value="Femenino">Femenino</option>
           </select>
+          <small class="field-error" [id]="'genero-error_' + i" *ngIf="campoInvalido(i, 'genero')">{{ errorCampo(i, 'genero') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'email_' + i">Correo electronico *</label>
-          <input [id]="'email_' + i" type="email" formControlName="email" placeholder="correo@ejemplo.com">
+          <input [id]="'email_' + i" type="email" formControlName="email" placeholder="correo@ejemplo.com" [attr.aria-invalid]="campoInvalido(i, 'email')" [attr.aria-describedby]="campoInvalido(i, 'email') ? 'email-error_' + i : null">
+          <small class="field-error" [id]="'email-error_' + i" *ngIf="campoInvalido(i, 'email')">{{ errorCampo(i, 'email') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'telefono_' + i">Teléfono (10 dígitos) *</label>
-          <input [id]="'telefono_' + i" type="tel" formControlName="telefono" placeholder="5512345678">
+          <input [id]="'telefono_' + i" type="tel" inputmode="numeric" maxlength="10" formControlName="telefono" placeholder="5512345678" [attr.aria-invalid]="campoInvalido(i, 'telefono')" [attr.aria-describedby]="campoInvalido(i, 'telefono') ? 'telefono-error_' + i : null">
+          <small class="field-error" [id]="'telefono-error_' + i" *ngIf="campoInvalido(i, 'telefono')">{{ errorCampo(i, 'telefono') }}</small>
         </div>
 
         <div class="field">
           <label [for]="'parentesco_' + i">Parentesco *</label>
-          <select [id]="'parentesco_' + i" formControlName="idParentesco">
+          <select [id]="'parentesco_' + i" formControlName="idParentesco" [attr.aria-invalid]="campoInvalido(i, 'idParentesco')" [attr.aria-describedby]="campoInvalido(i, 'idParentesco') ? 'parentesco-error_' + i : null">
             <option [ngValue]="null">Selecciona un parentesco</option>
             <option *ngFor="let parentesco of parentescos" [ngValue]="parentesco.id">{{ parentesco.nombre }}</option>
           </select>
+          <small class="field-error" [id]="'parentesco-error_' + i" *ngIf="campoInvalido(i, 'idParentesco')">{{ errorCampo(i, 'idParentesco') }}</small>
         </div>
       </fieldset>
     </div>

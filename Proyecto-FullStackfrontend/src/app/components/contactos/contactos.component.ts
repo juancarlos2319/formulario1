@@ -66,6 +66,20 @@ export class ContactosComponent implements OnInit {
     });
   }
 
+  campoInvalido(index: number, nombre: string): boolean {
+    const campo = this.contactos.at(index).get(nombre);
+    return !!campo && campo.invalid && (campo.touched || campo.dirty);
+  }
+
+  errorCampo(index: number, nombre: string): string {
+    const errores = this.contactos.at(index).get(nombre)?.errors;
+    if (errores?.['required']) return 'Este campo es obligatorio.';
+    if (errores?.['maxlength']) return 'No puede superar 100 caracteres.';
+    if (errores?.['email']) return 'Escribe un correo electrónico válido.';
+    if (errores?.['pattern']) return 'Ingresa diez dígitos.';
+    return 'Revisa este campo.';
+  }
+
   // Botón para agregar N contactos sin límite
   agregarContacto(datos?: ContactoEmergencia): void {
     this.contactos.push(this.crearContactoGroup(datos));
