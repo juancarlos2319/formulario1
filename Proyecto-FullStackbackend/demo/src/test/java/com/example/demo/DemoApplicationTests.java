@@ -41,7 +41,8 @@ class DemoApplicationTests {
         d.setEmail("uno@example.com"); d.setCorreosAdicionales(List.of("dos@example.com"));
         d.setTelefono("5511111111"); d.setTelefonosAdicionales(List.of("5522222222"));
         d.setContactosEmergencia(java.util.stream.IntStream.range(0,cantidad)
-                .mapToObj(i -> new ContactoDTO(null,"Contacto "+i,"Apellido","5533333333",1L,null)).toList());
+                .mapToObj(i -> new ContactoDTO(null, "Contacto " + i, "Apellido", LocalDate.of(1980, 1, 1),
+                    "No especificado", "contacto@example.com", "5533333333", 1L, null)).toList());
         return d;
     }
     private ContactoDTO existente(long id) { return new ContactoDTO(id,null,null,null,1L,null); }
@@ -83,7 +84,8 @@ class DemoApplicationTests {
     @Test void falloPutRevierteCambioDeRelaciones() {
         var d=personas.guardar(formulario(2));
         assertThrows(ResponseStatusException.class,()->personas.guardarContactos(d.getId(),
-                List.of(new ContactoDTO(null,"Nuevo","Apellido","5544444444",1L,null),existente(99999))));
+                List.of(new ContactoDTO(null, "Nuevo", "Apellido", LocalDate.of(1980, 1, 1),
+                    "No especificado", "nuevo@example.com", "5544444444", 1L, null), existente(99999))));
         assertEquals(3,count("persona")); assertEquals(2,personas.obtenerContactos(d.getId()).size());
     }
     @Test void restriccionesSqlRechazanAutorreferenciaYDuplicado() {

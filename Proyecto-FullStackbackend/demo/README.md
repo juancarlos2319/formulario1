@@ -28,7 +28,7 @@ El puerto predeterminado es 8080. Los SQL no se ejecutan automáticamente con la
 
 POST `/api/auth/login` compara usuario y BCrypt, y devuelve `message`, `username` y `token`. Los **tokens nuevos duran una hora** (3600000 ms). Los tokens ya emitidos conservan su vencimiento original.
 
-Enviar `Authorization: Bearer <token>` en las rutas protegidas. `SecurityConfig` registra `JwtFilter`, que establece la identidad en `SecurityContextHolder`; `ApiAuthFilter` no forma parte de la cadena configurada actualmente. El flujo de login no comprueba rol ni baja de la cuenta. El login devuelve 404 si no existe usuario y 401 si la contraseña no coincide.
+Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, registrado en `SecurityConfig`, verifica el JWT y establece la identidad en `SecurityContextHolder`; Spring Security exige autenticación para las rutas protegidas. Solo `POST /api/auth/login` es público. CORS se gestiona con Spring Security y `@CrossOrigin` en los controladores. El login no comprueba rol ni baja de la cuenta; devuelve 404 si no existe usuario y 401 si la contraseña no coincide.
 
 ## Rutas
 
@@ -51,7 +51,7 @@ Las validaciones explícitas producen 400 y un titular inexistente/inactivo prod
 
 ## Registro y actualización
 
-El titular necesita nombre, apellido, fecha de nacimiento, ocupación al crear, dos correos y dos teléfonos. Las reglas de comunicaciones existentes se mantienen. Los contactos nuevos necesitan nombre, apellido y un teléfono de diez dígitos; no necesitan fecha de nacimiento ni ocupación.
+El titular necesita nombre, apellido, fecha de nacimiento, ocupación al crear, dos correos y dos teléfonos. Las reglas de comunicaciones existentes se mantienen. Los contactos nuevos requieren nombre, apellido, fecha de nacimiento, género, correo y un teléfono de diez dígitos, de acuerdo con las restricciones del esquema.
 
 Ejemplo de alta con una persona de contacto nueva:
 
@@ -84,7 +84,7 @@ Para vincular una persona existente, enviar su ID, no el ID de la relación:
 {"idContacto": 3, "idParentesco": 9}
 ```
 
-Con `idContacto`, se reutiliza a la persona activa y se ignoran nombre/apellido/teléfono enviados: esta operación modifica el vínculo y parentesco, no los datos compartidos. Para crear una persona nueva, omitir idContacto y proporcionar sus datos completos.
+Con `idContacto`, se reutiliza a la persona activa y se ignoran los datos personales enviados: esta operación modifica únicamente el vínculo y el parentesco, no los datos compartidos. Para crear una persona nueva, omitir idContacto y proporcionar sus datos completos.
 
 Cada elemento devuelto contiene `idContacto`, `nombre`, `apellido`, `telefono`, `idParentesco` y `parentesco`. El formulario devuelve `contactosEmergencia` completa y conserva los campos singulares del primer contacto por compatibilidad. Los IDs permiten compartir personas y conservarlas en futuras ediciones.
 
@@ -92,7 +92,7 @@ PUT de contactos recibe la lista completa que debe quedar vinculada. Los IDs aus
 
 Se rechazan listas vacías, IDs repetidos, autorreferencias, parentescos inexistentes y personas de contacto inexistentes/dadas de baja. Las modificaciones son transaccionales; si una relación falla, se revierten las personas y relaciones nuevas de la operación. El límite de 20 titulares todavía no tiene bloqueo para solicitudes concurrentes.
 
-El frontend actual ya permite listas variables, incluye apellido y conserva `idContacto` al editar. Su formulario también solicita fecha de nacimiento, género y correo para cada contacto, aunque el backend solo exige nombre, apellido y teléfono al crear una persona nueva. Al reutilizar `idContacto`, el backend conserva los datos personales y actualiza el vínculo y el parentesco.
+El frontend actual permite listas variables y conserva `idContacto` al editar. Al vincular una persona existente, bloquea sus campos personales y envía únicamente el ID y el parentesco; al crear una persona nueva, solicita todos los datos requeridos por el esquema.
 
 ## SQL inicial
 
@@ -113,6 +113,7 @@ La utilidad pide contraseña y confirmación y devuelve BCrypt; guardar el hash 
 ## Pruebas existentes
 
 - RegistroCompletoTest: 14 pruebas unitarias de listas variables, contactos compartidos, validación, distinción de titulares y límite.
+- RegistroCompletoTest: 16 pruebas unitarias de listas variables, contactos compartidos, validación, distinción de titulares y reactivación.
 - JwtUtilTest: vigencia exacta de una hora y conservación del usuario.
 - DemoApplicationTests: 7 pruebas con PostgreSQL sobre persistencia, rollback, conservación de personas compartidas, PUT repetido y restricciones SQL.
 
@@ -125,7 +126,7 @@ $env:TEST_DATABASE_USERNAME = 'postgres'
 .\mvnw.cmd test
 ```
 
-Validación de este cambio: 22 pruebas aprobadas con PostgreSQL 17 temporal. No se utilizó la base de trabajo nomina_db.
+Última ejecución local: 24 pruebas reportadas, 0 fallos y 7 pruebas de integración omitidas porque no se configuró `TEST_DATABASE_URL`. No se usó la base de trabajo `nomina_db`.
 
 ## Documentación PDF
 
@@ -168,7 +169,7 @@ Recibe las credenciales y genera el token. El login usa directamente UsuarioRepo
 
 ### FormularioController.java
 
-Archivo: [src/main/java/com/example/demo/controller/FormularioController.java](src/main/java/com/example/demo/controller/FormularioController.java). 90 líneas.
+Archivo: [src/main/java/com/example/demo/controller/FormularioController.java](src/main/java/com/example/demo/controller/FormularioController.java). 104 líneas.
 
 Expone las rutas de personas y contactos. Delega reglas en PersonaService y transforma resultados/excepciones en respuestas HTTP.
 
@@ -176,10 +177,10 @@ Expone las rutas de personas y contactos. Delega reglas en PersonaService y tran
 - Línea 14: Permite el origen localhost:4200 y los métodos/encabezados declarados.
 - Línea 21: Consulta contactos de una persona identificada por la URL.
 - Línea 26: Recibe una lista de ContactoDTO para guardarla.
-- Línea 36: Lista activos; captura RuntimeException como 500 con texto.
-- Línea 50: Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400.
-- Línea 64: Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación.
-- Línea 78: Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción.
+- Línea 50: Lista activos; captura RuntimeException como 500 con texto.
+- Línea 64: Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400.
+- Línea 78: Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación.
+- Línea 92: Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción.
 
 ### OcupacionController.java
 
@@ -193,48 +194,48 @@ Consulta el catálogo directamente a través de su repositorio.
 
 ### PersonaService.java
 
-Archivo: [src/main/java/com/example/demo/service/PersonaService.java](src/main/java/com/example/demo/service/PersonaService.java). 295 líneas.
+Archivo: [src/main/java/com/example/demo/service/PersonaService.java](src/main/java/com/example/demo/service/PersonaService.java). 343 líneas.
 
 Registra titulares y relaciona personas de contacto con parentescos. Las operaciones se ejecutan dentro de transacciones.
 
-- Línea 18: Devuelve todas las relaciones del titular activo.
-- Línea 23: Sustituye la lista completa; exige al menos uno y no impone máximo.
-- Línea 42: Lista exclusivamente titulares activos, no personas creadas solo como contacto.
-- Línea 48: Valida titular, contactos y comunicaciones antes del alta transaccional.
-- Línea 53: El límite de 20 cuenta solo titulares; no hay bloqueo concurrente.
-- Línea 59: Identifica el registro principal como titular.
-- Línea 61: Persiste persona y relaciones dentro de la misma transacción.
-- Línea 66: Actualiza datos/comunicaciones de titular activo; los contactos se gestionan en su propia ruta.
-- Línea 98: Baja lógica del titular, sin borrar personas ni relaciones compartidas.
-- Línea 119: Incluye la lista completa en la respuesta, además de los campos singulares del primero.
-- Línea 134: Devuelve comunicaciones secundarias; la siguiente línea hace lo mismo con teléfonos.
-- Línea 166: Exige nombre y apellido de hasta 100 caracteres y fecha de nacimiento a los titulares.
-- Línea 174: Rechaza personas dadas de baja o que solo sean contactos con 404.
-- Línea 186: Mínimo uno; rechaza IDs repetidos e inválidos. Las personas nuevas necesitan nombre, apellido y teléfono.
-- Línea 207: Busca parentesco existente por ID o nombre exacto; no crea catálogo desde el formulario.
-- Línea 213: Reutiliza personas activas por ID o crea personas de contacto. Rechaza autorreferencias.
-- Línea 227: La persona nueva creada como contacto no cuenta como titular.
-- Línea 250: Quita relaciones omitidas; orphanRemoval elimina solo los vínculos, nunca personas compartidas.
-- Línea 253: Devuelve ID de persona, nombre, apellido, teléfono y parentesco de la relación.
-- Línea 260: Mantiene dos correos y dos teléfonos completos para titulares.
-- Línea 277: Crea posiciones faltantes y actualiza comunicaciones principales/secundarias.
+- Línea 22: Devuelve todas las relaciones del titular activo.
+- Línea 27: Sustituye la lista completa; exige al menos uno y no impone máximo.
+- Línea 51: Lista titulares activos, no personas creadas solo como contacto.
+- Línea 80: Valida titular, contactos y comunicaciones antes del alta transaccional.
+- Línea 86: El límite de 20 cuenta solo titulares; no hay bloqueo concurrente.
+- Línea 91: Identifica y persiste el registro principal como titular.
+- Línea 92: Persiste las relaciones dentro de la misma transacción.
+- Línea 98: Actualiza datos/comunicaciones de titular activo; los contactos se gestionan en su propia ruta.
+- Línea 131: Baja lógica del titular, sin borrar personas ni relaciones compartidas.
+- Línea 149: Incluye la lista completa en la respuesta, además de los campos singulares del primero.
+- Línea 164: Devuelve comunicaciones secundarias; la siguiente línea hace lo mismo con teléfonos.
+- Línea 198: Exige nombre y apellido de hasta 100 caracteres y fecha de nacimiento a los titulares.
+- Línea 206: Rechaza personas dadas de baja o que solo sean contactos con 404.
+- Línea 218: Valida mínimo uno, IDs y datos personales requeridos para contactos nuevos.
+- Línea 247: Busca parentesco existente por ID o nombre exacto; no crea catálogo desde el formulario.
+- Línea 261: Reutiliza solo personas activas; no modifica datos compartidos.
+- Línea 265: La persona nueva creada como contacto no cuenta como titular.
+- Línea 294: Quita relaciones omitidas; orphanRemoval elimina solo los vínculos, nunca personas compartidas.
+- Línea 297: Devuelve ID de persona, nombre, apellido, teléfono y parentesco de la relación.
+- Línea 306: Mantiene dos correos y dos teléfonos completos para titulares.
+- Línea 323: Crea posiciones faltantes y actualiza comunicaciones principales/secundarias.
 
 ### SecurityConfig.java
 
-Archivo: [src/main/java/com/example/demo/config/SecurityConfig.java](src/main/java/com/example/demo/config/SecurityConfig.java). 62 líneas.
+Archivo: [src/main/java/com/example/demo/config/SecurityConfig.java](src/main/java/com/example/demo/config/SecurityConfig.java). 54 líneas.
 
 Configura la cadena de seguridad y los beans de autenticación.
 
-- Línea 19: Habilita esta configuración de seguridad.
-- Línea 33: Desactiva protección CSRF.
-- Línea 34: Habilita integración CORS.
-- Línea 35: No mantiene la autenticación en una sesión HTTP de Spring Security.
-- Línea 38: Permite OPTIONS.
-- Línea 39: Permite rutas de autenticación en esta cadena. ApiAuthFilter exceptúa exactamente login.
-- Línea 42: El resto exige identidad autenticada, sin una condición de rol.
-- Línea 45: Añade JwtFilter antes del filtro username/password. ApiAuthFilter se inyecta pero no se añade explícitamente aquí.
-- Línea 52: Devuelve un servicio que rechaza consultas; el login se resuelve en el controlador.
-- Línea 60: Proporciona el comparador/codificador BCrypt.
+- Línea 18: Habilita esta configuración de seguridad.
+- Línea 26: Desactiva protección CSRF.
+- Línea 27: Habilita integración CORS.
+- Línea 28: No mantiene la autenticación en una sesión HTTP de Spring Security.
+- Línea 31: Permite OPTIONS.
+- Línea 32: Permite únicamente el endpoint público de login.
+- Línea 35: El resto exige identidad autenticada, sin una condición de rol.
+- Línea 37: Registra JwtFilter en la cadena de Spring Security para establecer la identidad autenticada.
+- Línea 44: Devuelve un servicio que rechaza consultas; el login se resuelve en el controlador.
+- Línea 52: Proporciona el comparador/codificador BCrypt.
 
 ### JwtUtil.java
 
@@ -265,24 +266,6 @@ Construye la autenticación que Spring Security utiliza para permitir las rutas 
 - Línea 45: Guarda la identidad en el contexto para las siguientes reglas de seguridad.
 - Línea 48: Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación.
 
-### ApiAuthFilter.java
-
-Archivo: [src/main/java/com/example/demo/security/ApiAuthFilter.java](src/main/java/com/example/demo/security/ApiAuthFilter.java). 46 líneas.
-
-Añade encabezados CORS y otra comprobación de JWT para rutas API. No establece identidad en SecurityContextHolder.
-
-- Línea 11: Puede registrarse como filtro del contenedor por Spring Boot, aunque no aparezca en addFilterBefore. No debe considerarse inactivo.
-- Línea 14: Recibe JwtUtil por constructor.
-- Línea 17: Recibe petición, respuesta y la cadena que puede continuar.
-- Línea 19: Añade permisos CORS solo para el origen localhost:4200.
-- Línea 23: Indica a cachés que la respuesta depende del origen.
-- Línea 25: Reconoce preconsulta CORS del origen admitido; responde 204 y termina.
-- Línea 30: Obtiene la ruta solicitada.
-- Línea 31: Revisa rutas API, exceptuando OPTIONS y exactamente /api/auth/login.
-- Línea 35: Exige encabezado y prefijo; a continuación analiza el JWT y exige sujeto no nulo.
-- Línea 40: Ante error devuelve 401 sin cuerpo y termina.
-- Línea 44: Continúa al siguiente filtro/controlador. Si Spring Security rechazó antes, la solicitud puede no llegar a este filtro.
-
 ### FormularioDTO.java
 
 Archivo: [src/main/java/com/example/demo/dto/FormularioDTO.java](src/main/java/com/example/demo/dto/FormularioDTO.java). 65 líneas.
@@ -299,27 +282,38 @@ Contrato del titular con comunicaciones y lista variable de contactos.
 
 ### ContactoDTO.java
 
-Archivo: [src/main/java/com/example/demo/dto/ContactoDTO.java](src/main/java/com/example/demo/dto/ContactoDTO.java). 5 líneas.
+Archivo: [src/main/java/com/example/demo/dto/ContactoDTO.java](src/main/java/com/example/demo/dto/ContactoDTO.java). 11 líneas.
 
 Contrato de una relación de contacto. Los IDs distinguen una persona existente de una nueva.
 
-- Línea 4: idContacto es el ID de persona, no el ID del vínculo. Sin ID se exigen nombre, apellido y teléfono; idParentesco o parentesco identifican el catálogo.
+- Línea 5: Sin ID se exigen los datos personales requeridos; con ID solo se cambia el vínculo. idParentesco o parentesco identifican el catálogo.
 
 ### Persona.java
 
-Archivo: [src/main/java/com/example/demo/model/Persona.java](src/main/java/com/example/demo/model/Persona.java). 88 líneas.
+Archivo: [src/main/java/com/example/demo/model/Persona.java](src/main/java/com/example/demo/model/Persona.java). 35 líneas.
 
 Datos compartidos por titulares y contactos. Las colecciones se ordenan por ID ascendente.
 
 - Línea 9: Mapea la tabla persona.
-- Línea 21: Permite fecha nula para personas creadas como contacto.
-- Línea 36: Marca explícita para distinguir titular de contacto.
-- Línea 40: Ocupación opcional en persistencia; el alta del titular la exige en servicio.
-- Línea 45: Colección de vínculos salientes; cascada y eliminación de huérfanos solo sobre relaciones.
-- Línea 49: Correos ordenados por ID: primero principal y restantes adicionales.
-- Línea 53: Teléfonos ordenados del mismo modo.
-- Línea 57: Consulta la distinción de rol de registro, independiente del rol del usuario de login.
-- Línea 79: Accesor singular conservado: devuelve la primera relación.
+- Línea 14: Fecha obligatoria por esquema.
+- Línea 28: Indica si existe PerfilTitular; no es una columna propia de Persona.
+- Línea 25: Accede a los datos exclusivos del registro titular.
+- Línea 17: Lista relaciones de emergencia sin borrar contactos compartidos.
+- Línea 17: Colección de vínculos salientes; cascada y eliminación de huérfanos solo sobre relaciones.
+- Línea 18: Correos ordenados por ID: primero principal y restantes adicionales.
+- Línea 19: Teléfonos ordenados del mismo modo.
+- Línea 29: Compatibilidad: titular se deriva de la existencia de PerfilTitular.
+- Línea 32: Devuelve relaciones salientes ordenadas.
+
+### PerfilTitular.java
+
+Archivo: [src/main/java/com/example/demo/model/PerfilTitular.java](src/main/java/com/example/demo/model/PerfilTitular.java). 20 líneas.
+
+Datos exclusivos del perfil de una persona registrada como titular.
+
+- Línea 10: Comparte la clave primaria con Persona.
+- Línea 13: Requiere una ocupación del catálogo.
+- Línea 14: null indica perfil activo; una fecha registra la baja lógica.
 
 ### CatalogoOcupacion.java
 
@@ -383,13 +377,14 @@ Cuenta con username, hash y rol. No mapea id_persona aunque el script SQL lo dec
 
 ### PersonaRepository.java
 
-Archivo: [src/main/java/com/example/demo/repository/PersonaRepository.java](src/main/java/com/example/demo/repository/PersonaRepository.java). 12 líneas.
+Archivo: [src/main/java/com/example/demo/repository/PersonaRepository.java](src/main/java/com/example/demo/repository/PersonaRepository.java). 13 líneas.
 
 Acceso a personas con consultas explícitas para titulares activos.
 
 - Línea 9: Hereda persistencia y búsqueda por ID para titulares y contactos.
 - Línea 10: Lista solo titulares activos.
-- Línea 11: Cuenta solo titulares activos, excluyendo contactos del límite de 20.
+- Línea 11: Lista titulares dados de baja.
+- Línea 12: Cuenta solo titulares activos, excluyendo contactos del límite de 20.
 
 ### CatalogoOcupacionRepository.java
 
@@ -428,35 +423,36 @@ Configuración de conexión, clave JWT e Hibernate. Los secretos se omiten en el
 
 ### schema.sql
 
-Archivo: [src/main/resources/schema.sql](src/main/resources/schema.sql). 75 líneas.
+Archivo: [src/main/resources/schema.sql](src/main/resources/schema.sql). 49 líneas.
 
 Esquema con contactos como personas y unión N a N con parentesco.
 
-- Línea 12: Catálogo de parentescos.
-- Línea 19: Datos de titulares y contactos; fecha/ocupación pueden ser nulas.
-- Línea 29: Marca explícita; contactos por defecto.
-- Línea 36: Unión entre titular y contacto con parentesco.
-- Línea 44: Restricción que evita repetir el par.
-- Línea 45: Prohíbe una persona como contacto de sí misma.
-- Línea 49: Facilita búsqueda de relaciones entrantes.
-- Línea 52: Correos de hasta 150 caracteres.
-- Línea 60: Teléfonos de hasta 30 caracteres.
-- Línea 68: Cuenta con id_persona obligatorio, todavía no mapeado en la entidad Usuario.
+- Línea 2: Catálogo de parentescos.
+- Línea 5: Datos personales comunes y obligatorios de titulares y contactos.
+- Línea 14: Datos complementarios y fecha de baja lógica de titulares.
+- Línea 34: Unión entre titular y contacto con parentesco.
+- Línea 39: Restricción que evita repetir el par.
+- Línea 40: Prohíbe una persona como contacto de sí misma.
+- Línea 42: Facilita búsqueda de relaciones salientes.
+- Línea 22: Correos de hasta 150 caracteres.
+- Línea 28: Teléfonos de exactamente diez dígitos.
+- Línea 43: Cuenta con id_persona obligatorio, todavía no mapeado en la entidad Usuario.
 
 ### data.sql
 
-Archivo: [src/main/resources/data.sql](src/main/resources/data.sql). 71 líneas.
+Archivo: [src/main/resources/data.sql](src/main/resources/data.sql). 39 líneas.
 
 Semilla con ocupaciones, parentescos, dos titulares, dos contactos-persona, comunicaciones y cuentas.
 
-- Línea 6: Siete ocupaciones iniciales.
-- Línea 19: Once parentescos iniciales.
-- Línea 36: Incluye es_titular: true para administradores y false para contactos.
-- Línea 46: Correos iniciales; repetir la semilla puede duplicarlos.
-- Línea 52: Teléfonos de titulares y contactos.
-- Línea 60: Vínculos titular/contacto/parentesco; evita duplicar el mismo par.
-- Línea 66: Cuentas con hashes BCrypt; no se verificaron contraseñas.
-- Línea 71: Ajusta la secuencia de usuarios después de IDs explícitos.
+- Línea 1: Siete ocupaciones iniciales.
+- Línea 5: Once parentescos iniciales.
+- Línea 11: Crea titulares y contactos con datos personales completos.
+- Línea 19: Distingue los dos titulares iniciales y sus datos complementarios.
+- Línea 22: Correos iniciales; repetir la semilla puede duplicarlos.
+- Línea 28: Teléfonos de titulares y contactos.
+- Línea 32: Vínculos titular/contacto/parentesco; evita duplicar el mismo par.
+- Línea 35: Cuentas con hashes BCrypt; no se verificaron contraseñas.
+- Línea 39: Ajusta la secuencia de personas después de IDs explícitos.
 
 ### pom.xml
 
@@ -489,36 +485,36 @@ Utilidad interactiva para crear un hash y guardarlo en usuario.password. No actu
 
 ### RegistroCompletoTest.java
 
-Archivo: [src/test/java/com/example/demo/service/RegistroCompletoTest.java](src/test/java/com/example/demo/service/RegistroCompletoTest.java). 154 líneas.
+Archivo: [src/test/java/com/example/demo/service/RegistroCompletoTest.java](src/test/java/com/example/demo/service/RegistroCompletoTest.java). 194 líneas.
 
-Catorce pruebas unitarias con repositorios simulados.
+Dieciséis pruebas unitarias con repositorios simulados.
 
 - Línea 23: Inyecta mocks y configura respuestas de catálogo/guardado.
-- Línea 77: Comprueba mínimo uno y respuesta con IDs/apellido.
-- Línea 84: Comprueba cuatro contactos excluidos de la categoría titular.
-- Línea 92: Reutiliza una persona y conserva sus datos compartidos.
-- Línea 101: Quita vínculos sin borrar personas.
-- Línea 108: Rechaza contacto igual al titular.
-- Línea 113: Rechaza repetición de IDs en una lista.
-- Línea 133: Evita operar sobre contactos a través de las rutas de titular.
-- Línea 144: Comprueba el límite de altas.
+- Línea 78: Comprueba mínimo uno y respuesta con IDs/apellido.
+- Línea 85: Comprueba cuatro contactos excluidos de la categoría titular.
+- Línea 93: Reutiliza una persona y conserva sus datos compartidos.
+- Línea 110: Quita vínculos sin borrar personas.
+- Línea 117: Rechaza contacto igual al titular.
+- Línea 122: Rechaza repetición de IDs en una lista.
+- Línea 142: Evita operar sobre contactos a través de las rutas de titular.
+- Línea 156: Comprueba el límite de altas.
 
 ### DemoApplicationTests.java
 
-Archivo: [src/test/java/com/example/demo/DemoApplicationTests.java](src/test/java/com/example/demo/DemoApplicationTests.java). 101 líneas.
+Archivo: [src/test/java/com/example/demo/DemoApplicationTests.java](src/test/java/com/example/demo/DemoApplicationTests.java). 103 líneas.
 
 Siete pruebas de integración con PostgreSQL. Sustituyen la suite anterior que dependía de AuthService inexistente.
 
 - Línea 18: Solo habilita una base local desechable nomina_backend_test con puerto explícito.
 - Línea 24: Prueba contra el esquema SQL real, no contra uno inventado por Hibernate.
 - Línea 32: Crea tablas si faltan y vacía datos de la base de prueba.
-- Línea 50: Comprueba la persistencia de cuatro personas de contacto y un titular.
-- Línea 59: Verifica que borrar un vínculo no borra al contacto compartido.
-- Línea 70: Comprueba repetición segura cuando se conservan los IDs.
-- Línea 76: Comprueba rollback del alta completa.
-- Línea 83: Comprueba rollback durante sustitución de contactos.
-- Línea 89: Verifica CHECK y UNIQUE en PostgreSQL.
-- Línea 96: Baja lógica sin borrado de personas.
+- Línea 51: Comprueba la persistencia de cuatro personas de contacto y un titular.
+- Línea 60: Verifica que borrar un vínculo no borra al contacto compartido.
+- Línea 71: Comprueba repetición segura cuando se conservan los IDs.
+- Línea 77: Comprueba rollback del alta completa.
+- Línea 84: Comprueba rollback durante sustitución de contactos.
+- Línea 91: Verifica CHECK y UNIQUE en PostgreSQL.
+- Línea 98: Baja lógica sin borrado de personas.
 
 ### maven-wrapper.properties
 

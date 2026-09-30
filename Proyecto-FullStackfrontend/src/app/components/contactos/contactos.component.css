@@ -17,6 +17,22 @@ h2 {
   margin-bottom: 1.5rem;
 }
 
+.shared-person-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid #39825c;
+  background: #f2fbf6;
+  color: #294c38;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.field :disabled {
+  background: #eef1ef;
+  color: #69736c;
+  cursor: not-allowed;
+}
+
 .card-section {
   background: #f8fafc;
   padding: 1.2rem;

@@ -56,14 +56,15 @@ export class ContactosComponent implements OnInit {
 
   // Crea la estructura de un contacto
   crearContactoGroup(datos?: ContactoEmergencia): FormGroup {
+    const personaExistente = datos?.idContacto != null;
     return this.fb.group({
       idContacto: [datos?.idContacto ?? null],
-      nombre: [datos?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
-      apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
-      fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
-      genero: [datos?.genero ?? '', Validators.required],
-      email: [datos?.email ?? '', [Validators.required, Validators.email]],
-      telefono: [datos?.telefono ?? '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      nombre: [{ value: datos?.nombre ?? '', disabled: personaExistente }, [Validators.required, Validators.maxLength(100)]],
+      apellido: [{ value: datos?.apellido ?? '', disabled: personaExistente }, [Validators.required, Validators.maxLength(100)]],
+      fechaNacimiento: [{ value: datos?.fechaNacimiento ?? '', disabled: personaExistente }, Validators.required],
+      genero: [{ value: datos?.genero ?? '', disabled: personaExistente }, Validators.required],
+      email: [{ value: datos?.email ?? '', disabled: personaExistente }, [Validators.required, Validators.email]],
+      telefono: [{ value: datos?.telefono ?? '', disabled: personaExistente }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
   }
@@ -128,7 +129,12 @@ export class ContactosComponent implements OnInit {
       return;
     }
 
-    const payload = this.contactos.getRawValue() as ContactoEmergencia[];
+    const payload = this.contactos.controls.map(control => {
+      const contacto = control.getRawValue() as ContactoEmergencia;
+      return contacto.idContacto == null
+        ? contacto
+        : { idContacto: contacto.idContacto, idParentesco: contacto.idParentesco };
+    });
     const solicitud: Observable<ContactoEmergencia[] | Usuario> = this.personaId
       ? this.registroService.guardarContactos(this.personaId, payload)
       : this.registroService.guardarRegistroCompleto(payload);

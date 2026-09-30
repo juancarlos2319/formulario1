@@ -220,7 +220,7 @@ public class PersonaService {
         java.util.Set<Long> ids = new java.util.HashSet<>();
         for (var c : contactos) {
             if (c == null) throw invalido("El contacto no puede ser nulo");
-            if ((c.idContacto() == null || c.nombre() != null || c.apellido() != null || c.telefono() != null) &&
+            if (c.idContacto() == null &&
                     (c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 100 ||
                     c.apellido() == null || c.apellido().isBlank() || c.apellido().length() > 100 ||
                     c.fechaNacimiento() == null || c.genero() == null || c.genero().isBlank() ||
@@ -259,23 +259,8 @@ public class PersonaService {
             Persona contacto;
             if (dto.idContacto() != null) {
                 contacto = personaRepository.findById(dto.idContacto())
-                        .filter(p -> true)
+                        .filter(p -> p.getPerfilTitular() == null || p.getPerfilTitular().getFechaBaja() == null)
                         .orElseThrow(() -> invalido("La persona de contacto no existe o estÃƒÂ¡ dada de baja"));
-                if (dto.nombre() != null || dto.apellido() != null || dto.telefono() != null) {
-                    contacto.setNombre(dto.nombre().trim());
-                    contacto.setApellido(dto.apellido().trim());
-                    contacto.setFechaNacimiento(dto.fechaNacimiento());
-                    contacto.setGenero(dto.genero().trim());
-                    PersonaTelefono telefono = contacto.getTelefonos().isEmpty() ? new PersonaTelefono() : contacto.getTelefonos().get(0);
-                    if (telefono.getPersona() == null) {
-                        telefono.setPersona(contacto);
-                        contacto.getTelefonos().add(telefono);
-                    }
-                    telefono.setTelefono(dto.telefono());
-                    PersonaCorreo correo = contacto.getCorreos().isEmpty() ? new PersonaCorreo() : contacto.getCorreos().get(0);
-                    if (correo.getPersona() == null) { correo.setPersona(contacto); contacto.getCorreos().add(correo); }
-                    correo.setCorreo(dto.email().trim());
-                }
             } else {
                 contacto = new Persona();
                 contacto.setNombre(dto.nombre().trim());

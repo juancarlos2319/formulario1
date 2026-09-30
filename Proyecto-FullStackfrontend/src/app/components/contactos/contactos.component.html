@@ -26,6 +26,10 @@
           </button>
         </div>
 
+        <p *ngIf="contacto.get('idContacto')?.value != null" class="shared-person-note">
+          Los datos personales de una persona compartida no se modifican desde este vínculo.
+        </p>
+
         <div class="field">
           <label [for]="'nombre_' + i">Nombre *</label>
           <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombre')" [attr.aria-describedby]="campoInvalido(i, 'nombre') ? 'nombre-error_' + i : null">

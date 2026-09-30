@@ -25,14 +25,14 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                          'las relaciones del titular activo.\n'
                          'public List<com.example.demo.dto.ContactoDTO> guardarContactos | Sustituye la '
                          'lista completa; exige al menos uno y no impone máximo.\n'
-                         'findByTitularTrueAndFechaBajaIsNull | Lista exclusivamente titulares activos, no '
+                         'findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull | Lista titulares activos, no '
                          'personas creadas solo como contacto.\n'
                          'public FormularioDTO guardar | Valida titular, contactos y comunicaciones antes '
                          'del alta transaccional.\n'
-                         'countByTitularTrueAndFechaBajaIsNull | El límite de 20 cuenta solo titulares; no '
+                         'personasActivas >= 20 | El límite de 20 cuenta solo titulares; no '
                          'hay bloqueo concurrente.\n'
-                         'persona.setTitular(true) | Identifica el registro principal como titular.\n'
-                         'saveAndFlush(persona) | Persiste persona y relaciones dentro de la misma '
+                         'Persona guardada = personaRepository.saveAndFlush(persona) | Identifica y persiste el registro principal como titular.\n'
+                         'reemplazarContactos(guardada, dto.getContactosEmergencia()) | Persiste las relaciones dentro de la misma '
                          'transacción.\n'
                          'public FormularioDTO actualizar | Actualiza datos/comunicaciones de titular '
                          'activo; los contactos se gestionan en su propia ruta.\n'
@@ -46,13 +46,11 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                          'fecha de nacimiento a los titulares.\n'
                          'private Persona titularActivo | Rechaza personas dadas de baja o que solo sean '
                          'contactos con 404.\n'
-                         'private void validarContactos | Mínimo uno; rechaza IDs repetidos e inválidos. Las '
-                         'personas nuevas necesitan nombre, apellido y teléfono.\n'
+                         'private void validarContactos | Valida mínimo uno, IDs y datos personales requeridos para contactos nuevos.\n'
                          'private CatalogoParentesco resolverParentesco | Busca parentesco existente por ID '
                          'o nombre exacto; no crea catálogo desde el formulario.\n'
-                         'private void reemplazarContactos | Reutiliza personas activas por ID o crea '
-                         'personas de contacto. Rechaza autorreferencias.\n'
-                         'contacto.setTitular(false) | La persona nueva creada como contacto no cuenta como '
+                         'contacto = personaRepository.findById(dto.idContacto()) | Reutiliza solo personas activas; no modifica datos compartidos.\n'
+                         'contacto = new Persona() | La persona nueva creada como contacto no cuenta como '
                          'titular.\n'
                          'titular.getContactosEmergencia().removeIf | Quita relaciones omitidas; '
                          'orphanRemoval elimina solo los vínculos, nunca personas compartidas.\n'
@@ -77,8 +75,7 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
  'ContactoDTO.java': ('Contrato de una relación de contacto. Los IDs distinguen una persona existente de una '
                       'nueva.',
                       '\n'
-                      'public record | idContacto es el ID de persona, no el ID del vínculo. Sin ID se '
-                      'exigen nombre, apellido y teléfono; idParentesco o parentesco identifican el '
+                      'public record | Sin ID se exigen los datos personales requeridos; con ID solo se cambia el vínculo. idParentesco o parentesco identifican el '
                       'catálogo.\n'),
  'FormularioDTO.java': ('Contrato del titular con comunicaciones y lista variable de contactos.',
                         '\n'
@@ -97,20 +94,17 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                   'ascendente.',
                   '\n'
                   '@Table | Mapea la tabla persona.\n'
-                  '@Column(name = "fecha_nacimiento") | Permite fecha nula para personas creadas como '
-                  'contacto.\n'
-                  '@Column(name = "es_titular" | Marca explícita para distinguir titular de contacto.\n'
-                  '@JoinColumn(name = "id_ocupacion") | Ocupación opcional en persistencia; el alta del '
-                  'titular la exige en servicio.\n'
+                  '@Column(name = "fecha_nacimiento", nullable = false) | Fecha obligatoria por esquema.\n'
+                  'public boolean isTitular | Indica si existe PerfilTitular; no es una columna propia de Persona.\n'
+                  'public PerfilTitular getPerfilTitular | Accede a los datos exclusivos del registro titular.\n'
+                  '@OneToMany(mappedBy = "persona" | Lista relaciones de emergencia sin borrar contactos compartidos.\n'
                   'private List<ContactoEmergencia> | Colección de vínculos salientes; cascada y eliminación '
                   'de huérfanos solo sobre relaciones.\n'
                   'private List<PersonaCorreo> | Correos ordenados por ID: primero principal y restantes '
                   'adicionales.\n'
                   'private List<PersonaTelefono> | Teléfonos ordenados del mismo modo.\n'
-                  'public boolean isTitular | Consulta la distinción de rol de registro, independiente del '
-                  'rol del usuario de login.\n'
-                  'public ContactoEmergencia getContactoEmergencia | Accesor singular conservado: devuelve '
-                  'la primera relación.\n'),
+                  'public void setTitular | Compatibilidad: titular se deriva de la existencia de PerfilTitular.\n'
+                  'public List<ContactoEmergencia> getContactosEmergencia | Devuelve relaciones salientes ordenadas.\n'),
  'PersonaCorreo.java': ('Correo asociado a una persona; longitud alineada en 150 con SQL y servicio.',
                         '\n'
                         '@Table | Mapea persona_correo.\n'
@@ -130,22 +124,22 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                             '\n'
                             'extends JpaRepository | Hereda persistencia y búsqueda por ID para titulares y '
                             'contactos.\n'
-                            'findByTitularTrueAndFechaBajaIsNull | Lista solo titulares activos.\n'
-                            'countByTitularTrueAndFechaBajaIsNull | Cuenta solo titulares activos, '
+                            'findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull | Lista solo titulares activos.\n'
+                            'findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull | Lista titulares dados de baja.\n'
+                            'countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull | Cuenta solo titulares activos, '
                             'excluyendo contactos del límite de 20.\n'),
  'schema.sql': ('Esquema con contactos como personas y unión N a N con parentesco.',
                 '\n'
                 'CREATE TABLE IF NOT EXISTS catalogo_parentesco | Catálogo de parentescos.\n'
-                'CREATE TABLE IF NOT EXISTS persona ( | Datos de titulares y contactos; fecha/ocupación '
-                'pueden ser nulas.\n'
-                'es_titular BOOLEAN | Marca explícita; contactos por defecto.\n'
+                'CREATE TABLE IF NOT EXISTS persona ( | Datos personales comunes y obligatorios de titulares y contactos.\n'
+                'CREATE TABLE IF NOT EXISTS perfil_titular | Datos complementarios y fecha de baja lógica de titulares.\n'
                 'CREATE TABLE IF NOT EXISTS persona_contacto_emergencia | Unión entre titular y contacto con '
                 'parentesco.\n'
                 'uq_pce_par | Restricción que evita repetir el par.\n'
                 'ck_pce_distintos | Prohíbe una persona como contacto de sí misma.\n'
-                'CREATE INDEX IF NOT EXISTS idx_pce_contacto | Facilita búsqueda de relaciones entrantes.\n'
+                'CREATE INDEX IF NOT EXISTS idx_pce_persona | Facilita búsqueda de relaciones salientes.\n'
                 'CREATE TABLE IF NOT EXISTS persona_correo | Correos de hasta 150 caracteres.\n'
-                'CREATE TABLE IF NOT EXISTS persona_telefono | Teléfonos de hasta 30 caracteres.\n'
+                'CREATE TABLE IF NOT EXISTS persona_telefono | Teléfonos de exactamente diez dígitos.\n'
                 'CREATE TABLE IF NOT EXISTS usuario | Cuenta con id_persona obligatorio, todavía no mapeado '
                 'en la entidad Usuario.\n'),
  'data.sql': ('Semilla con ocupaciones, parentescos, dos titulares, dos contactos-persona, comunicaciones y '
@@ -153,23 +147,22 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
               '\n'
               'INSERT INTO catalogo_ocupacion | Siete ocupaciones iniciales.\n'
               'INSERT INTO catalogo_parentesco | Once parentescos iniciales.\n'
-              'INSERT INTO persona ( | Incluye es_titular: true para administradores y false para '
-              'contactos.\n'
+              'INSERT INTO persona ( | Crea titulares y contactos con datos personales completos.\n'
+              'INSERT INTO perfil_titular | Distingue los dos titulares iniciales y sus datos complementarios.\n'
               'INSERT INTO persona_correo | Correos iniciales; repetir la semilla puede duplicarlos.\n'
               'INSERT INTO persona_telefono | Teléfonos de titulares y contactos.\n'
               'INSERT INTO persona_contacto_emergencia | Vínculos titular/contacto/parentesco; evita '
               'duplicar el mismo par.\n'
               'INSERT INTO usuario | Cuentas con hashes BCrypt; no se verificaron contraseñas.\n'
-              "SELECT setval('usuario_id_seq' | Ajusta la secuencia de usuarios después de IDs "
-              'explícitos.\n'),
- 'RegistroCompletoTest.java': ('Catorce pruebas unitarias con repositorios simulados.',
+              "SELECT setval('persona_id_seq' | Ajusta la secuencia de personas después de IDs explícitos.\n"),
+ 'RegistroCompletoTest.java': ('Dieciséis pruebas unitarias con repositorios simulados.',
                                '\n'
                                '@BeforeEach | Inyecta mocks y configura respuestas de catálogo/guardado.\n'
                                'void permiteUnContactoYDevuelveIdentidadCompleta | Comprueba mínimo uno y '
                                'respuesta con IDs/apellido.\n'
                                'void permiteMasDeDosContactosSinContarlosComoTitulares | Comprueba cuatro '
                                'contactos excluidos de la categoría titular.\n'
-                               'void compartePersonaEntreTitularesSinModificarSusDatos | Reutiliza una '
+                               'void compartePersonaSinModificarSusDatosPersonales | Reutiliza una '
                                'persona y conserva sus datos compartidos.\n'
                                'void reemplazarQuitaSoloRelacionYSostieneLasConservadas | Quita vínculos sin '
                                'borrar personas.\n'
@@ -274,9 +267,9 @@ add('SecurityConfig.java', 'Configura la cadena de seguridad y los beans de aute
 .cors( | Habilita integración CORS.
 SessionCreationPolicy.STATELESS | No mantiene la autenticación en una sesión HTTP de Spring Security.
 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS | Permite OPTIONS.
-.requestMatchers("/api/auth/**") | Permite rutas de autenticación en esta cadena. ApiAuthFilter exceptúa exactamente login.
+.requestMatchers("/api/auth/login") | Permite únicamente el endpoint público de login.
 .anyRequest().authenticated() | El resto exige identidad autenticada, sin una condición de rol.
-.addFilterBefore | Añade JwtFilter antes del filtro username/password. ApiAuthFilter se inyecta pero no se añade explícitamente aquí.
+.addFilterBefore | Registra JwtFilter en la cadena de Spring Security para establecer la identidad autenticada.
 public UserDetailsService | Devuelve un servicio que rechaza consultas; el login se resuelve en el controlador.
 return new BCryptPasswordEncoder | Proporciona el comparador/codificador BCrypt.
 ''')
@@ -298,19 +291,6 @@ if (username != null | Crea autenticación solo si hay sujeto y el contexto aún
 Collections.emptyList() | Construye autenticación sin autoridades/roles.
 SecurityContextHolder.getContext().setAuthentication | Guarda la identidad en el contexto para las siguientes reglas de seguridad.
 filterChain.doFilter | Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación.
-''')
-add('ApiAuthFilter.java', 'Añade encabezados CORS y otra comprobación de JWT para rutas API. No establece identidad en SecurityContextHolder.', '''
-@Component | Puede registrarse como filtro del contenedor por Spring Boot, aunque no aparezca en addFilterBefore. No debe considerarse inactivo.
-public ApiAuthFilter | Recibe JwtUtil por constructor.
-protected void doFilterInternal | Recibe petición, respuesta y la cadena que puede continuar.
-equals(request.getHeader("Origin")) | Añade permisos CORS solo para el origen localhost:4200.
-response.addHeader("Vary" | Indica a cachés que la respuesta depende del origen.
-request.getHeader("Access-Control-Request-Method") | Reconoce preconsulta CORS del origen admitido; responde 204 y termina.
-String path = | Obtiene la ruta solicitada.
-path.startsWith("/api/") | Revisa rutas API, exceptuando OPTIONS y exactamente /api/auth/login.
-authorization.startsWith("Bearer ") | Exige encabezado y prefijo; a continuación analiza el JWT y exige sujeto no nulo.
-response.setStatus(401) | Ante error devuelve 401 sin cuerpo y termina.
-chain.doFilter | Continúa al siguiente filtro/controlador. Si Spring Security rechazó antes, la solicitud puede no llegar a este filtro.
 ''')
 add('FormularioDTO.java', 'Contrato JSON del formulario. Contiene datos personales, comunicación principal/secundaria y una lista de contactos para el alta; conserva los campos singulares del primer contacto para la respuesta.', '''
 private java.util.List<String> correosAdicionales | Lista secundaria inicialmente vacía. El servicio exige exactamente un elemento en alta y actualización.
@@ -336,6 +316,7 @@ private List<PersonaTelefono> | Lista ordenada de teléfonos con principal en la
 public ContactoEmergencia getContactoEmergencia | Devuelve solo el primer contacto para los campos singulares del DTO.
 contactosEmergencia.clear() | El setter singular borra la colección antes de añadir su contacto; el alta actual usa directamente la lista.
 ''')
+add('PerfilTitular.java', 'Datos exclusivos del perfil de una persona registrada como titular.', '@MapsId | Comparte la clave primaria con Persona.\n@ManyToOne | Requiere una ocupación del catálogo.\n@Column(name = "fecha_baja") | null indica perfil activo; una fecha registra la baja lógica.')
 for name, purpose, field in [
     ('CatalogoOcupacion','Nombre de ocupación reutilizado por personas.','private String nombre'),
     ('PersonaCorreo','Correo de una persona. Column establece longitud 100, distinta del límite 150 del servicio y del esquema SQL.','private String correo'),
@@ -512,14 +493,15 @@ styles={
 }
 def para(text,style='body'): return Paragraph(escape(text),styles[style])
 story=[Spacer(1,65),para('Guía del backend','title'),para('Todos los archivos y sus líneas importantes','title'),para('Revisión: '+stamp),para(f'{len(resolved)} archivos · Java 21 · Spring Boot · PostgreSQL'),Spacer(1,18),para('Actualización: contactos como personas compartidas, mínimo uno sin máximo; parentesco por relación, distinción de titulares y JWT de una hora.'),para('Cada capítulo identifica ruta, responsabilidad y líneas verificadas del archivo actual. Los números cuentan también líneas vacías. Si una línea larga se divide visualmente, solo el primer renglón lleva número.'),para('El código se reproduce con numeración. Contraseña de base, clave JWT y hashes se omiten en la copia. Las sangrías excesivas de SQL se reducen sin alterar números de línea. README y lanzadores Maven se muestran con extractos.'),para('Método: lectura estática. Se ejecutaron 22 pruebas y se verificaron los SQL en PostgreSQL temporal, sin modificar nomina_db. Se cubren fuentes, pruebas, scripts, configuración y README; no metadatos de Git/IDE ni target. El generador, manifiesto y PDF son entregables nuevos.'),PageBreak(),para('Funcionamiento y cambios actuales','title')]
+story[9] = para('Método: lectura estática. Maven reportó 24 pruebas, cero fallos y siete integraciones omitidas por no configurar una base desechable; no se modificó nomina_db.')
 for text in [
  'Frontend → filtros → controlador → servicio → repositorio → PostgreSQL. El DTO transporta datos; la entidad modela su persistencia.',
- 'AuthController compara BCrypt. JwtUtil emite tokens de una hora y JwtFilter establece autenticación; no comprueba rol/baja de la cuenta.',
+ 'AuthController compara BCrypt. JwtUtil emite tokens de una hora y JwtFilter establece autenticación; solo POST /api/auth/login es público.',
  'guardar exige mínimo un contacto, comunicaciones completas y máximo 20 titulares activos. Crea personas o reutiliza IDs, vincula parentescos y persiste transaccionalmente. No hay bloqueo concurrente del contador.',
  'actualizar exige correo y teléfono principal y secundario. Crea las posiciones faltantes y modifica las dos primeras. No cambia contactos: para ello se utiliza la ruta específica de contactos.',
  'La respuesta contiene comunicaciones, lista completa de contactos con sus IDs y campos singulares del primero. PUT de contactos reemplaza los vínculos sin eliminar personas compartidas.',
- 'Los contactos tienen fecha y ocupación opcionales; es_titular los distingue del registro principal. Correo/teléfono se alinearon con SQL. Usuario todavía no mapea id_persona.',
- 'Validación: 22 pruebas aprobadas (14 unitarias del servicio, una de JWT y siete con PostgreSQL temporal).',
+ 'PerfilTitular distingue titulares de contactos; los contactos nuevos requieren los campos personales del esquema. Los vínculos existentes conservan sus datos compartidos.',
+ 'Validación local: Maven reportó 24 pruebas, cero fallos y siete integraciones omitidas por no configurar una base PostgreSQL desechable.',
  'El README contiene el ejemplo JSON actualizado, rutas y configuración. Para encontrar una referencia, abrir la ruta del capítulo en IntelliJ y pulsar Ctrl+G con el número indicado.'
 ]: story.append(para(text))
 story += [PageBreak(),para('Índice navegable','title')]
