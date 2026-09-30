@@ -1,27 +1,28 @@
-# FormularioRegistro
+# Frontend de formularios
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.21.
+Aplicación Angular 18.2 y TypeScript 5.5 para autenticación y administración de titulares y contactos de emergencia. Se comunica con la API Spring Boot en `http://localhost:8080`.
 
-## Development server
+## Requisitos y ejecución
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Instala Node.js y npm. Desde `Proyecto-FullStackfrontend/`, ejecuta `npm ci` y `npm start`; abre `http://localhost:4200/`. El backend y PostgreSQL deben estar disponibles para iniciar sesión y guardar datos.
 
-## Code scaffolding
+## Funciones y rutas
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Rutas principales: `/inicio` (login), `/dashboard`, `/personas`, `/registro`, `/registro/:id`, `/contactos` y `/contactos/:id`. Las rutas administrativas requieren autenticación.
 
-## Build
+El alta conserva los datos del titular como borrador en el flujo y crea el registro al guardar sus contactos. Se admiten varios contactos y se debe conservar al menos uno. Al editar, se conserva `idContacto` para reutilizar la persona y modificar su vínculo/parentesco.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+El formulario de contactos pide nombre, apellido, fecha de nacimiento, género, correo, teléfono y parentesco. La API solo exige nombre, apellido y teléfono para una persona nueva; con `idContacto` conserva los datos personales existentes. Consulta el [contrato de la API](../Proyecto-FullStackbackend/demo/README.md) antes de modificar estos campos.
 
-## Running unit tests
+## Integración con la API
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+La URL local de la API es `http://localhost:8080`. Al cambiar de entorno, revisa `AuthService`, `RegistroService` y `jwt.interceptor.ts`; el backend debe permitir el origen `http://localhost:4200`.
 
-## Running end-to-end tests
+## Autenticación
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+El JWT se almacena en `localStorage`; el borrador de alta usa `sessionStorage`. El interceptor agrega la autorización y limpia la sesión ante respuestas 401 o 403.
 
-## Further help
+## Validación
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Ejecuta `npm run build` para compilar y `npm test` para las pruebas unitarias con Jasmine/Karma. `package.json` no configura pruebas E2E.
+

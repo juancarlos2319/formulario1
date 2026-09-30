@@ -16,19 +16,19 @@ El frontend envía JSON al controlador; PersonaService valida y coordina transac
 
 ## Configuración
 
-La conexión a `nomina_db` y `jwt.secret` se configuran en `src/main/resources/application.properties`. Contiene valores directos; no usa referencias a DB_PASSWORD/JWT_SECRET. CORS admite `http://localhost:4200`.
+La configuración local de PostgreSQL y JWT está en `src/main/resources/application.properties`. **El archivo contiene valores sensibles escritos directamente**: no los copies a documentación, logs o ejemplos; externalízalos antes de desplegar o compartir el proyecto y rota los secretos si ya fueron expuestos. No se debe asumir que las variables de entorno ya están conectadas a la configuración actual. CORS admite `http://localhost:4200`.
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-El puerto predeterminado es 8080. Los SQL no se ejecutan automáticamente con la configuración PostgreSQL actual. Como la base aún no se ha creado, usa directamente los scripts actuales.
+El puerto predeterminado es 8080. Los SQL no se ejecutan automáticamente con la configuración PostgreSQL actual. Para una base nueva, crea `nomina_db`, ejecuta primero `schema.sql` y después `data.sql` como se indica abajo. Ejecuta `data.sql` una sola vez.
 
 ## Autenticación
 
 POST `/api/auth/login` compara usuario y BCrypt, y devuelve `message`, `username` y `token`. Los **tokens nuevos duran una hora** (3600000 ms). Los tokens ya emitidos conservan su vencimiento original.
 
-Enviar `Authorization: Bearer <token>` en las rutas protegidas. JwtFilter establece la identidad en SecurityContextHolder; ApiAuthFilter añade comprobaciones JWT/CORS. El flujo actual no comprueba rol ni baja de la cuenta durante login o validación de un token. El login devuelve 404 si no existe usuario y 401 si la contraseña no coincide.
+Enviar `Authorization: Bearer <token>` en las rutas protegidas. `SecurityConfig` registra `JwtFilter`, que establece la identidad en `SecurityContextHolder`; `ApiAuthFilter` no forma parte de la cadena configurada actualmente. El flujo de login no comprueba rol ni baja de la cuenta. El login devuelve 404 si no existe usuario y 401 si la contraseña no coincide.
 
 ## Rutas
 
@@ -89,7 +89,7 @@ PUT de contactos recibe la lista completa que debe quedar vinculada. Los IDs aus
 
 Se rechazan listas vacías, IDs repetidos, autorreferencias, parentescos inexistentes y personas de contacto inexistentes/dadas de baja. Las modificaciones son transaccionales; si una relación falla, se revierten las personas y relaciones nuevas de la operación. El límite de 20 titulares todavía no tiene bloqueo para solicitudes concurrentes.
 
-El frontend anterior necesita adaptarse: incluir apellido al crear contactos, conservar idContacto al editar y permitir listas de longitud variable.
+El frontend actual ya permite listas variables, incluye apellido y conserva `idContacto` al editar. Su formulario también solicita fecha de nacimiento, género y correo para cada contacto, aunque el backend solo exige nombre, apellido y teléfono al crear una persona nueva. Al reutilizar `idContacto`, el backend conserva los datos personales y actualiza el vínculo y el parentesco.
 
 ## SQL inicial
 
