@@ -6,6 +6,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PersonasComponent } from './components/personas/personas.component';
 import { RegistroComponent } from './components/registro/registro.component';
 import { ContactosComponent } from './components/contactos/contactos.component';
+import { ContactosListaComponent } from './components/contactos-lista/contactos-lista.component';
 import { PersonasDesactivadasComponent } from './components/personas-desactivadas/personas-desactivadas.component';
 
 export const routes: Routes = [
@@ -23,8 +24,10 @@ export const routes: Routes = [
       { path: 'registro', component: RegistroComponent, data: { titulo: 'Registro' } },
       { path: 'registro/:id', component: RegistroComponent, data: { titulo: 'Editar persona' } },
       { path: 'contactos', component: ContactosComponent, data: { titulo: 'Contactos de emergencia' } },
-      { path: 'contactos/:id', component: ContactosComponent, data: { titulo: 'Contactos de emergencia' } }
+      { path: 'contactos/:id/editar/:contactoId', component: ContactosComponent, data: { titulo: 'Editar contacto', modoContactos: 'editar' } },
+      { path: 'contactos/:id/agregar', component: ContactosComponent, data: { titulo: 'Agregar contacto', modoContactos: 'agregar' } },
+      { path: 'contactos/:id', component: ContactosListaComponent, data: { titulo: 'Contactos de emergencia' } }
     ]
   },
-  { path: '**', redirectTo: 'inicio' }
+    { path: '**', redirectTo: 'inicio' }
 ];

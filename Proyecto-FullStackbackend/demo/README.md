@@ -84,7 +84,7 @@ Para vincular una persona existente, enviar su ID, no el ID de la relación:
 {"idContacto": 3, "idParentesco": 9}
 ```
 
-Con `idContacto`, se reutiliza a la persona activa y se ignoran los datos personales enviados: esta operación modifica únicamente el vínculo y el parentesco, no los datos compartidos. Para crear una persona nueva, omitir idContacto y proporcionar sus datos completos.
+Con `idContacto` y solo `idParentesco`, se reutiliza a la persona activa y se modifica únicamente el vínculo. Si también se envían nombre, apellido, fecha de nacimiento, género, correo y teléfono válidos, se actualiza la persona compartida; el cambio afecta a todos sus titulares. Para crear una persona nueva, omitir `idContacto` y proporcionar sus datos completos.
 
 Cada elemento devuelto contiene `idContacto`, `nombre`, `apellido`, `telefono`, `idParentesco` y `parentesco`. El formulario devuelve `contactosEmergencia` completa y conserva los campos singulares del primer contacto por compatibilidad. Los IDs permiten compartir personas y conservarlas en futuras ediciones.
 
@@ -92,7 +92,7 @@ PUT de contactos recibe la lista completa que debe quedar vinculada. Los IDs aus
 
 Se rechazan listas vacías, IDs repetidos, autorreferencias, parentescos inexistentes y personas de contacto inexistentes/dadas de baja. Las modificaciones son transaccionales; si una relación falla, se revierten las personas y relaciones nuevas de la operación. El límite de 20 titulares todavía no tiene bloqueo para solicitudes concurrentes.
 
-El frontend actual permite listas variables y conserva `idContacto` al editar. Al vincular una persona existente, bloquea sus campos personales y envía únicamente el ID y el parentesco; al crear una persona nueva, solicita todos los datos requeridos por el esquema.
+El frontend permite listas variables. Desde la lista de contactos se puede editar una persona compartida (con confirmación del impacto en todos sus titulares), cambiar solo el parentesco o agregar un contacto nuevo.
 
 ## SQL inicial
 

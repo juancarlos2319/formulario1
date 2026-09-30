@@ -13,11 +13,15 @@ import { FeedbackService } from '../shared/feedback/feedback.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './contactos.component.html',
-  styleUrls: ['./contactos.component.css']
+  styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
 })
 export class ContactosComponent implements OnInit {
   contactosForm!: FormGroup;
-  personaId!: number;
+  personaId = 0;
+  contactoId: number | null = null;
+  modoEdicion = false;
+  modoAgregar = false;
+  contactosOriginales: ContactoEmergencia[] = [];
   mensajeError: string = '';
   mensajeExito: string = '';
   parentescos: Parentesco[] = [];
@@ -37,7 +41,11 @@ export class ContactosComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.personaId = +idParam;
+      this.personaId = Number(idParam);
+      this.modoEdicion = this.route.snapshot.data['modoContactos'] === 'editar';
+      this.modoAgregar = this.route.snapshot.data['modoContactos'] === 'agregar';
+      const contactoId = this.route.snapshot.paramMap.get('contactoId');
+      this.contactoId = contactoId === null ? null : Number(contactoId);
       this.cargarContactos();
     } else {
       if (!this.registroService.obtenerBorrador()) {
@@ -54,17 +62,27 @@ export class ContactosComponent implements OnInit {
     return this.contactosForm.get('contactos') as FormArray;
   }
 
+  numeroContacto(index: number): number {
+    const idContacto = this.contactos.at(index).get('idContacto')?.value as number | null;
+    if (this.modoEdicion && idContacto != null) {
+      const indiceOriginal = this.contactosOriginales.findIndex(contacto => contacto.idContacto === idContacto);
+      if (indiceOriginal >= 0) return indiceOriginal + 1;
+    }
+    if (this.modoEdicion) return this.contactosOriginales.length + index;
+    if (this.modoAgregar) return this.contactosOriginales.length + index + 1;
+    return index + 1;
+  }
+
   // Crea la estructura de un contacto
   crearContactoGroup(datos?: ContactoEmergencia): FormGroup {
-    const personaExistente = datos?.idContacto != null;
     return this.fb.group({
       idContacto: [datos?.idContacto ?? null],
-      nombre: [{ value: datos?.nombre ?? '', disabled: personaExistente }, [Validators.required, Validators.maxLength(100)]],
-      apellido: [{ value: datos?.apellido ?? '', disabled: personaExistente }, [Validators.required, Validators.maxLength(100)]],
-      fechaNacimiento: [{ value: datos?.fechaNacimiento ?? '', disabled: personaExistente }, Validators.required],
-      genero: [{ value: datos?.genero ?? '', disabled: personaExistente }, Validators.required],
-      email: [{ value: datos?.email ?? '', disabled: personaExistente }, [Validators.required, Validators.email]],
-      telefono: [{ value: datos?.telefono ?? '', disabled: personaExistente }, [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      nombre: [datos?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
+      apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
+      fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
+      genero: [datos?.genero ?? '', Validators.required],
+      email: [datos?.email ?? '', [Validators.required, Validators.email]],
+      telefono: [datos?.telefono ?? '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
   }
@@ -90,6 +108,7 @@ export class ContactosComponent implements OnInit {
 
   // Permite borrar dinámicamente si hay más de 1 contacto en pantalla
   eliminarContacto(index: number): void {
+    if (this.modoEdicion && this.contactos.at(index).get('idContacto')?.value != null) return;
     if (this.contactos.length > 1) {
       this.contactos.removeAt(index);
     } else {
@@ -101,11 +120,17 @@ export class ContactosComponent implements OnInit {
     this.registroService.obtenerContactos(this.personaId)
       .subscribe({
         next: (data) => {
+          this.contactosOriginales = data ?? [];
           this.contactos.clear();
-          if (data && data.length > 0) {
-            data.forEach(contacto => this.agregarContacto(contacto));
+          if (this.modoEdicion) {
+            const contacto = this.contactosOriginales.find(item => item.idContacto === this.contactoId);
+            if (!contacto) {
+              this.feedbackService.notify('No se encontró el vínculo que intentas editar.', 'error');
+              this.router.navigate(['/contactos', this.personaId]);
+              return;
+            }
+            this.agregarContacto(contacto);
           } else {
-            this.agregarContacto();
             this.agregarContacto();
           }
         },
@@ -119,7 +144,7 @@ export class ContactosComponent implements OnInit {
       });
   }
 
-  guardarContactos(): void {
+  async guardarContactos(): Promise<void> {
     this.mensajeError = '';
     this.mensajeExito = '';
 
@@ -129,21 +154,48 @@ export class ContactosComponent implements OnInit {
       return;
     }
 
-    const payload = this.contactos.controls.map(control => {
+    if (this.modoEdicion) {
+      const contacto = this.contactos.getRawValue()[0] as ContactoEmergencia;
+      const confirmado = await this.feedbackService.confirm({
+        title: 'Actualizar datos del contacto',
+        message: `Los cambios de ${contacto.nombre} ${contacto.apellido} se aplicarán a todos los titulares que comparten este contacto. ¿Deseas continuar?`,
+        confirmLabel: 'Actualizar contacto'
+      });
+      if (!confirmado) return;
+    }
+
+    const editados = this.contactos.controls.map(control => {
       const contacto = control.getRawValue() as ContactoEmergencia;
-      return contacto.idContacto == null
-        ? contacto
-        : { idContacto: contacto.idContacto, idParentesco: contacto.idParentesco };
+      return contacto;
     });
-    const solicitud: Observable<ContactoEmergencia[] | Usuario> = this.personaId
+    let payload: ContactoEmergencia[];
+    if (this.modoEdicion) {
+      const contactoActualizado = editados.find(contacto => contacto.idContacto === this.contactoId);
+      payload = this.contactosOriginales.map(contacto => contacto.idContacto === this.contactoId
+        ? { ...contactoActualizado, idContacto: contacto.idContacto }
+        : { idContacto: contacto.idContacto, idParentesco: contacto.idParentesco });
+      payload.push(...editados.filter(contacto => contacto.idContacto == null));
+    } else if (this.modoAgregar) {
+      payload = [
+        ...this.contactosOriginales.map(contacto => ({
+          idContacto: contacto.idContacto,
+          idParentesco: contacto.idParentesco
+        })),
+        ...editados
+      ];
+    } else {
+      payload = editados;
+    }
+
+    const solicitud: Observable<ContactoEmergencia[] | Usuario> = this.personaId > 0
       ? this.registroService.guardarContactos(this.personaId, payload)
       : this.registroService.guardarRegistroCompleto(payload);
 
     solicitud
       .subscribe({
         next: () => {
-          this.mensajeExito = 'Contactos guardados correctamente.';
-          this.registroService.limpiarBorrador();
+          this.feedbackService.notify('Contactos guardados correctamente.', 'success');
+          if (this.personaId === 0) this.registroService.limpiarBorrador();
           this.router.navigate(['/personas']);
         },
         error: (err) => {
@@ -153,6 +205,14 @@ export class ContactosComponent implements OnInit {
             : 'Ocurrio un error al guardar los contactos. Revisa los datos ingresados.';
         }
       });
+  }
+
+  cancelar(): void {
+    if (this.personaId > 0) {
+      this.router.navigate(['/contactos', this.personaId]);
+    } else {
+      this.router.navigate(['/registro']);
+    }
   }
 
   private cargarParentescos(): void {

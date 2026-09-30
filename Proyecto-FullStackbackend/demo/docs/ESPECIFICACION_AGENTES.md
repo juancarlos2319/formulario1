@@ -23,6 +23,7 @@
 - `GET /api/formularios/inactivos` lista titulares con baja lógica; `PUT /api/formularios/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
 - Al quitar un vínculo no borres la persona/contacto compartido ni sus teléfonos. Las altas/actualizaciones de varias entidades deben ser transaccionales.
 - Para reutilizar contacto existente se envía `idContacto`; para un contacto nuevo se envían sus datos. Al reemplazar la lista de contactos, IDs omitidos se desvinculan y los presentes se conservan.
+- Para reutilizar un contacto existente se envía `idContacto`; solo con `idParentesco` se modifica el vínculo, y enviando todos los datos personales también se actualiza la persona compartida. Al reemplazar la lista, conserva IDs de los demás vínculos.
 - Ocupaciones y parentescos provienen de catálogos existentes; no crees catálogos de forma implícita durante el registro.
 
 ## Seguridad y pruebas

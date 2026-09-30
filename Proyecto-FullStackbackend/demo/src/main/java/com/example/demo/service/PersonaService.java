@@ -220,7 +220,8 @@ public class PersonaService {
         java.util.Set<Long> ids = new java.util.HashSet<>();
         for (var c : contactos) {
             if (c == null) throw invalido("El contacto no puede ser nulo");
-            if (c.idContacto() == null &&
+                if ((c.idContacto() == null || c.nombre() != null || c.apellido() != null ||
+                    c.fechaNacimiento() != null || c.genero() != null || c.email() != null || c.telefono() != null) &&
                     (c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 100 ||
                     c.apellido() == null || c.apellido().isBlank() || c.apellido().length() > 100 ||
                     c.fechaNacimiento() == null || c.genero() == null || c.genero().isBlank() ||
@@ -231,10 +232,6 @@ public class PersonaService {
             if (c.idContacto() != null) {
                 if (c.idContacto() <= 0 || !ids.add(c.idContacto()))
                     throw invalido("Los contactos existentes deben tener IDs positivos y no repetidos");
-            } else if (c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 100 ||
-                    c.apellido() == null || c.apellido().isBlank() || c.apellido().length() > 100 ||
-                    c.telefono() == null || !c.telefono().matches("[0-9]{10}")) {
-                throw invalido("El nuevo contacto requiere nombre y apellido de hasta 100 caracteres y telÃƒÂ©fono de 10 dÃƒÂ­gitos");
             }
             if (c.idParentesco() != null) {
                 if (c.idParentesco() <= 0) throw invalido("ID de parentesco invÃƒÂ¡lido");
@@ -261,6 +258,25 @@ public class PersonaService {
                 contacto = personaRepository.findById(dto.idContacto())
                         .filter(p -> p.getPerfilTitular() == null || p.getPerfilTitular().getFechaBaja() == null)
                         .orElseThrow(() -> invalido("La persona de contacto no existe o estÃƒÂ¡ dada de baja"));
+                if (dto.nombre() != null || dto.apellido() != null || dto.fechaNacimiento() != null ||
+                    dto.genero() != null || dto.email() != null || dto.telefono() != null) {
+                    contacto.setNombre(dto.nombre().trim());
+                    contacto.setApellido(dto.apellido().trim());
+                    contacto.setFechaNacimiento(dto.fechaNacimiento());
+                    contacto.setGenero(dto.genero().trim());
+                    PersonaCorreo correo = contacto.getCorreos().isEmpty() ? new PersonaCorreo() : contacto.getCorreos().get(0);
+                    if (correo.getPersona() == null) {
+                        correo.setPersona(contacto);
+                        contacto.getCorreos().add(correo);
+                    }
+                    correo.setCorreo(dto.email().trim());
+                    PersonaTelefono telefono = contacto.getTelefonos().isEmpty() ? new PersonaTelefono() : contacto.getTelefonos().get(0);
+                    if (telefono.getPersona() == null) {
+                        telefono.setPersona(contacto);
+                        contacto.getTelefonos().add(telefono);
+                    }
+                    telefono.setTelefono(dto.telefono());
+                }
             } else {
                 contacto = new Persona();
                 contacto.setNombre(dto.nombre().trim());

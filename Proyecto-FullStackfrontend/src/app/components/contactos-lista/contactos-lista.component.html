@@ -1,0 +1,65 @@
+<section class="welcome">
+  <div>
+    <p class="eyebrow">PERSONAS REGISTRADAS</p>
+    <h1>Contactos de emergencia</h1>
+    <p>Consulta la información de cada contacto y administra sus vínculos.</p>
+  </div>
+  <div class="welcome-actions">
+    <a class="secondary" routerLink="/personas">Volver a personas</a>
+    <a class="primary" [routerLink]="['/contactos', personaId, 'agregar']">＋ Agregar contacto</a>
+  </div>
+</section>
+
+<div *ngIf="mensajeError" class="notice error" role="alert">
+  {{ mensajeError }}
+  <button type="button" (click)="cargarContactos()" [disabled]="cargando">Reintentar</button>
+</div>
+<div *ngIf="cargando" class="notice" role="status">Cargando contactos…</div>
+
+<section *ngIf="!cargando && (!mensajeError || contactos.length > 0)" class="panel contacts-panel" aria-labelledby="contacts-title">
+  <div class="table-heading">
+    <div>
+      <h2 id="contacts-title">Lista de contactos</h2>
+      <p class="muted">{{ contactos.length }} registros</p>
+    </div>
+  </div>
+
+  <div class="table-wrap" *ngIf="contactos.length">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">CONTACTO</th>
+          <th scope="col">TELÉFONO</th>
+          <th scope="col">CORREO</th>
+          <th scope="col">FECHA DE NACIMIENTO</th>
+          <th scope="col">GÉNERO</th>
+          <th scope="col">PARENTESCO</th>
+          <th scope="col">ACCIÓN</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contacto of contactos">
+          <td>
+            <div class="person">
+              <span class="avatar">{{ obtenerIniciales(contacto.nombre, contacto.apellido) }}</span>
+              <strong>{{ contacto.nombre }} {{ contacto.apellido }}</strong>
+            </div>
+          </td>
+          <td>{{ contacto.telefono || 'Sin teléfono' }}</td>
+          <td>{{ contacto.email || 'Sin correo' }}</td>
+          <td>{{ contacto.fechaNacimiento || 'No registrada' }}</td>
+          <td>{{ contacto.genero || 'No registrado' }}</td>
+          <td>{{ contacto.parentesco || 'Sin parentesco' }}</td>
+          <td>
+            <a *ngIf="contacto.idContacto != null" class="edit-link" [routerLink]="['/contactos', personaId, 'editar', contacto.idContacto]">Editar contacto</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!contactos.length" class="empty">
+    <h3>{{ mensajeError ? 'No se pudieron cargar los contactos' : 'Aún no hay contactos' }}</h3>
+    <p>{{ mensajeError ? 'Reintenta la consulta.' : 'Agrega el primer contacto de emergencia.' }}</p>
+  </div>
+</section>

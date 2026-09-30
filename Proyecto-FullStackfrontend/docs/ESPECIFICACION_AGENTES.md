@@ -20,8 +20,10 @@
 ## Contratos y comportamiento
 
 - Prefijos actuales: `/api/auth/login`, `/api/formularios`, `/api/ocupaciones`, `/api/parentescos`.
+- `/contactos/:id` lista los datos de contacto; editar un vínculo abre `/contactos/:id/editar/:contactoId` y agregar uno usa `/contactos/:id/agregar`.
 - Las rutas protegidas requieren `Authorization: Bearer <token>`; el login devuelve un objeto con `token` y `username`.
 - Los contactos de emergencia pueden ser varios; al editar una relación se debe conservar `idContacto` y enviar `idParentesco`. La API distingue una persona/contacto de la relación persona-parentesco y no modifica datos personales de una persona compartida.
+- Los contactos de emergencia pueden ser varios; al editar se conserva `idContacto`. Enviar solo el ID y el parentesco cambia el vínculo; enviar también todos los datos personales modifica la persona compartida y afecta a los demás titulares relacionados.
 - `RegistroService` mantiene un borrador del registro en memoria y `sessionStorage`; no persistir esos datos más allá del flujo previsto.
 - URLs, campos, validaciones y detalles completos están definidos en `Proyecto-FullStackbackend/demo/README.md`; esa documentación es la fuente compartida del contrato vigente.
 

@@ -1,35 +1,35 @@
-<div class="form-wrapper">
-  <h2>Contactos de emergencia</h2>
-  <p class="subtitle">Puedes agregar o eliminar los contactos que necesites mediante el botón inferior.</p>
-  
-  <p *ngIf="mensajeExito" style="color: green; font-weight: bold;">{{ mensajeExito }}</p>
-  <p *ngIf="mensajeError" style="color: red; font-weight: bold;">{{ mensajeError }}</p>
+<section class="welcome">
+  <div>
+    <p class="eyebrow">PERSONAS REGISTRADAS</p>
+    <h1>{{ modoEdicion ? 'Editar vínculo' : modoAgregar ? 'Agregar contacto' : 'Contactos de emergencia' }}</h1>
+    <p>{{ modoEdicion ? 'Actualiza los datos personales o el parentesco del contacto.' : 'Completa la información de cada contacto de emergencia.' }}</p>
+  </div>
+</section>
 
+<div class="form-wrapper panel">
+  <p *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }}</p>
   <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
-    
     <div formArrayName="contactos">
-      <fieldset 
-        class="card-section" 
-        *ngFor="let contacto of contactos.controls; let i = index" 
+      <fieldset
+        class="card-section"
+        *ngFor="let contacto of contactos.controls; let i = index"
         [formGroupName]="i"
-        style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;"
       >
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <legend style="font-weight: bold;">Contacto {{ i + 1 }}</legend>
-          <button 
+        <div class="card-heading">
+          <legend>Contacto {{ numeroContacto(i) }}</legend>
+          <button
             type="button" 
             (click)="eliminarContacto(i)" 
-            *ngIf="contactos.length > 1"
-            style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;"
+            *ngIf="contactos.length > 1 && (!modoEdicion || contacto.get('idContacto')?.value == null)"
+            class="card-remove"
           >
-            Eliminar
+            Quitar
           </button>
         </div>
 
-        <p *ngIf="contacto.get('idContacto')?.value != null" class="shared-person-note">
-          Los datos personales de una persona compartida no se modifican desde este vínculo.
+        <p *ngIf="modoEdicion" class="shared-person-note">
+          Los cambios personales se aplicarán a todos los titulares que comparten este contacto.
         </p>
-
         <div class="field">
           <label [for]="'nombre_' + i">Nombre *</label>
           <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombre')" [attr.aria-describedby]="campoInvalido(i, 'nombre') ? 'nombre-error_' + i : null">
@@ -81,18 +81,21 @@
       </fieldset>
     </div>
 
-    <div style="margin-bottom: 20px;">
-      <button 
-        type="button" 
+    <div class="add-contact-action">
+      <button
+        type="button"
         (click)="agregarContacto()"
-        style="background-color: #27ae60; color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;"
+        class="add-contact-button"
       >
-        + Agregar otro contacto
+        ＋ Agregar otro contacto
       </button>
     </div>
 
-    <button type="submit" class="btn-submit">
-      Guardar y Finalizar
-    </button>
+    <div class="form-actions">
+      <button type="button" class="cancel-button" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn-submit" [disabled]="contactosForm.invalid">
+      {{ modoEdicion ? 'Guardar cambios' : 'Guardar y finalizar' }}
+      </button>
+    </div>
   </form>
 </div>

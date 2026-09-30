@@ -90,7 +90,7 @@ class RegistroCompletoTest {
         verify(personas).countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
         assertEquals(List.of("secundario@example.com"), resultado.getCorreosAdicionales());
     }
-    @Test void compartePersonaSinModificarSusDatosPersonales() {
+    @Test void editarPersonaCompartidaActualizaSusDatosPersonales() {
         Persona a = persona(1, true), b = persona(2, true), c = persona(3, false);
         c.setNombre("Nombre original");
         c.setApellido("Apellido original");
@@ -101,10 +101,12 @@ class RegistroCompletoTest {
                 LocalDate.of(2000, 1, 1), "Otro", "otro@example.com", "0000000000", 9L, null)));
         assertSame(c, a.getContactosEmergencia().getFirst().getContacto());
         assertSame(c, b.getContactosEmergencia().getFirst().getContacto());
-        assertEquals("Nombre original", c.getNombre());
-        assertEquals("Apellido original", c.getApellido());
-        assertEquals(LocalDate.of(1980, 1, 1), c.getFechaNacimiento());
-        assertEquals("No especificado", c.getGenero());
+        assertEquals("No sobrescribir", c.getNombre());
+        assertEquals("Otro", c.getApellido());
+        assertEquals(LocalDate.of(2000, 1, 1), c.getFechaNacimiento());
+        assertEquals("Otro", c.getGenero());
+        assertEquals("otro@example.com", c.getCorreos().getFirst().getCorreo());
+        assertEquals("0000000000", c.getTelefonos().getFirst().getTelefono());
         verify(personas, never()).save(c);
     }
     @Test void reemplazarQuitaSoloRelacionYSostieneLasConservadas() {

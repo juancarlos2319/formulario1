@@ -153,7 +153,7 @@
 
     <p *ngIf="registroForm.touched && registroForm.invalid" class="field-error" role="status">Revisa los campos marcados, los contactos adicionales y la aceptación de términos.</p>
     <div class="form-actions">
-      <a *ngIf="!guardando" routerLink="/dashboard" class="btn-secondary">Cancelar</a>
+      <a *ngIf="!guardando" routerLink="/personas" class="btn-secondary">Cancelar</a>
       <button type="submit" [disabled]="cargandoPersona || guardando || cargandoCP" class="btn-primary">
         {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
       </button>
