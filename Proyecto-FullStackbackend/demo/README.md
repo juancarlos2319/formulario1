@@ -12,7 +12,7 @@ El frontend envía JSON al controlador; PersonaService valida y coordina transac
 - `es_titular = false`: persona creada solo como contacto; no aparece en ese listado ni cuenta en el límite.
 - Un titular también puede ser contacto de otro titular. No puede ser su propio contacto.
 - Se exige **mínimo un contacto, sin máximo**. Un contacto puede estar relacionado con varios titulares, con parentescos diferentes.
-- Quitar una relación no elimina la persona compartida ni sus teléfonos. Los contactos sin relaciones se conservan.
+- Quitar una relación conserva la persona si tiene otras referencias. Al retirar el último vínculo se eliminan la persona y sus comunicaciones, excepto si tiene perfil de titular, cuenta de usuario o vínculos salientes.
 
 ## Configuración
 
@@ -41,6 +41,7 @@ Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, reg
 | DELETE `/api/formularios/{id}` | Baja lógica del titular |
 | GET `/api/formularios/inactivos` | Listar titulares dados de baja |
 | PUT `/api/formularios/{id}/reactivar` | Reactivar un titular dado de baja |
+| POST `/api/formularios/contactos/coincidencias` | Buscar contactos por correo o teléfono para confirmar su reutilización |
 | GET `/api/formularios/{id}/contactos` | Consultar todas las relaciones de contacto |
 | PUT `/api/formularios/{id}/contactos` | Sustituir la lista de relaciones (mínimo una) |
 | GET `/api/ocupaciones` | Catálogo de ocupaciones |
@@ -94,11 +95,23 @@ Se rechazan listas vacías, IDs repetidos, autorreferencias, parentescos inexist
 
 El frontend permite listas variables. Desde la lista de contactos se puede editar una persona compartida (con confirmación del impacto en todos sus titulares), cambiar solo el parentesco o agregar un contacto nuevo.
 
+## Detección y reutilización de contactos
+
+`POST /api/formularios/contactos/coincidencias` requiere JWT y recibe `email`, `telefono` y, opcionalmente, `excluirId` (el contacto que se está editando). Debe recibirse al menos un correo válido o un teléfono de diez dígitos. Devuelve una lista de `ContactoDTO` con datos personales; `idParentesco` y `parentesco` son nulos porque pertenecen a cada vínculo. La consulta no modifica datos y usa un cuerpo JSON para evitar datos personales en la URL.
+
+La comparación del correo ignora mayúsculas y espacios exteriores. Busca comunicaciones de personas usadas como contactos y contactos sin perfil ni cuenta, incluidos registros previos sin referencias. Si hay varias coincidencias, el frontend pide revisar los datos sin elegir una persona arbitrariamente. Las personas dadas de baja no pueden vincularse; deben reactivarse antes.
+
+El formulario consulta tras 350 ms sin cambios. Aceptar rellena datos y envía únicamente `idContacto` e `idParentesco`; rechazar vacía el campo que disparó la búsqueda. Un contacto compartido puede tener distintos parentescos según el titular. Al editar y aceptar otra persona se sustituye el vínculo original. Guardar un alta o edición para un titular existente vuelve a su lista de contactos.
+
+El backend devuelve 409 si se intenta crear o modificar un contacto con comunicaciones de otra persona de contacto sin reutilizar su ID. También rechaza comunicaciones repetidas dentro de la misma lista. Las operaciones de contactos se serializan mediante un bloqueo transaccional de PostgreSQL para evitar altas duplicadas y carreras con la limpieza. La eliminación de los contactos que pierden su último vínculo se realiza en la misma transacción; las claves foráneas existentes eliminan sus correos y teléfonos. Esta limpieza se aplica a los vínculos retirados, no borra automáticamente huérfanos históricos ni fusiona duplicados anteriores.
+
+Para una base existente, ejecutar manualmente `src/main/resources/migrations/20260930_contactos_compartidos.sql`. Solo crea tres índices y no cambia ni borra los datos existentes. Para una base nueva, `schema.sql` ya incluye esos índices; después se ejecuta `data.sql` como antes. No es necesario agregar columnas ni tablas.
+
 ## SQL inicial
 
 Ejecuta primero [schema.sql](src/main/resources/schema.sql) y después [data.sql](src/main/resources/data.sql) sobre una base vacía. Estos scripts ya contienen el modelo actual: `catalogo_parentesco`, `persona.es_titular` y `persona_contacto_emergencia`.
 
-La semilla marca Carlos y Laura como titulares y las personas de soporte como contactos. Los scripts están pensados para una base nueva; no hay archivos de migración en el proyecto. Evita ejecutar `data.sql` más de una vez: correos y teléfonos no tienen una restricción de unicidad por contenido y podrían duplicarse.
+La semilla marca Carlos y Laura como titulares y las personas de soporte como contactos. Los scripts están pensados para una base nueva; para una base existente usa la migración de índices indicada arriba. Evita ejecutar `data.sql` más de una vez: correos y teléfonos no tienen una restricción de unicidad global por contenido y podrían duplicarse.
 
 ## Generar un hash
 

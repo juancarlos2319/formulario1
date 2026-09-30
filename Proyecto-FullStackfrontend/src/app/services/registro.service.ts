@@ -64,6 +64,11 @@ export class RegistroService {
       .pipe(catchError(this.manejarError('obtener los contactos')));
   }
 
+  buscarContactos(datos: { email?: string; telefono?: string; excluirId?: number }): Observable<ContactoEmergencia[]> {
+    return this.http.post<ContactoEmergencia[]>(`${this.apiUrl}/contactos/coincidencias`, datos, { headers: this.getHeaders() })
+      .pipe(catchError(() => throwError(() => new Error('No se pudo verificar si el contacto ya existe. Reintenta la consulta.'))));
+  }
+
   guardarContactos(id: number, contactos: ContactoEmergencia[]): Observable<ContactoEmergencia[]> {
     return this.http.put<ContactoEmergencia[]>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar los contactos')));

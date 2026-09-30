@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS catalogo_ocupacion (id BIGSERIAL PRIMARY KEY, nombre VARCHAR(100) NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS catalogo_ocupacion (id BIGSERIAL PRIMARY KEY, nombre VARCHAR(100) NOT NULL UNIQUE);
 CREATE TABLE IF NOT EXISTS catalogo_parentesco (id BIGSERIAL PRIMARY KEY, nombre VARCHAR(50) NOT NULL UNIQUE);
 
 -- Datos compartidos por titulares, contactos y administradores.
@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS persona_contacto_emergencia (
     CONSTRAINT ck_pce_distintos CHECK (id_persona <> id_contacto)
 );
 CREATE INDEX IF NOT EXISTS idx_pce_persona ON persona_contacto_emergencia(id_persona);
+CREATE INDEX IF NOT EXISTS idx_pce_contacto ON persona_contacto_emergencia(id_contacto);
+CREATE INDEX IF NOT EXISTS idx_persona_correo_busqueda ON persona_correo(lower(trim(correo)));
+CREATE INDEX IF NOT EXISTS idx_persona_telefono_busqueda ON persona_telefono(telefono);
 CREATE TABLE IF NOT EXISTS usuario (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,

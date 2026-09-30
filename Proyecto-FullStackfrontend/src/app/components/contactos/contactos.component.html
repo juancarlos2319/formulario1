@@ -8,28 +8,34 @@
 
 <div class="form-wrapper panel">
   <p *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }}</p>
+  <p *ngIf="cargandoContactos" role="status">Cargando contactos…</p>
+  <p *ngIf="verificando" role="status">Verificando correo y teléfono…</p>
+  <p *ngIf="errorVerificacion" class="notice error" role="alert">No se pudo completar la verificación. Revisa los datos y <button type="button" (click)="reintentarVerificacion()">reintenta la consulta</button>.</p>
+  <button *ngIf="personaId > 0 && !contactosCargados && !cargandoContactos" type="button" class="cancel-button" (click)="cargarContactos()">Reintentar carga</button>
   <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
     <div formArrayName="contactos">
       <fieldset
         class="card-section"
         *ngFor="let contacto of contactos.controls; let i = index"
         [formGroupName]="i"
+        [disabled]="guardando"
       >
         <div class="card-heading">
           <legend>Contacto {{ numeroContacto(i) }}</legend>
           <button
             type="button" 
             (click)="eliminarContacto(i)" 
-            *ngIf="contactos.length > 1 && (!modoEdicion || contacto.get('idContacto')?.value == null)"
+            *ngIf="contactos.length > 1 && (!modoEdicion || i > 0)"
             class="card-remove"
           >
             Quitar
           </button>
         </div>
 
-        <p *ngIf="modoEdicion" class="shared-person-note">
+        <p *ngIf="modoEdicion && !contacto.get('email')?.disabled" class="shared-person-note">
           Los cambios personales se aplicarán a todos los titulares que comparten este contacto.
         </p>
+        <p *ngIf="contacto.get('email')?.disabled" class="shared-person-note">Se usará la persona registrada. El parentesco corresponde a este vínculo.</p>
         <div class="field">
           <label [for]="'nombre_' + i">Nombre *</label>
           <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombre')" [attr.aria-describedby]="campoInvalido(i, 'nombre') ? 'nombre-error_' + i : null">
@@ -54,6 +60,8 @@
             <option value="">Selecciona un genero</option>
             <option value="Masculino">Masculino</option>
             <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="No especificado">No especificado</option>
           </select>
           <small class="field-error" [id]="'genero-error_' + i" *ngIf="campoInvalido(i, 'genero')">{{ errorCampo(i, 'genero') }}</small>
         </div>
@@ -85,6 +93,7 @@
       <button
         type="button"
         (click)="agregarContacto()"
+        [disabled]="guardando || cargandoContactos || (personaId > 0 && !contactosCargados)"
         class="add-contact-button"
       >
         ＋ Agregar otro contacto
@@ -92,8 +101,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="cancel-button" (click)="cancelar()">Cancelar</button>
-      <button type="submit" class="btn-submit" [disabled]="contactosForm.invalid">
+      <button type="button" class="cancel-button" [disabled]="guardando" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn-submit" [disabled]="guardando || verificando || errorVerificacion || contactosForm.invalid || contactos.length === 0 || cargandoContactos || (personaId > 0 && !contactosCargados)">
       {{ modoEdicion ? 'Guardar cambios' : 'Guardar y finalizar' }}
       </button>
     </div>

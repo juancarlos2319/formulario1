@@ -26,10 +26,10 @@ public class PersonaService {
     @org.springframework.transaction.annotation.Transactional
     public List<com.example.demo.dto.ContactoDTO> guardarContactos(Long id, List<com.example.demo.dto.ContactoDTO> contactos) {
         try {
+            personaRepository.bloquearContactos();
             validarContactos(contactos);
             Persona titular = titularActivo(id);
             reemplazarContactos(titular, contactos);
-            personaRepository.saveAndFlush(titular);
             return titular.getContactosEmergencia().stream().map(this::contactoADTO).toList();
         } catch (RuntimeException exception) {
             LOGGER.error("No fue posible guardar los contactos de la persona {}", id, exception);
@@ -78,6 +78,7 @@ public class PersonaService {
 
     @org.springframework.transaction.annotation.Transactional
     public FormularioDTO guardar(FormularioDTO dto) {
+        personaRepository.bloquearContactos();
         validarTitular(dto);
         validarContactos(dto.getContactosEmergencia());
         validarComunicacion(dto);
@@ -90,7 +91,6 @@ public class PersonaService {
         Persona persona = convertirAEntidad(dto);
         Persona guardada = personaRepository.saveAndFlush(persona);
         reemplazarContactos(guardada, dto.getContactosEmergencia());
-        personaRepository.saveAndFlush(guardada);
         return convertirADTO(guardada);
     }
 
@@ -218,8 +218,13 @@ public class PersonaService {
     private void validarContactos(List<com.example.demo.dto.ContactoDTO> contactos) {
         if (contactos == null || contactos.isEmpty()) throw invalido("Se requiere al menos un contacto de emergencia");
         java.util.Set<Long> ids = new java.util.HashSet<>();
+        java.util.Set<String> correos = new java.util.HashSet<>();
+        java.util.Set<String> telefonos = new java.util.HashSet<>();
         for (var c : contactos) {
             if (c == null) throw invalido("El contacto no puede ser nulo");
+            if ((c.email() != null && !correos.add(normalizarCorreo(c.email()))) ||
+                (c.telefono() != null && !telefonos.add(c.telefono().trim())))
+                throw invalido("No repitas el mismo correo o teléfono en varios contactos de la lista");
                 if ((c.idContacto() == null || c.nombre() != null || c.apellido() != null ||
                     c.fechaNacimiento() != null || c.genero() != null || c.email() != null || c.telefono() != null) &&
                     (c.nombre() == null || c.nombre().isBlank() || c.nombre().length() > 100 ||
@@ -248,8 +253,16 @@ public class PersonaService {
     }
 
     private void reemplazarContactos(Persona titular, List<com.example.demo.dto.ContactoDTO> datos) {
+        var anteriores = titular.getContactosEmergencia().stream().map(r -> r.getContacto().getId()).toList();
         var conservadas = new java.util.ArrayList<ContactoEmergencia>();
         for (var dto : datos) {
+            if (dto.email() != null || dto.telefono() != null) {
+                var coincidencias = personaRepository.buscarContactos(normalizarCorreo(dto.email()),
+                        dto.telefono() == null ? "" : dto.telefono().trim(), dto.idContacto());
+                if (!coincidencias.isEmpty()) throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.CONFLICT,
+                        "El correo o teléfono ya está registrado. Confirma el autocompletado para reutilizar el contacto.");
+            }
             if (dto.idContacto() != null && dto.idContacto().equals(titular.getId()))
                 throw invalido("Una persona no puede ser su propio contacto");
             CatalogoParentesco parentesco = resolverParentesco(dto);
@@ -306,8 +319,30 @@ public class PersonaService {
             relacion.setParentesco(parentesco);
             conservadas.add(relacion);
         }
-        // orphanRemoval elimina ÃƒÂºnicamente relaciones, nunca personas compartidas.
         titular.getContactosEmergencia().removeIf(r -> !conservadas.contains(r));
+        personaRepository.saveAndFlush(titular);
+        var actuales = conservadas.stream().map(r -> r.getContacto().getId()).collect(Collectors.toSet());
+        anteriores.stream().filter(id -> !actuales.contains(id)).distinct()
+                .forEach(personaRepository::eliminarContactoSinReferencias);
+    }
+
+    private String normalizarCorreo(String email) {
+        return email == null ? "" : email.trim().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<com.example.demo.dto.ContactoDTO> buscarContactos(com.example.demo.dto.BusquedaContactoDTO busqueda) {
+        String email = normalizarCorreo(busqueda.email());
+        String telefono = busqueda.telefono() == null ? "" : busqueda.telefono().trim();
+        if ((email.isEmpty() && telefono.isEmpty()) || email.length() > 150 ||
+                (!email.isEmpty() && !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) ||
+                (!telefono.isEmpty() && !telefono.matches("[0-9]{10}"))) throw invalido("Escribe un correo o teléfono válido");
+        return personaRepository.buscarContactos(email, telefono, busqueda.excluirId()).stream()
+                .map(p -> new com.example.demo.dto.ContactoDTO(p.getId(), p.getNombre(), p.getApellido(),
+                    p.getFechaNacimiento(), p.getGenero(),
+                    p.getCorreos().isEmpty() ? null : p.getCorreos().getFirst().getCorreo(),
+                    p.getTelefonos().isEmpty() ? null : p.getTelefonos().getFirst().getTelefono(), null, null))
+                .toList();
     }
 
     private com.example.demo.dto.ContactoDTO contactoADTO(ContactoEmergencia relacion) {

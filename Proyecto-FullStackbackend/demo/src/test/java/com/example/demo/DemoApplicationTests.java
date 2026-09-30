@@ -37,12 +37,13 @@ class DemoApplicationTests {
     private FormularioDTO formulario(int cantidad) {
         FormularioDTO d = new FormularioDTO();
         d.setNombre("Titular"); d.setApellido("Prueba");
+        d.setGenero("No especificado"); d.setDireccion("Calle de prueba"); d.setCiudad("Ciudad de prueba");
         d.setFechaNacimiento(LocalDate.of(1990,1,1)); d.setOcupacion("Docente");
         d.setEmail("uno@example.com"); d.setCorreosAdicionales(List.of("dos@example.com"));
         d.setTelefono("5511111111"); d.setTelefonosAdicionales(List.of("5522222222"));
         d.setContactosEmergencia(java.util.stream.IntStream.range(0,cantidad)
                 .mapToObj(i -> new ContactoDTO(null, "Contacto " + i, "Apellido", LocalDate.of(1980, 1, 1),
-                    "No especificado", "contacto@example.com", "5533333333", 1L, null)).toList());
+                    "No especificado", "contacto" + i + "@example.com", String.format("553333%04d", i), 1L, null)).toList());
         return d;
     }
     private ContactoDTO existente(long id) { return new ContactoDTO(id,null,null,null,1L,null); }
@@ -54,8 +55,8 @@ class DemoApplicationTests {
         assertEquals(4,count("persona_contacto_emergencia"));
         assertEquals(1,personas.obtenerTodos().size());
         assertEquals(4,personas.obtenerContactos(d.getId()).size());
-        assertTrue(jdbc.queryForObject("SELECT es_titular FROM persona WHERE id=?",Boolean.class,d.getId()));
-        assertEquals(4,jdbc.queryForObject("SELECT count(*) FROM persona WHERE NOT es_titular",Integer.class));
+        assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM perfil_titular WHERE id_persona=?",Integer.class,d.getId()));
+        assertEquals(4,jdbc.queryForObject("SELECT count(*) FROM persona p WHERE NOT EXISTS (SELECT 1 FROM perfil_titular t WHERE t.id_persona=p.id)",Integer.class));
     }
     @Test void contactoCompartidoSobreviveARetirarUnaRelacion() {
         var a=personas.guardar(formulario(2));
@@ -99,5 +100,73 @@ class DemoApplicationTests {
         var a=personas.guardar(formulario(1));
         personas.eliminarLogico(a.getId());
         assertEquals(0,personas.obtenerTodos().size()); assertEquals(2,count("persona"));
+    }
+
+    @Test void buscaPorCorreoNormalizadoYTelefonoSinConfundirElMismoContacto() {
+        var a = personas.guardar(formulario(2));
+        var contacto = a.getContactosEmergencia().getFirst();
+        assertEquals(contacto.idContacto(), personas.buscarContactos(new BusquedaContactoDTO(
+                "  CONTACTO0@EXAMPLE.COM ", null, null)).getFirst().idContacto());
+        assertEquals(contacto.idContacto(), personas.buscarContactos(new BusquedaContactoDTO(
+                null, contacto.telefono(), null)).getFirst().idContacto());
+        assertTrue(personas.buscarContactos(new BusquedaContactoDTO(contacto.email(), contacto.telefono(), contacto.idContacto())).isEmpty());
+    }
+
+    @Test void noCreaDuplicadoSinConfirmacionYPermiteReutilizarId() {
+        var a = personas.guardar(formulario(1));
+        assertEquals(409, assertThrows(ResponseStatusException.class,
+                () -> personas.guardar(formulario(1))).getStatusCode().value());
+        assertEquals(2, count("persona"));
+        var segundo = formulario(1);
+        segundo.setContactosEmergencia(List.of(existente(a.getContactosEmergencia().getFirst().idContacto())));
+        personas.guardar(segundo);
+        assertEquals(3, count("persona"));
+        assertEquals(2, count("persona_contacto_emergencia"));
+    }
+
+    @Test void eliminaPersonaYComunicacionesSoloAlQuitarUltimaReferencia() {
+        var a = personas.guardar(formulario(2));
+        Long compartido = a.getContactosEmergencia().getFirst().idContacto();
+        Long conservado = a.getContactosEmergencia().get(1).idContacto();
+        var datosB = formulario(1);
+        datosB.setContactosEmergencia(List.of(existente(compartido), existente(conservado)));
+        var b = personas.guardar(datosB);
+        personas.guardarContactos(a.getId(), List.of(existente(conservado)));
+        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM persona WHERE id=?", Integer.class, compartido));
+        personas.guardarContactos(b.getId(), List.of(existente(conservado)));
+        assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM persona WHERE id=?", Integer.class, compartido));
+        assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM persona_correo WHERE id_persona=?", Integer.class, compartido));
+        assertEquals(0, jdbc.queryForObject("SELECT count(*) FROM persona_telefono WHERE id_persona=?", Integer.class, compartido));
+        assertEquals(conservado, personas.obtenerContactos(a.getId()).getFirst().idContacto());
+    }
+
+    @Test void quitarContactoNoBorraSuPerfilTitular() {
+        var a = personas.guardar(formulario(1));
+        Long contacto = a.getContactosEmergencia().getFirst().idContacto();
+        var datosB = formulario(1);
+        datosB.setContactosEmergencia(List.of(existente(a.getId()), existente(contacto)));
+        var b = personas.guardar(datosB);
+        personas.guardarContactos(b.getId(), List.of(existente(contacto)));
+        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM perfil_titular WHERE id_persona=?", Integer.class, a.getId()));
+    }
+
+    @Test void quitarContactoNoBorraSuCuenta() {
+        var a = personas.guardar(formulario(2));
+        Long contacto = a.getContactosEmergencia().getFirst().idContacto();
+        jdbc.update("INSERT INTO usuario(username,password,id_persona) VALUES ('cuenta-prueba','hash-de-prueba',?)", contacto);
+        personas.guardarContactos(a.getId(), List.of(existente(a.getContactosEmergencia().get(1).idContacto())));
+        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM persona WHERE id=?", Integer.class, contacto));
+        assertEquals(1, count("usuario"));
+    }
+
+    @Test void editarConCorreoDeOtraPersonaNoSobrescribeSusDatos() {
+        var a = personas.guardar(formulario(2));
+        var primero = a.getContactosEmergencia().getFirst();
+        var segundo = a.getContactosEmergencia().get(1);
+        var cambio = new ContactoDTO(primero.idContacto(), primero.nombre(), primero.apellido(),
+                primero.fechaNacimiento(), primero.genero(), segundo.email(), primero.telefono(), 1L, null);
+        assertEquals(409, assertThrows(ResponseStatusException.class, () -> personas.guardarContactos(a.getId(),
+                List.of(cambio, existente(segundo.idContacto())))).getStatusCode().value());
+        assertEquals(primero.email(), personas.obtenerContactos(a.getId()).getFirst().email());
     }
 }

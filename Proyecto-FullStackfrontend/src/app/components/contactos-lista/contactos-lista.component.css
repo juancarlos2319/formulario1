@@ -10,3 +10,4 @@ th,td{padding:14px;border-bottom:1px solid #f0edf5;vertical-align:middle}
 .secondary{border:1px solid #e9e3f2;background:#fff;color:#7155b8}
 .primary{background:#7155d9;color:white}
 @media(max-width:760px){.welcome-actions{width:100%;flex-direction:column;align-items:stretch}.welcome-actions>a{text-align:center}}
+.remove-contact{margin-left:8px;padding:8px 10px;border:1px solid #f0d9d9;border-radius:7px;background:#fffafa;color:#a83d48;cursor:pointer}.remove-contact:disabled{opacity:.5;cursor:not-allowed}

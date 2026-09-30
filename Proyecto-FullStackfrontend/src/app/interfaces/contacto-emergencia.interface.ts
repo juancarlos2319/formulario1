@@ -1,5 +1,5 @@
 export interface ContactoEmergencia {
-  idContacto?: number;
+  idContacto?: number | null;
   nombre?: string;
   apellido?: string;
   fechaNacimiento?: string;

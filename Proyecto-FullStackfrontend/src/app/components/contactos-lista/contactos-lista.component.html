@@ -52,6 +52,7 @@
           <td>{{ contacto.parentesco || 'Sin parentesco' }}</td>
           <td>
             <a *ngIf="contacto.idContacto != null" class="edit-link" [routerLink]="['/contactos', personaId, 'editar', contacto.idContacto]">Editar contacto</a>
+            <button type="button" class="remove-contact" (click)="quitarContacto(contacto)" [disabled]="cargando || quitando || !!mensajeError || contactos.length <= 1" [attr.aria-label]="'Quitar contacto ' + contacto.nombre">Quitar contacto</button>
           </td>
         </tr>
       </tbody>

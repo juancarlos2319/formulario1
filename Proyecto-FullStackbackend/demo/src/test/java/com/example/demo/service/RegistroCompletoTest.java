@@ -42,7 +42,7 @@ class RegistroCompletoTest {
 
     private ContactoDTO nuevo(String nombre) {
         return new ContactoDTO(null, nombre, "PÃƒÂ©rez", LocalDate.of(1980, 1, 1), "No especificado",
-            "contacto@example.com", "5511111111", 9L, null);
+            nombre.replace(" ", "").toLowerCase() + "@example.com", String.format("55%08d", Math.abs(nombre.hashCode()) % 100000000), 9L, null);
     }
     private ContactoDTO existente(long id) {
         return new ContactoDTO(id, null, null, null, 9L, null);
@@ -114,7 +114,8 @@ class RegistroCompletoTest {
         relacion(a,b); ContactoEmergencia conservada = relacion(a,c);
         service.guardarContactos(1L, List.of(existente(3)));
         assertEquals(List.of(conservada), a.getContactosEmergencia());
-        verify(personas, never()).delete(any());
+        verify(personas).eliminarContactoSinReferencias(2L);
+        verify(personas, never()).eliminarContactoSinReferencias(3L);
     }
     @Test void rechazaAutorreferencia() {
         persona(1,true);

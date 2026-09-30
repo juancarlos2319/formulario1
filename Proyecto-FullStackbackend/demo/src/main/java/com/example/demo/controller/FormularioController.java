@@ -17,6 +17,11 @@ import java.util.List;
         methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
 )
 public class FormularioController {
+    @PostMapping("/contactos/coincidencias")
+    public List<com.example.demo.dto.ContactoDTO> buscarContactos(
+            @RequestBody com.example.demo.dto.BusquedaContactoDTO busqueda) {
+        return personaService.buscarContactos(busqueda);
+    }
 
     @GetMapping("/{id}/contactos")
     public List<com.example.demo.dto.ContactoDTO> obtenerContactos(@PathVariable Long id) {
