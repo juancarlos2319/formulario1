@@ -79,6 +79,16 @@ export class RegistroService {
       .pipe(catchError(this.manejarError('obtener los formularios')));
   }
 
+  obtenerFormulariosInactivos(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(`${this.apiUrl}/inactivos`, { headers: this.getHeaders() })
+      .pipe(catchError(this.manejarError('obtener las personas desactivadas')));
+  }
+
+  reactivarFormulario(id: number): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}/reactivar`, null, { headers: this.getHeaders() })
+      .pipe(catchError(this.manejarError('reactivar la persona')));
+  }
+
   obtenerPersonaPorId(id: number): Observable<Usuario | undefined> {
     return this.obtenerFormularios().pipe(
       map((personas) => personas.find((persona) => persona.id === id))

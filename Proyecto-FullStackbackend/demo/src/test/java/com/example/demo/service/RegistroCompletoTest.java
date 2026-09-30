@@ -146,6 +146,33 @@ class RegistroCompletoTest {
         assertThrows(RuntimeException.class, () -> service.guardar(datos(1)));
         verify(personas, never()).save(any());
     }
+
+    @Test void reactivaTitularDesactivadoSiHayCupo() {
+        Persona desactivada = persona(4, true);
+        desactivada.getPerfilTitular().setFechaBaja(LocalDate.now());
+        CatalogoOcupacion ocupacion = new CatalogoOcupacion();
+        ocupacion.setNombre("Docente");
+        desactivada.getPerfilTitular().setOcupacion(ocupacion);
+        when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(19L);
+
+        FormularioDTO resultado = service.reactivar(4L);
+
+        assertNull(desactivada.getPerfilTitular().getFechaBaja());
+        assertEquals(4L, resultado.getId());
+        verify(personas).save(desactivada);
+    }
+
+    @Test void rechazaReactivacionCuandoSeAlcanzoElLimite() {
+        Persona desactivada = persona(4, true);
+        desactivada.getPerfilTitular().setFechaBaja(LocalDate.now());
+        when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(20L);
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> service.reactivar(4L));
+
+        assertEquals(409, error.getStatusCode().value());
+        assertNotNull(desactivada.getPerfilTitular().getFechaBaja());
+        verify(personas, never()).save(any());
+    }
     @Test void rechazaTelefonoSecundarioInvalido() {
         FormularioDTO dto=datos(1); dto.setTelefonosAdicionales(List.of("123"));
         assertThrows(IllegalArgumentException.class, () -> service.guardar(dto));

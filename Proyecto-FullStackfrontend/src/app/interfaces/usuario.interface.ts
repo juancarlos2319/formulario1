@@ -8,6 +8,7 @@ export interface Usuario {
   telefono: string;
   correosAdicionales?: string[];
   telefonosAdicionales?: string[];
+  fechaBaja?: string;
   fechaNacimiento: string;
   genero: string;
   direccion: string;

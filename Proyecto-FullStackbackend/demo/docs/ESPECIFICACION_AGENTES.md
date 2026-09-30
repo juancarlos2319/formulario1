@@ -1,3 +1,4 @@
+- `GET /api/formularios/inactivos` lista solo titulares con baja lógica; `PUT /api/formularios/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
 # Especificación de contexto — Backend
 
 ## Stack y ejecución
@@ -19,6 +20,7 @@
 - `persona.es_titular` distingue titulares de personas creadas solo como contactos. El listado principal contiene titulares activos; el límite de negocio documentado es 20 titulares activos.
 - Cada titular registrado requiere al menos un contacto; no hay máximo. Una misma persona puede estar compartida por varios titulares y tener parentescos distintos.
 - `persona_contacto_emergencia` representa el vínculo y su parentesco. No permitas autorreferencias ni IDs duplicados dentro de una solicitud.
+- `GET /api/formularios/inactivos` lista titulares con baja lógica; `PUT /api/formularios/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
 - Al quitar un vínculo no borres la persona/contacto compartido ni sus teléfonos. Las altas/actualizaciones de varias entidades deben ser transaccionales.
 - Para reutilizar contacto existente se envía `idContacto`; para un contacto nuevo se envían sus datos. Al reemplazar la lista de contactos, IDs omitidos se desvinculan y los presentes se conservan.
 - Ocupaciones y parentescos provienen de catálogos existentes; no crees catálogos de forma implícita durante el registro.

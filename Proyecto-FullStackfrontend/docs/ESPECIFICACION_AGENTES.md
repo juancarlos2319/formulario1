@@ -1,3 +1,4 @@
+- `src/app/app.routes.ts`: la pantalla `personas/desactivadas` permite consultar y reactivar titulares con baja lógica; accede desde `PersonasComponent`.
 # Especificación de contexto — Frontend
 
 ## Stack y ejecución
@@ -10,6 +11,7 @@
 ## Arquitectura
 
 - `src/app/app.routes.ts`: rutas. `InicioComponent` usa `guestGuard`; el layout administrativo y sus páginas requieren `authGuard`.
+- La ruta `personas/desactivadas` muestra titulares dados de baja y permite reactivarlos; el enlace se ofrece desde la pantalla de personas.
 - `components/`: pantallas de inicio, dashboard, personas, registro, contactos y componentes compartidos.
 - `services/`: `RegistroService` consume formularios, contactos y catálogos; `AuthService` gestiona el inicio/cierre de sesión y vigencia JWT.
 - `interfaces/`: contratos TypeScript; `guards/` y `interceptors/`: control de navegación y solicitudes.

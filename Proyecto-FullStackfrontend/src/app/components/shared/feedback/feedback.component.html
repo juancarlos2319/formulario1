@@ -1,0 +1,27 @@
+<div class="notice-stack" aria-label="Avisos" aria-live="polite">
+  <article *ngFor="let notice of feedback.notices()" class="notice" [ngClass]="notice.kind" [attr.role]="notice.kind === 'error' ? 'alert' : 'status'">
+    <span>{{ notice.message }}</span>
+    <button type="button" aria-label="Cerrar aviso" (click)="dismissNotice(notice.id)">×</button>
+  </article>
+</div>
+
+<dialog
+  *ngIf="feedback.confirmation() as confirmation"
+  #confirmDialog
+  class="confirm-dialog"
+  aria-labelledby="confirm-title"
+  aria-describedby="confirm-message"
+  (cancel)="cancelConfirmation($event)"
+  (click)="confirmBackdropClick($event)">
+  <p class="eyebrow">CONFIRMACIÓN</p>
+  <h2 id="confirm-title">{{ confirmation.title }}</h2>
+  <p id="confirm-message">{{ confirmation.message }}</p>
+  <div class="dialog-actions">
+    <button type="button" class="cancel" (click)="feedback.finishConfirmation(false)">
+      {{ confirmation.cancelLabel || 'Cancelar' }}
+    </button>
+    <button type="button" class="confirm" [ngClass]="confirmation.tone || 'default'" (click)="feedback.finishConfirmation(true)">
+      {{ confirmation.confirmLabel || 'Confirmar' }}
+    </button>
+  </div>
+</dialog>

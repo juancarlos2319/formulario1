@@ -6,6 +6,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { PersonasComponent } from './components/personas/personas.component';
 import { RegistroComponent } from './components/registro/registro.component';
 import { ContactosComponent } from './components/contactos/contactos.component';
+import { PersonasDesactivadasComponent } from './components/personas-desactivadas/personas-desactivadas.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'inicio', pathMatch: 'full' },
@@ -17,6 +18,7 @@ export const routes: Routes = [
     canActivateChild: [authGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent, data: { titulo: 'Resumen' } },
+      { path: 'personas/desactivadas', component: PersonasDesactivadasComponent, data: { titulo: 'Personas desactivadas' } },
       { path: 'personas', component: PersonasComponent, data: { titulo: 'Personas' } },
       { path: 'registro', component: RegistroComponent, data: { titulo: 'Registro' } },
       { path: 'registro/:id', component: RegistroComponent, data: { titulo: 'Editar persona' } },

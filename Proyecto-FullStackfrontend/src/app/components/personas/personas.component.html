@@ -1,4 +1,4 @@
-<section class="welcome"><div><p class="eyebrow">TU COMUNIDAD</p><h1>Personas registradas</h1><p>Busca, consulta y actualiza los datos de tu comunidad.</p></div><a *ngIf="!cargando && !mensajeError && usuarios.length < 20" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
+<section class="welcome"><div><p class="eyebrow">TU COMUNIDAD</p><h1>Personas registradas</h1><p>Busca, consulta y actualiza los datos de tu comunidad.</p></div><div class="welcome-actions"><a class="secondary" routerLink="/personas/desactivadas">Ver desactivadas</a><a *ngIf="!cargando && !mensajeError && usuarios.length < 20" class="primary" routerLink="/registro">＋ Registrar persona</a></div></section>
       <div *ngIf="mensajeError" class="notice error" role="alert">{{ mensajeError }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando || eliminando !== null">Reintentar</button></div>
       <div *ngIf="cargando" class="notice" role="status">Cargando personas…</div>
       <ng-container *ngIf="!cargando && (!mensajeError || usuarios.length > 0)">

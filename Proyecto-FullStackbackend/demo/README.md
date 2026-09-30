@@ -39,12 +39,15 @@ Enviar `Authorization: Bearer <token>` en las rutas protegidas. `SecurityConfig`
 | POST `/api/formularios` | Registrar titular y al menos un contacto |
 | PUT `/api/formularios/{id}` | Actualizar datos y comunicaciones de titular activo |
 | DELETE `/api/formularios/{id}` | Baja lógica del titular |
+| GET `/api/formularios/inactivos` | Listar titulares dados de baja |
+| PUT `/api/formularios/{id}/reactivar` | Reactivar un titular dado de baja |
 | GET `/api/formularios/{id}/contactos` | Consultar todas las relaciones de contacto |
 | PUT `/api/formularios/{id}/contactos` | Sustituir la lista de relaciones (mínimo una) |
 | GET `/api/ocupaciones` | Catálogo de ocupaciones |
 | GET `/api/parentescos` | Catálogo de parentescos, ordenado por ID |
 
-Las validaciones explícitas producen 400 y un titular inexistente/inactivo produce 404. Los errores generales conservan el manejo previo de cada controlador; no hay todavía un formato uniforme de errores.
+Las validaciones explícitas producen 400 y un titular inexistente/inactivo produce 404. La reactivación requiere que la persona esté dada de baja; si ya existen 20 titulares activos, devuelve 409 y mantiene la baja. Los errores generales conservan el manejo previo de cada controlador; no hay todavía un formato uniforme de errores.
+
 
 ## Registro y actualización
 

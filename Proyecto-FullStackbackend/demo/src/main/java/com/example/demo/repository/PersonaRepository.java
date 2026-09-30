@@ -8,5 +8,6 @@ import java.util.List;
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
     List<Persona> findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
+    List<Persona> findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull();
     long countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
 }

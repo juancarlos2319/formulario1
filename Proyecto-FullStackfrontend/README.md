@@ -8,7 +8,7 @@ Instala Node.js y npm. Desde `Proyecto-FullStackfrontend/`, ejecuta `npm ci` y `
 
 ## Funciones y rutas
 
-Rutas principales: `/inicio` (login), `/dashboard`, `/personas`, `/registro`, `/registro/:id`, `/contactos` y `/contactos/:id`. Las rutas administrativas requieren autenticación.
+Rutas principales: `/inicio` (login), `/dashboard`, `/personas`, `/personas/desactivadas`, `/registro`, `/registro/:id`, `/contactos` y `/contactos/:id`. Las rutas administrativas requieren autenticación. Desde “Personas” se abre la lista de titulares dados de baja y se pueden reactivar.
 
 El alta conserva los datos del titular como borrador en el flujo y crea el registro al guardar sus contactos. Se admiten varios contactos y se debe conservar al menos uno. Al editar, se conserva `idContacto` para reutilizar la persona y modificar su vínculo/parentesco.
 

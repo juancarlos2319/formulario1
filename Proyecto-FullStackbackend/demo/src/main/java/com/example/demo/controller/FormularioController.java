@@ -32,6 +32,20 @@ public class FormularioController {
     @Autowired
     private PersonaService personaService;
 
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<FormularioDTO>> obtenerInactivos() {
+        return ResponseEntity.ok(personaService.obtenerInactivos());
+    }
+
+    @PutMapping("/{id}/reactivar")
+    public ResponseEntity<?> reactivar(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(personaService.reactivar(id));
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> obtenerFormularios() {
         try {

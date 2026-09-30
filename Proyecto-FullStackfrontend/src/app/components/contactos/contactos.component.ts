@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { RegistroService } from '../../services/registro.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../../interfaces/contacto-emergencia.interface';
+import { FeedbackService } from '../shared/feedback/feedback.service';
 
 @Component({
   selector: 'app-contactos',
@@ -23,6 +24,7 @@ export class ContactosComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private registroService = inject(RegistroService);
+  private feedbackService = inject(FeedbackService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -90,7 +92,7 @@ export class ContactosComponent implements OnInit {
     if (this.contactos.length > 1) {
       this.contactos.removeAt(index);
     } else {
-      alert('Debes mantener al menos un contacto en la lista.');
+      this.feedbackService.notify('Debes mantener al menos un contacto en la lista.', 'warning');
     }
   }
 

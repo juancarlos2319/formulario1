@@ -4,6 +4,7 @@ import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, Validatio
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { RegistroService } from '../../services/registro.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
+import { FeedbackService } from '../shared/feedback/feedback.service';
 
 @Component({
   selector: 'app-registro',
@@ -16,6 +17,7 @@ export class RegistroComponent implements OnInit {
   private fb = inject(FormBuilder);
   private registroService = inject(RegistroService);
   private codigoPostalService = inject(CodigoPostalService);
+  private feedbackService = inject(FeedbackService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   personaId: number | null = null;
@@ -162,12 +164,12 @@ export class RegistroComponent implements OnInit {
             colonia
           });
         } else {
-          alert('Código Postal no encontrado.');
+          this.feedbackService.notify('Código postal no encontrado.', 'warning');
         }
       },
       error: () => {
         this.cargandoCP = false;
-        alert('Error al consultar el servicio de Código Postal.');
+        this.feedbackService.notify('Error al consultar el servicio de código postal.', 'error');
       }
     });
   }

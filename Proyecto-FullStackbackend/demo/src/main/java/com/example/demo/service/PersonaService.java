@@ -53,6 +53,29 @@ public class PersonaService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<FormularioDTO> obtenerInactivos() {
+        return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public FormularioDTO reactivar(Long id) {
+        Persona persona = personaRepository.findById(id)
+                .filter(p -> p.getPerfilTitular() != null && p.getPerfilTitular().getFechaBaja() != null)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Persona desactivada no encontrada"));
+
+        if (personaRepository.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull() >= 20) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.CONFLICT, "Se alcanzó el límite de 20 personas activas");
+        }
+
+        persona.getPerfilTitular().setFechaBaja(null);
+        return convertirADTO(personaRepository.save(persona));
+    }
+
     @org.springframework.transaction.annotation.Transactional
     public FormularioDTO guardar(FormularioDTO dto) {
         validarTitular(dto);
