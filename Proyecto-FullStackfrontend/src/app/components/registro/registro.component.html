@@ -109,23 +109,31 @@
 
     <!-- Contactos -->
     <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">03</span> Contacto</legend><p class="section-help">Registra dos correos y dos teléfonos. Todos son obligatorios.</p>
+      <legend><span class="section-number">03</span> Contacto</legend><p class="section-help">Registra al menos un correo y un teléfono. Puedes agregar más.</p>
       <div class="form-row">
         <div formArrayName="correos">
-          <div class="form-group" *ngFor="let correo of correos.controls; let i = index">
-            <label [for]="'correo-' + i">Correo {{ i + 1 }} *</label>
-            <input [id]="'correo-' + i" type="email" [formControlName]="i" class="form-control" autocomplete="email" />
-            <small class="field-error" *ngIf="campoInvalido('correos.' + i)">{{ errorCampo('correos.' + i) }}</small>
+          <div class="dynamic-row" *ngFor="let correo of correos.controls; let i = index">
+            <div class="form-group">
+              <label [for]="'correo-' + i">Correo {{ i + 1 }} *</label>
+              <input [id]="'correo-' + i" type="email" [formControlName]="i" class="form-control" autocomplete="email" [attr.aria-invalid]="campoInvalido('correos.' + i)" [attr.aria-describedby]="campoInvalido('correos.' + i) ? 'correo-error-' + i : null" />
+              <small class="field-error" [id]="'correo-error-' + i" *ngIf="campoInvalido('correos.' + i)">{{ errorCampo('correos.' + i) }}</small>
+            </div>
+            <button *ngIf="correos.length > 1" type="button" class="btn-remove" (click)="quitarCorreo(i)" [attr.aria-label]="'Quitar correo ' + (i + 1)" title="Quitar correo">Quitar</button>
           </div>
-          <small class="field-error" *ngIf="registroForm.hasError('correosRepetidos')">No repitas correos.</small>
+          <small class="field-error" *ngIf="registroForm.hasError('correosRepetidos')">Los correos no deben repetirse.</small>
+          <button type="button" class="btn-add" (click)="agregarCorreo()">＋ Agregar correo</button>
         </div>
         <div formArrayName="telefonos">
-          <div class="form-group" *ngFor="let telefono of telefonos.controls; let i = index">
-            <label [for]="'telefono-' + i">Telefono {{ i + 1 }} *</label>
-            <input [id]="'telefono-' + i" type="tel" inputmode="numeric" maxlength="10" [formControlName]="i" class="form-control" />
-            <small class="field-error" *ngIf="campoInvalido('telefonos.' + i)">{{ errorCampo('telefonos.' + i) }}</small>
+          <div class="dynamic-row" *ngFor="let telefono of telefonos.controls; let i = index">
+            <div class="form-group">
+              <label [for]="'telefono-' + i">Teléfono {{ i + 1 }} *</label>
+              <input [id]="'telefono-' + i" type="tel" inputmode="numeric" maxlength="10" [formControlName]="i" class="form-control" [attr.aria-invalid]="campoInvalido('telefonos.' + i)" [attr.aria-describedby]="campoInvalido('telefonos.' + i) ? 'telefono-error-' + i : null" />
+              <small class="field-error" [id]="'telefono-error-' + i" *ngIf="campoInvalido('telefonos.' + i)">{{ errorCampo('telefonos.' + i) }}</small>
+            </div>
+            <button *ngIf="telefonos.length > 1" type="button" class="btn-remove" (click)="quitarTelefono(i)" [attr.aria-label]="'Quitar teléfono ' + (i + 1)" title="Quitar teléfono">Quitar</button>
           </div>
-          <small class="field-error" *ngIf="registroForm.hasError('telefonosRepetidos')">No repitas telefonos.</small>
+          <small class="field-error" *ngIf="registroForm.hasError('telefonosRepetidos')">Los teléfonos no deben repetirse.</small>
+          <button type="button" class="btn-add" (click)="agregarTelefono()">＋ Agregar teléfono</button>
         </div>
       </div>
     </fieldset>

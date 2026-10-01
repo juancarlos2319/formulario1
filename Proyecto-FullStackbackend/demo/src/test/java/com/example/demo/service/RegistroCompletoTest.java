@@ -108,6 +108,49 @@ class RegistroCompletoTest {
         assertThrows(ResponseStatusException.class, () -> guardarConDatos(datos(0)));
         verify(personas, never()).save(any()); verify(personas, never()).saveAndFlush(any());
     }
+
+    @Test void permiteUnCorreoYUnTelefono() {
+        PersonaDTO dto = datos(1);
+        dto.setCorreos(List.of("uno@example.com"));
+        dto.setTelefonos(List.of("5512345678"));
+
+        PersonaDTO resultado = guardarConDatos(dto);
+
+        assertEquals(List.of("uno@example.com"), resultado.getCorreos());
+        assertEquals(List.of("5512345678"), resultado.getTelefonos());
+    }
+
+    @Test void guardaTodosLosCorreosYTelefonosRecibidos() {
+        PersonaDTO dto = datos(1);
+        List<String> correos = List.of("uno@example.com", "dos@example.com", "tres@example.com");
+        List<String> telefonos = List.of("5511111111", "5522222222", "5533333333", "5544444444");
+        dto.setCorreos(correos);
+        dto.setTelefonos(telefonos);
+
+        PersonaDTO resultado = guardarConDatos(dto);
+
+        assertEquals(correos, resultado.getCorreos());
+        assertEquals(telefonos, resultado.getTelefonos());
+        assertEquals(3, guardadas.get(resultado.getId()).getCorreos().size());
+        assertEquals(4, guardadas.get(resultado.getId()).getTelefonos().size());
+    }
+
+    @Test void rechazaComunicacionesVaciasORepetidasAntesDeGuardar() {
+        PersonaDTO sinCorreo = datos(1);
+        sinCorreo.setCorreos(List.of());
+        PersonaDTO sinTelefono = datos(1);
+        sinTelefono.setTelefonos(List.of());
+        PersonaDTO correoRepetido = datos(1);
+        correoRepetido.setCorreos(List.of("igual@example.com", " IGUAL@example.com "));
+        PersonaDTO telefonoRepetido = datos(1);
+        telefonoRepetido.setTelefonos(List.of("5512345678", "5512345678"));
+
+        for (PersonaDTO dto : List.of(sinCorreo, sinTelefono, correoRepetido, telefonoRepetido)) {
+            assertThrows(ResponseStatusException.class, () -> guardarConDatos(dto));
+        }
+
+        verify(personas, never()).saveAndFlush(any());
+    }
     @Test void permiteUnContactoYDevuelveIdentidadCompleta() {
         PersonaDTO resultado = guardarConDatos(datos(1));
         assertEquals(1, resultado.getContactosEmergencia().size());

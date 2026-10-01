@@ -92,8 +92,8 @@ export class RegistroComponent implements OnInit {
       numero: ['', Validators.required],
 
       // Contacto Principal y Listas
-      correos: this.fb.array([this.fb.control('', [Validators.required, Validators.email]), this.fb.control('', [Validators.required, Validators.email])]),
-      telefonos: this.fb.array([this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')]), this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')])]),
+      correos: this.fb.array([this.crearControlCorreo()]),
+      telefonos: this.fb.array([this.crearControlTelefono()]),
 
       aceptaTerminos: [false, Validators.requiredTrue]
     }, { validators: this.datosContactoDistintos });
@@ -102,14 +102,36 @@ export class RegistroComponent implements OnInit {
   get correos(): FormArray { return this.registroForm.get('correos') as FormArray; }
   get telefonos(): FormArray { return this.registroForm.get('telefonos') as FormArray; }
 
+  agregarCorreo(): void {
+    this.correos.push(this.crearControlCorreo());
+  }
+
+  quitarCorreo(index: number): void {
+    if (this.correos.length > 1) this.correos.removeAt(index);
+  }
+
+  agregarTelefono(): void {
+    this.telefonos.push(this.crearControlTelefono());
+  }
+
+  quitarTelefono(index: number): void {
+    if (this.telefonos.length > 1) this.telefonos.removeAt(index);
+  }
+
+  private crearControlCorreo(valor = '') {
+    return this.fb.control(valor, [Validators.required, Validators.email]);
+  }
+
+  private crearControlTelefono(valor = '') {
+    return this.fb.control(valor, [Validators.required, Validators.pattern('^[0-9]{10}$')]);
+  }
+
   private cargarComunicaciones(persona: { correos?: string[]; telefonos?: string[] }): void {
     for (const tipo of ['correos', 'telefonos'] as const) {
       const array = this.registroForm.get(tipo) as FormArray;
       array.clear();
       for (const valor of persona[tipo]?.length ? persona[tipo]! : ['']) {
-        array.push(this.fb.control(valor, tipo === 'correos'
-          ? [Validators.required, Validators.email]
-          : [Validators.required, Validators.pattern('^[0-9]{10}$')]));
+        array.push(tipo === 'correos' ? this.crearControlCorreo(valor) : this.crearControlTelefono(valor));
       }
     }
   }

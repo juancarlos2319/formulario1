@@ -61,4 +61,51 @@ describe('RegistroComponent: carga por ID', () => {
     expect(servicio.obtenerPersonaPorId).not.toHaveBeenCalled();
     expect(component.edicionBloqueada()).toBeFalse();
   });
+
+  it('inicia con un correo y un teléfono y permite agregarlos y quitarlos por separado', () => {
+    ruta.snapshot.paramMap = convertToParamMap({});
+    component.ngOnInit();
+
+    expect(component.correos.length).toBe(1);
+    expect(component.telefonos.length).toBe(1);
+
+    component.agregarCorreo();
+    expect(component.correos.length).toBe(2);
+    expect(component.telefonos.length).toBe(1);
+    component.quitarCorreo(1);
+    component.quitarCorreo(0);
+    expect(component.correos.length).toBe(1);
+
+    component.agregarTelefono();
+    expect(component.telefonos.length).toBe(2);
+    expect(component.correos.length).toBe(1);
+    component.quitarTelefono(1);
+    component.quitarTelefono(0);
+    expect(component.telefonos.length).toBe(1);
+  });
+
+  it('marca correos y teléfonos repetidos sin distinguir mayúsculas', () => {
+    ruta.snapshot.paramMap = convertToParamMap({});
+    component.ngOnInit();
+    component.correos.at(0).setValue('persona@example.com');
+    component.agregarCorreo();
+    component.correos.at(1).setValue('PERSONA@example.com');
+    component.telefonos.at(0).setValue('5512345678');
+    component.agregarTelefono();
+    component.telefonos.at(1).setValue('5512345678');
+
+    expect(component.registroForm.hasError('correosRepetidos')).toBeTrue();
+    expect(component.registroForm.hasError('telefonosRepetidos')).toBeTrue();
+    expect(component.registroForm.invalid).toBeTrue();
+  });
+
+  it('valida el formato de cada correo y teléfono', () => {
+    ruta.snapshot.paramMap = convertToParamMap({});
+    component.ngOnInit();
+    component.correos.at(0).setValue('correo-invalido');
+    component.telefonos.at(0).setValue('12345');
+
+    expect(component.correos.at(0).hasError('email')).toBeTrue();
+    expect(component.telefonos.at(0).hasError('pattern')).toBeTrue();
+  });
 });
