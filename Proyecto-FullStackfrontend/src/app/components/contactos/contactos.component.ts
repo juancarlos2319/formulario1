@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, merge, of, debounceTime, map, tap, switchMap, catchError } from 'rxjs';
 import { PersonasService } from '../../services/personas.service';
-import { Usuario } from '../../interfaces/usuario.interface';
+import { Resultado } from '../../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../../interfaces/contacto-emergencia.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 
@@ -16,16 +16,19 @@ import { FeedbackService } from '../shared/feedback/feedback.service';
   styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
 })
 export class ContactosComponent implements OnInit, OnDestroy {
-  guardando = false;
+  readonly guardando = signal(false);
   private destruido = false;
+  private readonly revisionVerificaciones = signal(0);
   private confirmaciones = Promise.resolve();
   private verificaciones = new Map<FormGroup, { revision: number; pendiente: boolean; fallo: boolean; reutilizado: boolean; subscription: Subscription }>();
 
   get verificando(): boolean {
+    this.revisionVerificaciones();
     return this.contactos.controls.some(control => this.verificaciones.get(control as FormGroup)?.pendiente);
   }
 
   get errorVerificacion(): boolean {
+    this.revisionVerificaciones();
     return this.contactos.controls.some(control => this.verificaciones.get(control as FormGroup)?.fallo);
   }
 
@@ -39,11 +42,11 @@ export class ContactosComponent implements OnInit, OnDestroy {
   modoEdicion = false;
   modoAgregar = false;
   contactosOriginales: ContactoEmergencia[] = [];
-  cargandoContactos = false;
-  contactosCargados = false;
-  mensajeError: string = '';
-  mensajeExito: string = '';
-  parentescos: Parentesco[] = [];
+  readonly cargandoContactos = signal(false);
+  readonly contactosCargados = signal(false);
+  readonly mensajeError = signal('');
+  readonly mensajeExito = signal('');
+  readonly parentescos = signal<Parentesco[]>([]);
 
   private fb = inject(FormBuilder);
   private registroService = inject(PersonasService);
@@ -68,7 +71,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       this.cargarContactos();
     } else {
       if (!this.registroService.obtenerBorrador()) {
-        this.mensajeError = 'Primero completa los datos de la persona registrada.';
+        this.mensajeError.set('Primero completa los datos de la persona registrada.');
         this.router.navigate(['/registro']);
         return;
       }
@@ -99,10 +102,14 @@ export class ContactosComponent implements OnInit, OnDestroy {
       apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
       fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
       genero: [datos?.genero ?? '', Validators.required],
-      email: [datos?.email ?? '', [Validators.required, Validators.email]],
-      telefono: [datos?.telefono ?? '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      correos: this.fb.array((datos?.correos?.length ? datos.correos : ['']).map(valor => this.fb.control(valor, [Validators.required, Validators.email]))),
+      telefonos: this.fb.array((datos?.telefonos?.length ? datos.telefonos : ['']).map(valor => this.fb.control(valor, [Validators.required, Validators.pattern('^[0-9]{10}$')]))),
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
+  }
+
+  comunicaciones(index: number, tipo: 'correos' | 'telefonos'): FormArray {
+    return this.contactos.at(index).get(tipo) as FormArray;
   }
 
   campoInvalido(index: number, nombre: string): boolean {
@@ -129,25 +136,25 @@ export class ContactosComponent implements OnInit, OnDestroy {
   private observarCoincidencias(grupo: FormGroup): void {
     const estado = { revision: 0, pendiente: false, fallo: false, reutilizado: false, subscription: new Subscription() };
     this.verificaciones.set(grupo, estado);
+    let correosPrevios: string[] = grupo.get('correos')!.value;
+    let telefonosPrevios: string[] = grupo.get('telefonos')!.value;
     estado.subscription = merge(
-      grupo.get('email')!.valueChanges.pipe(map(() => 'email' as const)),
-      grupo.get('telefono')!.valueChanges.pipe(map(() => 'telefono' as const))
+      grupo.get('correos')!.valueChanges.pipe(map((valores: string[]) => { const indice = Math.max(0, valores.findIndex((v, i) => v !== correosPrevios[i])); correosPrevios = [...valores]; return { campo: 'correos' as const, indice }; })),
+      grupo.get('telefonos')!.valueChanges.pipe(map((valores: string[]) => { const indice = Math.max(0, valores.findIndex((v, i) => v !== telefonosPrevios[i])); telefonosPrevios = [...valores]; return { campo: 'telefonos' as const, indice }; }))
     ).pipe(
-      tap(() => { estado.revision++; estado.pendiente = true; estado.fallo = false; }),
+      tap(() => { estado.revision++; estado.pendiente = true; estado.fallo = false; this.revisionVerificaciones.update(v => v + 1); }),
       debounceTime(350),
-      switchMap(campo => {
+      switchMap(({ campo, indice }) => {
         const revision = estado.revision;
         const datos = grupo.getRawValue();
-        const email = String(datos.email ?? '').trim();
-        const telefono = String(datos.telefono ?? '').trim();
         const consulta = {
-          email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : undefined,
-          telefono: /^[0-9]{10}$/.test(telefono) ? telefono : undefined,
+          correos: (datos.correos as string[]).map(v => v.trim()).filter(v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),
+          telefonos: (datos.telefonos as string[]).filter(v => /^[0-9]{10}$/.test(v)),
           excluirId: datos.idContacto ?? undefined
         };
-        return (consulta.email || consulta.telefono ? this.registroService.buscarContactos(consulta) : of([])).pipe(
-          map(coincidencias => ({ campo, revision, coincidencias, fallo: false })),
-          catchError(() => of({ campo, revision, coincidencias: [] as ContactoEmergencia[], fallo: true }))
+        return (consulta.correos.length || consulta.telefonos.length ? this.registroService.buscarContactos(consulta) : of([])).pipe(
+          map(coincidencias => ({ campo, indice, revision, coincidencias, fallo: false })),
+          catchError(() => of({ campo, indice, revision, coincidencias: [] as ContactoEmergencia[], fallo: true }))
         );
       })
     ).subscribe(resultado => {
@@ -159,8 +166,8 @@ export class ContactosComponent implements OnInit, OnDestroy {
           if (!resultado.coincidencias.length) return;
           if (resultado.coincidencias.length > 1) {
             this.feedbackService.notify('El correo y/o teléfono coinciden con varias personas. Revisa los datos antes de continuar.', 'warning');
-            grupo.get(resultado.campo)!.setValue('', { emitEvent: false });
-            grupo.get(resultado.campo)!.markAsTouched();
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).setValue('', { emitEvent: false });
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).markAsTouched();
             // Obliga a consultar de nuevo el otro dato si todavía existe una coincidencia.
             estado.fallo = true;
             return;
@@ -171,8 +178,8 @@ export class ContactosComponent implements OnInit, OnDestroy {
             this.contactos.controls.some(c => c !== grupo && c.get('idContacto')?.value === persona.idContacto);
           if (repetido) {
             this.feedbackService.notify('Esta persona ya está en la lista o es el titular. Selecciona otro contacto.', 'warning');
-            grupo.get(resultado.campo)!.setValue('', { emitEvent: false });
-            grupo.get(resultado.campo)!.markAsTouched();
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).setValue('', { emitEvent: false });
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).markAsTouched();
             return;
           }
           const aceptar = await this.feedbackService.confirm({
@@ -183,17 +190,22 @@ export class ContactosComponent implements OnInit, OnDestroy {
           if (!vigente()) return;
           if (aceptar) {
             const { idParentesco, parentesco, ...personales } = persona;
+            for (const tipo of ['correos', 'telefonos'] as const) {
+              const array = grupo.get(tipo) as FormArray;
+              array.clear({ emitEvent: false });
+              for (const valor of persona[tipo] ?? []) array.push(this.fb.control(valor), { emitEvent: false });
+            }
             grupo.patchValue(personales, { emitEvent: false });
             estado.reutilizado = true;
-            for (const campo of ['nombre', 'apellido', 'fechaNacimiento', 'genero', 'email', 'telefono']) {
+            for (const campo of ['nombre', 'apellido', 'fechaNacimiento', 'genero', 'correos', 'telefonos']) {
               grupo.get(campo)!.disable({ emitEvent: false });
             }
           } else {
-            grupo.get(resultado.campo)!.setValue('', { emitEvent: false });
-            grupo.get(resultado.campo)!.markAsTouched();
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).setValue('', { emitEvent: false });
+            (grupo.get(resultado.campo) as FormArray).at(resultado.indice).markAsTouched();
           }
         } finally {
-          if (vigente()) estado.pendiente = false;
+          if (vigente()) { estado.pendiente = false; this.revisionVerificaciones.update(v => v + 1); }
         }
       });
     });
@@ -201,7 +213,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
 
   reintentarVerificacion(): void {
     this.contactos.controls.forEach(grupo => {
-      if (this.verificaciones.get(grupo as FormGroup)?.fallo) grupo.get('email')!.updateValueAndValidity();
+      if (this.verificaciones.get(grupo as FormGroup)?.fallo) grupo.get('correos')!.updateValueAndValidity();
     });
   }
 
@@ -219,14 +231,14 @@ export class ContactosComponent implements OnInit, OnDestroy {
   }
 
   cargarContactos(): void {
-    if (this.cargandoContactos) return;
-    this.cargandoContactos = true;
-    this.contactosCargados = false;
-    this.mensajeError = '';
+    if (this.cargandoContactos()) return;
+    this.cargandoContactos.set(true);
+    this.contactosCargados.set(false);
+    this.mensajeError.set('');
     this.registroService.obtenerContactos(this.personaId)
       .subscribe({
         next: (data) => {
-          this.cargandoContactos = false;
+          this.cargandoContactos.set(false);
           this.contactosOriginales = data ?? [];
           this.verificaciones.forEach(estado => estado.subscription.unsubscribe());
           this.verificaciones.clear();
@@ -242,29 +254,29 @@ export class ContactosComponent implements OnInit, OnDestroy {
           } else {
             this.agregarContacto();
           }
-          this.contactosCargados = true;
+          this.contactosCargados.set(true);
         },
         error: (err) => {
-          this.cargandoContactos = false;
+          this.cargandoContactos.set(false);
           console.error('Error al cargar contactos:', err);
-          this.mensajeError = err instanceof Error ? err.message : 'No se pudieron cargar los contactos.';
+          this.mensajeError.set(err instanceof Error ? err.message : 'No se pudieron cargar los contactos.');
         }
       });
   }
 
   async guardarContactos(): Promise<void> {
-    if (this.guardando || this.verificando || this.errorVerificacion) return;
-    if (this.cargandoContactos || (this.personaId > 0 && !this.contactosCargados) || this.contactos.length === 0) return;
-    this.mensajeError = '';
-    this.mensajeExito = '';
+    if (this.guardando() || this.verificando || this.errorVerificacion) return;
+    if (this.cargandoContactos() || (this.personaId > 0 && !this.contactosCargados()) || this.contactos.length === 0) return;
+    this.mensajeError.set('');
+    this.mensajeExito.set('');
 
     if (this.contactosForm.invalid) {
-      this.mensajeError = 'Por favor completa todos los campos requeridos (*).';
+      this.mensajeError.set('Por favor completa todos los campos requeridos (*).');
       this.contactosForm.markAllAsTouched();
       return;
     }
 
-    this.guardando = true;
+    this.guardando.set(true);
     if (this.modoEdicion && !this.verificaciones.get(this.contactos.at(0) as FormGroup)?.reutilizado) {
       const contacto = this.contactos.getRawValue()[0] as ContactoEmergencia;
       const confirmado = await this.feedbackService.confirm({
@@ -272,7 +284,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
         message: `Los cambios de ${contacto.nombre} ${contacto.apellido} se aplicarán a todos los titulares que comparten este contacto. ¿Deseas continuar?`,
         confirmLabel: 'Actualizar contacto'
       });
-      if (!confirmado) { this.guardando = false; return; }
+      if (!confirmado) { this.guardando.set(false); return; }
     }
 
     const editados = this.contactos.controls.map(control => {
@@ -300,7 +312,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       payload = editados;
     }
 
-    const solicitud: Observable<ContactoEmergencia[] | Usuario> = this.personaId > 0
+    const solicitud: Observable<Resultado> = this.personaId > 0
       ? this.registroService.guardarContactos(this.personaId, payload)
       : this.registroService.guardarRegistroCompleto(payload);
 
@@ -309,15 +321,15 @@ export class ContactosComponent implements OnInit, OnDestroy {
         next: () => {
           this.feedbackService.notify('Contactos guardados correctamente.', 'success');
           if (this.personaId === 0) this.registroService.limpiarBorrador();
-          this.guardando = false;
+          this.guardando.set(false);
           this.router.navigate(this.personaId > 0 ? ['/contactos', this.personaId] : ['/personas']);
         },
         error: (err) => {
-          this.guardando = false;
+          this.guardando.set(false);
           console.error('Error al guardar contactos:', err);
-          this.mensajeError = err instanceof Error
+          this.mensajeError.set(err instanceof Error
             ? err.message
-            : 'Ocurrio un error al guardar los contactos. Revisa los datos ingresados.';
+            : 'Ocurrio un error al guardar los contactos. Revisa los datos ingresados.');
         }
       });
   }
@@ -332,8 +344,8 @@ export class ContactosComponent implements OnInit, OnDestroy {
 
   private cargarParentescos(): void {
     this.registroService.obtenerParentescos().subscribe({
-      next: (parentescos) => this.parentescos = parentescos,
-      error: (err) => this.mensajeError = err instanceof Error ? err.message : 'No se pudieron cargar los parentescos.'
+      next: (parentescos) => this.parentescos.set(parentescos),
+      error: (err) => this.mensajeError.set(err instanceof Error ? err.message : 'No se pudieron cargar los parentescos.')
     });
   }
 }

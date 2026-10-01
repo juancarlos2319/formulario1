@@ -4,8 +4,8 @@ export interface ContactoEmergencia {
   apellido?: string;
   fechaNacimiento?: string;
   genero?: string;
-  email?: string;
-  telefono?: string;
+  correos?: string[];
+  telefonos?: string[];
   idParentesco?: number;
   parentesco?: string;
 }

@@ -7,21 +7,21 @@
   <a class="secondary" routerLink="/personas">Volver a personas</a>
 </section>
 
-<div *ngIf="mensajeError" class="notice error" role="alert">
-  {{ mensajeError }}
-  <button type="button" (click)="cargarPersonas()" [disabled]="cargando || reactivando !== null">Reintentar</button>
+<div *ngIf="mensajeError()" class="notice error" role="alert">
+  {{ mensajeError() }}
+  <button type="button" (click)="cargarPersonas()" [disabled]="cargando() || reactivando() !== null">Reintentar</button>
 </div>
-<div *ngIf="cargando" class="notice" role="status">Cargando personas desactivadas…</div>
+<div *ngIf="cargando()" class="notice" role="status">Cargando personas desactivadas…</div>
 
-<section *ngIf="!cargando && (!mensajeError || personas.length > 0)" class="panel people" aria-labelledby="inactive-title">
+<section *ngIf="!cargando() && (!mensajeError() || personas().length > 0)" class="panel people" aria-labelledby="inactive-title">
   <div class="table-heading">
     <div>
       <h2 id="inactive-title">Titulares dados de baja</h2>
-      <p class="muted">{{ personas.length }} registros</p>
+      <p class="muted">{{ personas().length }} registros</p>
     </div>
   </div>
 
-  <div class="table-wrap" *ngIf="personas.length">
+  <div class="table-wrap" *ngIf="personas().length">
     <table>
       <thead>
         <tr>
@@ -33,13 +33,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let persona of personas">
+        <tr *ngFor="let persona of personas()">
           <td>
             <div class="person">
               <span class="avatar">{{ obtenerIniciales(persona.nombre, persona.apellido) }}</span>
               <div>
                 <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
-                <small>{{ persona.email || 'Sin correo' }}</small>
+                <small>{{ persona.correos.join(', ') || 'Sin correo' }}</small>
               </div>
             </div>
           </td>
@@ -47,8 +47,8 @@
           <td>{{ persona.ocupacion || 'Sin ocupación' }}</td>
           <td>{{ persona.ciudad || 'Sin ciudad' }}</td>
           <td>
-            <button type="button" class="restore" (click)="reactivar(persona)" [disabled]="reactivando !== null">
-              {{ reactivando === persona.id ? 'Reactivando…' : 'Reactivar' }}
+            <button type="button" class="restore" (click)="reactivar(persona)" [disabled]="reactivando() !== null">
+              {{ reactivando() === persona.id ? 'Reactivando…' : 'Reactivar' }}
             </button>
           </td>
         </tr>
@@ -56,8 +56,8 @@
     </table>
   </div>
 
-  <div *ngIf="!personas.length" class="empty">
-    <h3>{{ mensajeError ? 'No se pudieron cargar los registros' : 'No hay personas desactivadas' }}</h3>
-    <p>{{ mensajeError ? 'Reintenta la consulta.' : 'Las personas dadas de baja aparecerán aquí.' }}</p>
+  <div *ngIf="!personas().length" class="empty">
+    <h3>{{ mensajeError() ? 'No se pudieron cargar los registros' : 'No hay personas desactivadas' }}</h3>
+    <p>{{ mensajeError() ? 'Reintenta la consulta.' : 'Las personas dadas de baja aparecerán aquí.' }}</p>
   </div>
 </section>

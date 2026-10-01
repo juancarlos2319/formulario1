@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
-import { Usuario } from '../interfaces/usuario.interface';
+import { Observable, catchError, throwError, finalize, shareReplay } from 'rxjs';
+import { Usuario, PersonaResumen, Resultado, Resumen } from '../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergencia.interface';
 
 @Injectable({
@@ -37,16 +37,17 @@ export class PersonasService {
     }
   }
 
-  guardarRegistroCompleto(contactos: ContactoEmergencia[]): Observable<Usuario> {
+  guardarRegistroCompleto(contactos: ContactoEmergencia[]): Observable<Resultado> {
     const borrador = this.obtenerBorrador();
     if (!borrador) {
       return throwError(() => new Error('Primero completa los datos de la persona registrada.'));
     }
-    return this.http.post<Usuario>(this.apiUrl, { ...borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() })
+    return this.http.post<Resultado>(this.apiUrl, { ...borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar el registro y sus contactos')));
   }
 
   private http = inject(HttpClient);
+  private solicitudes = new Map<string, Observable<unknown>>();
   private apiUrl = 'http://localhost:8080/api/personas';
 
   // 1. Método auxiliar para adjuntar el token en cada petición
@@ -64,43 +65,42 @@ export class PersonasService {
       .pipe(catchError(this.manejarError('obtener los contactos')));
   }
 
-  buscarContactos(datos: { email?: string; telefono?: string; excluirId?: number }): Observable<ContactoEmergencia[]> {
+  buscarContactos(datos: { correos?: string[]; telefonos?: string[]; excluirId?: number }): Observable<ContactoEmergencia[]> {
     return this.http.post<ContactoEmergencia[]>(`${this.apiUrl}/contactos/coincidencias`, datos, { headers: this.getHeaders() })
       .pipe(catchError(() => throwError(() => new Error('No se pudo verificar si el contacto ya existe. Reintenta la consulta.'))));
   }
 
-  guardarContactos(id: number, contactos: ContactoEmergencia[]): Observable<ContactoEmergencia[]> {
-    return this.http.put<ContactoEmergencia[]>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
+  guardarContactos(id: number, contactos: ContactoEmergencia[]): Observable<Resultado> {
+    return this.http.put<Resultado>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar los contactos')));
   }
 
-  crearPersona(datos: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>(this.apiUrl, datos, { headers: this.getHeaders() })
+  crearPersona(datos: Usuario): Observable<Resultado> {
+    return this.http.post<Resultado>(this.apiUrl, datos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar el formulario')));
   }
 
-  obtenerPersonas(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.apiUrl, { headers: this.getHeaders() })
+  obtenerPersonas(): Observable<PersonaResumen[]> {
+    return this.http.get<PersonaResumen[]>(this.apiUrl, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('obtener los formularios')));
   }
 
-  obtenerPersonasInactivas(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.apiUrl}/inactivos`, { headers: this.getHeaders() })
+  obtenerPersonasInactivas(): Observable<PersonaResumen[]> {
+    return this.http.get<PersonaResumen[]>(`${this.apiUrl}/inactivos`, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('obtener las personas desactivadas')));
   }
 
-  reactivarPersona(id: number): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}/reactivar`, null, { headers: this.getHeaders() })
+  reactivarPersona(id: number): Observable<Resultado> {
+    return this.http.put<Resultado>(`${this.apiUrl}/${id}/reactivar`, null, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('reactivar la persona')));
   }
 
   obtenerPersonaPorId(id: number): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener la persona')));
+    return this.consultarCompartido<Usuario>(`${this.apiUrl}/${id}`, 'obtener la persona');
   }
 
-  actualizarPersona(id: number, datos: Usuario): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
+  actualizarPersona(id: number, datos: Usuario): Observable<Resultado> {
+    return this.http.put<Resultado>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('actualizar el formulario')));
   }
 
@@ -110,13 +110,28 @@ export class PersonasService {
   }
 
   obtenerOcupaciones(): Observable<string[]> {
-    return this.http.get<string[]>('http://localhost:8080/api/ocupaciones', { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener las ocupaciones')));
+    return this.consultarCompartido<string[]>('http://localhost:8080/api/ocupaciones', 'obtener las ocupaciones');
   }
 
   obtenerParentescos(): Observable<Parentesco[]> {
     return this.http.get<Parentesco[]>('http://localhost:8080/api/parentescos', { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('obtener los parentescos')));
+  }
+
+  obtenerResumen(): Observable<Resumen> {
+    return this.consultarCompartido<Resumen>(`${this.apiUrl}/resumen`, 'obtener el resumen');
+  }
+
+  private consultarCompartido<T>(url: string, operacion: string): Observable<T> {
+    const pendiente = this.solicitudes.get(url);
+    if (pendiente) return pendiente as Observable<T>;
+    const solicitud = this.http.get<T>(url, { headers: this.getHeaders() }).pipe(
+      catchError(this.manejarError(operacion)),
+      finalize(() => this.solicitudes.delete(url)),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+    this.solicitudes.set(url, solicitud);
+    return solicitud;
   }
 
   private manejarError(operacion: string) {

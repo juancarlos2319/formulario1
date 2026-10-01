@@ -12,12 +12,12 @@ describe('ContactosComponent', () => {
   let servicio: jasmine.SpyObj<PersonasService>;
   let feedback: jasmine.SpyObj<FeedbackService>;
   let router: jasmine.SpyObj<Router>;
-  const nuevo = { nombre: 'Ana', apellido: 'Perez', fechaNacimiento: '1990-01-01', genero: 'Otro', email: 'ana@example.com', telefono: '5512345678', idParentesco: 9 };
+  const nuevo = { nombre: 'Ana', apellido: 'Perez', fechaNacimiento: '1990-01-01', genero: 'Otro', correos: ['ana@example.com'], telefonos: ['5512345678'], idParentesco: 9 };
   beforeEach(() => {
     servicio = jasmine.createSpyObj('PersonasService', ['obtenerContactos', 'obtenerParentescos', 'guardarContactos', 'buscarContactos', 'obtenerBorrador', 'guardarRegistroCompleto', 'limpiarBorrador']);
     servicio.obtenerContactos.and.returnValue(of([{ idContacto: 2, idParentesco: 9 }]));
     servicio.obtenerParentescos.and.returnValue(of([]));
-    servicio.guardarContactos.and.returnValue(of([]));
+    servicio.guardarContactos.and.returnValue(of({ ok: true }));
     servicio.buscarContactos.and.returnValue(of([]));
     feedback = jasmine.createSpyObj('FeedbackService', ['notify', 'confirm']);
     feedback.confirm.and.resolveTo(true);
@@ -54,7 +54,7 @@ describe('ContactosComponent', () => {
   it('autocompleta previa confirmaci?n y env?a el ID conservando parentesco', fakeAsync(() => {
     servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8, idParentesco: undefined }]));
     component.ngOnInit();
-    component.contactos.at(0).patchValue({ email: nuevo.email, idParentesco: 7 });
+    component.contactos.at(0).patchValue({ correos: [nuevo.correos[0]], idParentesco: 7 });
     component.guardarContactos();
     expect(servicio.guardarContactos).not.toHaveBeenCalled();
     tick(350); flushMicrotasks();
@@ -68,9 +68,9 @@ describe('ContactosComponent', () => {
     servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8 }]));
     feedback.confirm.and.resolveTo(false);
     component.ngOnInit();
-    component.contactos.at(0).patchValue({ nombre: 'Borrador', telefono: nuevo.telefono });
+    component.contactos.at(0).patchValue({ nombre: 'Borrador', telefonos: [nuevo.telefonos[0]] });
     tick(350); flushMicrotasks();
-    expect(component.contactos.at(0).get('telefono')!.value).toBe('');
+    expect(component.contactos.at(0).get('telefonos.0')!.value).toBe('');
     expect(component.contactos.at(0).get('nombre')!.value).toBe('Borrador');
     expect(component.contactos.at(0).get('idContacto')!.value).toBeNull();
   }));
@@ -79,13 +79,13 @@ describe('ContactosComponent', () => {
     const anterior = new Subject<ContactoEmergencia[]>();
     servicio.buscarContactos.and.returnValues(anterior, of([]));
     component.ngOnInit();
-    component.contactos.at(0).patchValue({ email: nuevo.email });
+    component.contactos.at(0).patchValue({ correos: [nuevo.correos[0] ]});
     tick(350);
-    component.contactos.at(0).patchValue({ email: 'distinto@example.com' });
+    component.contactos.at(0).patchValue({ correos: ['distinto@example.com' ]});
     anterior.next([{ ...nuevo, idContacto: 8 }]);
     tick(350); flushMicrotasks();
     expect(feedback.confirm).not.toHaveBeenCalled();
-    expect(component.contactos.at(0).get('email')!.value).toBe('distinto@example.com');
+    expect(component.contactos.at(0).get('correos.0')!.value).toBe('distinto@example.com');
   }));
 
   it('bloquea guardado cuando falla la consulta y permite reintentar', fakeAsync(() => {
@@ -109,8 +109,8 @@ describe('ContactosComponent', () => {
     component.modoEdicion = true;
     component.contactoId = 2;
     component.cargarContactos();
-    servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8, email: 'otro@example.com' }]));
-    component.contactos.at(0).patchValue({ email: 'otro@example.com' });
+    servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8, correos: ['otro@example.com' ]}]));
+    component.contactos.at(0).patchValue({ correos: ['otro@example.com' ]});
     tick(350); flushMicrotasks();
     component.guardarContactos(); flushMicrotasks();
     expect(servicio.guardarContactos).toHaveBeenCalledWith(1, [{ idContacto: 8, idParentesco: 9 }, { idContacto: 3, idParentesco: 7 }]);
@@ -120,20 +120,20 @@ describe('ContactosComponent', () => {
   it('no elige arbitrariamente cuando hay varias coincidencias', fakeAsync(() => {
     servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8 }, { ...nuevo, idContacto: 9 }]));
     component.ngOnInit();
-    component.contactos.at(0).patchValue({ email: nuevo.email });
+    component.contactos.at(0).patchValue({ correos: [nuevo.correos[0] ]});
     tick(350); flushMicrotasks();
     expect(feedback.confirm).not.toHaveBeenCalled();
     expect(component.contactos.at(0).get('idContacto')!.value).toBeNull();
-    expect(component.contactos.at(0).get('email')!.value).toBe('');
+    expect(component.contactos.at(0).get('correos.0')!.value).toBe('');
   }));
 
   it('reutiliza el contacto durante el registro de una persona nueva', fakeAsync(() => {
     spyOn(TestBed.inject(ActivatedRoute).snapshot.paramMap, 'get').and.returnValue(null);
     servicio.obtenerBorrador.and.returnValue({ nombre: 'Titular' } as Usuario);
-    servicio.guardarRegistroCompleto.and.returnValue(of({ id: 10 } as Usuario));
+    servicio.guardarRegistroCompleto.and.returnValue(of({ ok: true }));
     servicio.buscarContactos.and.returnValue(of([{ ...nuevo, idContacto: 8 }]));
     component.ngOnInit();
-    component.contactos.at(0).patchValue({ telefono: nuevo.telefono, idParentesco: 7 });
+    component.contactos.at(0).patchValue({ telefonos: [nuevo.telefonos[0]], idParentesco: 7 });
     tick(350); flushMicrotasks();
     component.guardarContactos();
     expect(servicio.guardarRegistroCompleto).toHaveBeenCalledWith([{ idContacto: 8, idParentesco: 7 }]);

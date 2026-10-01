@@ -3,31 +3,26 @@ package com.example.demo.dto;
 import java.time.LocalDate;
 
 public class PersonaDTO {
-    private java.util.List<String> correosAdicionales = java.util.List.of();
-    private java.util.List<String> telefonosAdicionales = java.util.List.of();
+    private java.util.List<String> telefonos = java.util.List.of();
+    private java.util.List<String> correos = java.util.List.of();
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
     private java.util.List<ContactoDTO> contactosEmergencia;
 
-    public java.util.List<String> getCorreosAdicionales() { return correosAdicionales; }
-    public void setCorreosAdicionales(java.util.List<String> valores) { correosAdicionales = valores; }
-    public java.util.List<String> getTelefonosAdicionales() { return telefonosAdicionales; }
-    public void setTelefonosAdicionales(java.util.List<String> valores) { telefonosAdicionales = valores; }
+    public java.util.List<String> getCorreos() { return correos; }
+    public void setCorreos(java.util.List<String> valores) { correos = valores; }
+    public java.util.List<String> getTelefonos() { return telefonos; }
+    public void setTelefonos(java.util.List<String> valores) { telefonos = valores; }
     public java.util.List<ContactoDTO> getContactosEmergencia() { return contactosEmergencia; }
     public void setContactosEmergencia(java.util.List<ContactoDTO> valores) { contactosEmergencia = valores; }
 
     private Long id;
     private String nombre;
     private String apellido;
-    private String email;
-    private String telefono;
     private LocalDate fechaNacimiento;
     private String genero;
     private String direccion;
     private String ciudad;
     private String ocupacion;
-    private Boolean aceptaTerminos = true;
-    private String contactoEmergenciaNombre;
-    private String contactoEmergenciaTelefono;
-    private String contactoEmergenciaParentesco;
     private LocalDate fechaBaja;
 
     public PersonaDTO() {}
@@ -38,10 +33,6 @@ public class PersonaDTO {
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellido() { return apellido; }
     public void setApellido(String apellido) { this.apellido = apellido; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
     public LocalDate getFechaNacimiento() { return fechaNacimiento; }
     public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     public String getGenero() { return genero; }
@@ -52,14 +43,6 @@ public class PersonaDTO {
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
     public String getOcupacion() { return ocupacion; }
     public void setOcupacion(String ocupacion) { this.ocupacion = ocupacion; }
-    public Boolean getAceptaTerminos() { return aceptaTerminos; }
-    public void setAceptaTerminos(Boolean aceptaTerminos) { this.aceptaTerminos = aceptaTerminos; }
-    public String getContactoEmergenciaNombre() { return contactoEmergenciaNombre; }
-    public void setContactoEmergenciaNombre(String contactoEmergenciaNombre) { this.contactoEmergenciaNombre = contactoEmergenciaNombre; }
-    public String getContactoEmergenciaTelefono() { return contactoEmergenciaTelefono; }
-    public void setContactoEmergenciaTelefono(String contactoEmergenciaTelefono) { this.contactoEmergenciaTelefono = contactoEmergenciaTelefono; }
-    public String getContactoEmergenciaParentesco() { return contactoEmergenciaParentesco; }
-    public void setContactoEmergenciaParentesco(String contactoEmergenciaParentesco) { this.contactoEmergenciaParentesco = contactoEmergenciaParentesco; }
     public LocalDate getFechaBaja() { return fechaBaja; }
     public void setFechaBaja(LocalDate fechaBaja) { this.fechaBaja = fechaBaja; }
 }

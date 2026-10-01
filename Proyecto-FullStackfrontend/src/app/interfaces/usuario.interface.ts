@@ -1,23 +1,27 @@
 import { ContactoEmergencia } from './contacto-emergencia.interface';
 
-export interface Usuario {
+export interface PersonaResumen {
   id?: number;
   nombre: string;
   apellido: string;
-  email: string;
-  telefono: string;
-  correosAdicionales?: string[];
-  telefonosAdicionales?: string[];
-  fechaBaja?: string;
+  correos: string[];
+  telefonos: string[];
+  ciudad: string;
+  ocupacion: string;
+  fechaBaja?: string | null;
+}
+
+export interface Usuario extends PersonaResumen {
   fechaNacimiento: string;
   genero: string;
   direccion: string;
-  ciudad: string;
-  ocupacion: string;
-  aceptaTerminos?: boolean;
-  activo?: boolean;
-  contactoEmergenciaNombre?: string;
-  contactoEmergenciaTelefono?: string;
-  contactoEmergenciaParentesco?: string;
   contactosEmergencia?: ContactoEmergencia[];
+}
+
+export interface Resultado { ok: boolean; }
+export interface Resumen {
+  total: number;
+  conCorreo: number;
+  conTelefono: number;
+  ocupaciones: { nombre: string; cantidad: number }[];
 }

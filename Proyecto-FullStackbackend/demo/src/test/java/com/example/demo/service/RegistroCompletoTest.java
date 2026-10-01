@@ -18,8 +18,10 @@ class RegistroCompletoTest {
         CatalogoOcupacion ocupacion = new CatalogoOcupacion();
         ocupacion.setNombre("Docente");
         titular.getPerfilTitular().setOcupacion(ocupacion);
+        titular.getContactosEmergencia().add(new ContactoEmergencia());
+        assertNull(service.obtenerPorId(7L).getContactosEmergencia());
         assertEquals(7L, service.obtenerPorId(7L).getId());
-        verify(personas).findById(7L);
+        verify(personas, times(2)).findById(7L);
         verify(personas, never()).findAll();
         verify(personas, never()).findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
     }
@@ -39,42 +41,52 @@ class RegistroCompletoTest {
     private final PersonaService service = new PersonaService();
     private final CatalogoParentesco parentesco = new CatalogoParentesco();
     private long siguienteId = 100;
+    private final Map<Long, Persona> guardadas = new HashMap<>();
+
+    private PersonaDTO guardarConDatos(PersonaDTO dto) {
+        Long id = service.guardar(dto);
+        PersonaDTO resultado = service.obtenerPorId(id);
+        resultado.setContactosEmergencia(service.obtenerContactos(id));
+        return resultado;
+    }
 
     @BeforeEach void configurar() {
         ReflectionTestUtils.setField(service, "personaRepository", personas);
         ReflectionTestUtils.setField(service, "ocupacionRepository", ocupaciones);
         ReflectionTestUtils.setField(service, "parentescoRepository", parentescos);
         ReflectionTestUtils.setField(service, "usuarioRepository", usuarios);
+        when(personas.findById(anyLong())).thenAnswer(i -> Optional.ofNullable(guardadas.get(i.getArgument(0))));
         parentesco.setId(9L);
         parentesco.setNombre("Amigo(a)");
         when(parentescos.findById(9L)).thenReturn(Optional.of(parentesco));
-        when(ocupaciones.findByNombre("Docente")).thenReturn(Optional.of(new CatalogoOcupacion()));
+        when(ocupaciones.findByNombre("Docente")).thenAnswer(i -> { CatalogoOcupacion o = new CatalogoOcupacion(); o.setNombre("Docente"); return Optional.of(o); });
         when(personas.save(any(Persona.class))).thenAnswer(i -> {
             Persona p = i.getArgument(0);
             if (p.getId() == null) p.setId(siguienteId++);
+            guardadas.put(p.getId(), p);
             return p;
         });
         when(personas.saveAndFlush(any(Persona.class))).thenAnswer(i -> {
             Persona p = i.getArgument(0);
             if (p.getId() == null) p.setId(siguienteId++);
+            guardadas.put(p.getId(), p);
             return p;
         });
     }
 
     private ContactoDTO nuevo(String nombre) {
-        return new ContactoDTO(null, nombre, "PÃƒÂ©rez", LocalDate.of(1980, 1, 1), "No especificado",
-            nombre.replace(" ", "").toLowerCase() + "@example.com", String.format("55%08d", Math.abs(nombre.hashCode()) % 100000000), 9L, null);
+        return new ContactoDTO(null, nombre, "PÃƒÂ©rez", LocalDate.of(1980, 1, 1), "No especificado", List.of(nombre.replace(" ", "").toLowerCase() + "@example.com"), List.of(String.format("55%08d", Math.abs(nombre.hashCode()) % 100000000)), 9L, null);
     }
     private ContactoDTO existente(long id) {
-        return new ContactoDTO(id, null, null, null, 9L, null);
+        return new ContactoDTO(id, null, null, null, null, null, null, 9L, null);
     }
     private PersonaDTO datos(int cantidad) {
         PersonaDTO dto = new PersonaDTO();
         dto.setNombre("Titular"); dto.setApellido("Prueba");
         dto.setFechaNacimiento(LocalDate.of(1990, 1, 1));
-        dto.setEmail("principal@example.com"); dto.setTelefono("5512345678");
-        dto.setCorreosAdicionales(List.of("secundario@example.com"));
-        dto.setTelefonosAdicionales(List.of("5587654321"));
+        dto.setCorreos(List.of("principal@example.com")); dto.setTelefonos(List.of("5512345678"));
+        dto.setCorreos(List.of("principal@example.com", "secundario@example.com"));
+        dto.setTelefonos(List.of("5512345678", "5587654321"));
         dto.setOcupacion("Docente");
         dto.setContactosEmergencia(java.util.stream.IntStream.range(0, cantidad).mapToObj(i -> nuevo("Contacto " + i)).toList());
         return dto;
@@ -93,23 +105,23 @@ class RegistroCompletoTest {
     }
 
     @Test void rechazaListaVaciaAntesDeEscribir() {
-        assertThrows(ResponseStatusException.class, () -> service.guardar(datos(0)));
+        assertThrows(ResponseStatusException.class, () -> guardarConDatos(datos(0)));
         verify(personas, never()).save(any()); verify(personas, never()).saveAndFlush(any());
     }
     @Test void permiteUnContactoYDevuelveIdentidadCompleta() {
-        PersonaDTO resultado = service.guardar(datos(1));
+        PersonaDTO resultado = guardarConDatos(datos(1));
         assertEquals(1, resultado.getContactosEmergencia().size());
         assertNotNull(resultado.getContactosEmergencia().getFirst().idContacto());
         assertEquals("PÃƒÂ©rez", resultado.getContactosEmergencia().getFirst().apellido());
         assertEquals("Amigo(a)", resultado.getContactosEmergencia().getFirst().parentesco());
     }
     @Test void permiteMasDeDosContactosSinContarlosComoTitulares() {
-        PersonaDTO resultado = service.guardar(datos(4));
+        PersonaDTO resultado = guardarConDatos(datos(4));
         assertEquals(4, resultado.getContactosEmergencia().size());
         verify(personas, times(4)).save(argThat(p -> !p.isTitular() && p.getTelefonos().size() == 1));
         verify(personas, times(2)).saveAndFlush(argThat(p -> p.isTitular() && p.getCorreos().size() == 2));
         verify(personas).countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
-        assertEquals(List.of("secundario@example.com"), resultado.getCorreosAdicionales());
+        assertEquals(List.of("secundario@example.com"), resultado.getCorreos().subList(1, resultado.getCorreos().size()));
     }
     @Test void editarPersonaCompartidaActualizaSusDatosPersonales() {
         Persona a = persona(1, true), b = persona(2, true), c = persona(3, false);
@@ -118,8 +130,7 @@ class RegistroCompletoTest {
         c.setFechaNacimiento(LocalDate.of(1980, 1, 1));
         c.setGenero("No especificado");
         service.guardarContactos(1L, List.of(existente(3)));
-        service.guardarContactos(2L, List.of(new ContactoDTO(3L, "No sobrescribir", "Otro",
-                LocalDate.of(2000, 1, 1), "Otro", "otro@example.com", "0000000000", 9L, null)));
+        service.guardarContactos(2L, List.of(new ContactoDTO(3L, "No sobrescribir", "Otro", LocalDate.of(2000, 1, 1), "Otro", List.of("otro@example.com"), List.of("0000000000"), 9L, null)));
         assertSame(c, a.getContactosEmergencia().getFirst().getContacto());
         assertSame(c, b.getContactosEmergencia().getFirst().getContacto());
         assertEquals("No sobrescribir", c.getNombre());
@@ -155,13 +166,13 @@ class RegistroCompletoTest {
     @Test void rechazaParentescoInexistente() {
         persona(1,true);
         assertThrows(ResponseStatusException.class, () -> service.guardarContactos(1L,
-                List.of(new ContactoDTO(null,"Ana","PÃƒÂ©rez","5511111111",99L,null))));
+                List.of(new ContactoDTO(null, "Ana", "PÃƒÂ©rez", null, null, null, List.of("5511111111"), 99L, null))));
         verify(personas, never()).save(any());
     }
     @Test void exigeApellidoParaNuevaPersonaContacto() {
         var dto = datos(1);
-        dto.setContactosEmergencia(List.of(new ContactoDTO(null,"Ana",null,"5511111111",9L,null)));
-        assertThrows(ResponseStatusException.class, () -> service.guardar(dto));
+        dto.setContactosEmergencia(List.of(new ContactoDTO(null, "Ana", null, null, null, null, List.of("5511111111"), 9L, null)));
+        assertThrows(ResponseStatusException.class, () -> guardarConDatos(dto));
     }
     @Test void contactoNoSePuedeEditarComoTitular() {
         persona(3,false);
@@ -211,7 +222,7 @@ class RegistroCompletoTest {
     }
     @Test void limiteVeinteTitulares() {
         when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(20L);
-        assertThrows(RuntimeException.class, () -> service.guardar(datos(1)));
+        assertThrows(RuntimeException.class, () -> guardarConDatos(datos(1)));
         verify(personas, never()).save(any());
     }
 
@@ -223,7 +234,8 @@ class RegistroCompletoTest {
         desactivada.getPerfilTitular().setOcupacion(ocupacion);
         when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(19L);
 
-        PersonaDTO resultado = service.reactivar(4L);
+        service.reactivar(4L);
+        PersonaDTO resultado = service.obtenerPorId(4L);
 
         assertNull(desactivada.getPerfilTitular().getFechaBaja());
         assertEquals(4L, resultado.getId());
@@ -242,8 +254,8 @@ class RegistroCompletoTest {
         verify(personas, never()).save(any());
     }
     @Test void rechazaTelefonoSecundarioInvalido() {
-        PersonaDTO dto=datos(1); dto.setTelefonosAdicionales(List.of("123"));
-        assertThrows(IllegalArgumentException.class, () -> service.guardar(dto));
+        PersonaDTO dto=datos(1); dto.setTelefonos(List.of("5512345678", "123"));
+        assertThrows(ResponseStatusException.class, () -> guardarConDatos(dto));
         verify(personas, never()).save(any());
     }
 }

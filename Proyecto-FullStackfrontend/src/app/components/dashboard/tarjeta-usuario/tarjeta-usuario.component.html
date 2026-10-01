@@ -10,18 +10,18 @@
   </div>
 
   <div class="card-body">
-    <p><strong>Email:</strong> {{ usuario.email }}</p>
-    <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+    <p><strong>Email:</strong> {{ usuario.correos.join(', ') }}</p>
+    <p><strong>Teléfono:</strong> {{ usuario.telefonos.join(', ') }}</p>
     <p><strong>Ciudad:</strong> {{ usuario.ciudad }}</p>
     <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
     <p><strong>Género:</strong> {{ usuario.genero }}</p>
     <p><strong>Fecha Nacimiento:</strong> {{ usuario.fechaNacimiento }}</p>
 
-    <div class="emergency-box" *ngIf="usuario.contactoEmergenciaNombre">
-      <h4>🚨 Contacto de Emergencia</h4>
-      <p><strong>Nombre:</strong> {{ usuario.contactoEmergenciaNombre }}</p>
-      <p><strong>Teléfono:</strong> {{ usuario.contactoEmergenciaTelefono }}</p>
-      <p><strong>Relación:</strong> {{ usuario.contactoEmergenciaParentesco }}</p>
+    <div class="emergency-box" *ngFor="let contacto of usuario.contactosEmergencia">
+      <h4>Contacto de emergencia</h4>
+      <p>{{ contacto.nombre }} {{ contacto.apellido }}</p>
+      <p>{{ contacto.telefonos?.join(', ') }}</p>
+      <p>{{ contacto.parentesco }}</p>
     </div>
   </div>
 

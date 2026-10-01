@@ -12,6 +12,22 @@ describe('PersonasService: consulta individual', () => {
     http = TestBed.inject(HttpTestingController);
   });
   afterEach(() => http.verify());
+  it('comparte peticiones simultaneas sin conservar datos despues', () => {
+    service.obtenerPersonaPorId(7).subscribe();
+    service.obtenerPersonaPorId(7).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/7').flush({ id: 7 });
+    service.obtenerPersonaPorId(7).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/7').flush({ id: 7 });
+  });
+
+  it('envia arrays y recibe solo confirmacion al editar', () => {
+    const datos = { nombre: 'Prueba', correos: ['uno@example.com'], telefonos: ['5512345678'] } as import('../interfaces/usuario.interface').Usuario;
+    service.actualizarPersona(7, datos).subscribe(resultado => expect(resultado).toEqual({ ok: true }));
+    const req = http.expectOne('http://localhost:8080/api/personas/7');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(datos);
+    req.flush({ ok: true });
+  });
   it('consulta solo el ID y no descarga la lista', () => {
     service.obtenerPersonaPorId(7).subscribe(persona => expect(persona.id).toBe(7));
     const req = http.expectOne('http://localhost:8080/api/personas/7');

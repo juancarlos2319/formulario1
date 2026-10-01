@@ -50,3 +50,8 @@ CREATE TABLE IF NOT EXISTS usuario (
     rol VARCHAR(20) NOT NULL DEFAULT 'ROLE_ADMIN',
     id_persona BIGINT NOT NULL UNIQUE REFERENCES persona(id) ON DELETE CASCADE
 );
+
+-- Completa la tabla si Hibernate la creo antes de ejecutar este script.
+ALTER TABLE usuario
+    ADD COLUMN IF NOT EXISTS id_persona BIGINT NOT NULL
+        UNIQUE REFERENCES persona(id) ON DELETE CASCADE;

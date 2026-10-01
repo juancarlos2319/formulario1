@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.PersonaDTO;
+import com.example.demo.dto.PersonaResumenDTO;
+import com.example.demo.dto.ResultadoDTO;
 import com.example.demo.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,16 +31,22 @@ public class PersonaController {
     }
 
     @PutMapping("/{id}/contactos")
-    public List<com.example.demo.dto.ContactoDTO> guardarContactos(
+    public ResultadoDTO guardarContactos(
             @PathVariable Long id, @RequestBody List<com.example.demo.dto.ContactoDTO> contactos) {
-        return personaService.guardarContactos(id, contactos);
+        personaService.guardarContactos(id, contactos);
+        return new ResultadoDTO(true);
     }
 
     @Autowired
     private PersonaService personaService;
 
+    @GetMapping("/resumen")
+    public com.example.demo.dto.ResumenDTO obtenerResumen() {
+        return personaService.obtenerResumen();
+    }
+
     @GetMapping("/inactivos")
-    public ResponseEntity<List<PersonaDTO>> obtenerInactivos() {
+    public ResponseEntity<List<PersonaResumenDTO>> obtenerInactivos() {
         return ResponseEntity.ok(personaService.obtenerInactivos());
     }
 
@@ -50,7 +58,8 @@ public class PersonaController {
     @PutMapping("/{id}/reactivar")
     public ResponseEntity<?> reactivar(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(personaService.reactivar(id));
+            personaService.reactivar(id);
+            return ResponseEntity.ok(new ResultadoDTO(true));
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
@@ -59,7 +68,7 @@ public class PersonaController {
     @GetMapping
     public ResponseEntity<?> obtenerPersonas() {
         try {
-            List<PersonaDTO> lista = personaService.obtenerTodos();
+            List<PersonaResumenDTO> lista = personaService.obtenerTodos();
             return ResponseEntity.ok(lista);
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -73,8 +82,8 @@ public class PersonaController {
     @PostMapping
     public ResponseEntity<?> guardarPersona(@RequestBody PersonaDTO dto) {
         try {
-            PersonaDTO guardado = personaService.guardar(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
+            personaService.guardar(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ResultadoDTO(true));
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (IllegalArgumentException e) {
@@ -87,8 +96,8 @@ public class PersonaController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarPersona(@PathVariable Long id, @RequestBody PersonaDTO dto) {
         try {
-            PersonaDTO actualizado = personaService.actualizar(id, dto);
-            return ResponseEntity.ok(actualizado);
+            personaService.actualizar(id, dto);
+            return ResponseEntity.ok(new ResultadoDTO(true));
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (IllegalArgumentException e) {

@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
-import { Usuario } from '../../interfaces/usuario.interface';
+import { Resumen } from '../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,34 +13,27 @@ import { Usuario } from '../../interfaces/usuario.interface';
 })
 export class DashboardComponent implements OnInit {
   private registroService = inject(PersonasService);
-  usuarios: Usuario[] = [];
-  cargando = true;
-  mensajeError = '';
+  readonly resumen = signal<Resumen>({ total: 0, conCorreo: 0, conTelefono: 0, ocupaciones: [] });
+  readonly cargando = signal(true);
+  readonly mensajeError = signal('');
   readonly fecha = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
-  get conEmail(): number { return this.usuarios.filter(u => u.email?.trim()).length; }
-  get conTelefono(): number { return this.usuarios.filter(u => u.telefono?.trim()).length; }
-  get lugaresDisponibles(): number { return Math.max(0, 20 - this.usuarios.length); }
-
+  get conEmail(): number { return this.resumen().conCorreo; }
+  get conTelefono(): number { return this.resumen().conTelefono; }
+  get lugaresDisponibles(): number { return Math.max(0, 20 - this.resumen().total); }
   get ocupaciones(): { nombre: string; cantidad: number; porcentaje: number }[] {
-    const grupos = new Map<string, number>();
-    this.usuarios.forEach(u => {
-      const nombre = u.ocupacion?.trim() || 'Sin ocupación';
-      grupos.set(nombre, (grupos.get(nombre) || 0) + 1);
-    });
-    return Array.from(grupos, ([nombre, cantidad]) => ({
-      nombre, cantidad, porcentaje: this.usuarios.length ? cantidad / this.usuarios.length * 100 : 0
-    })).sort((a, b) => b.cantidad - a.cantidad).slice(0, 5);
+    const resumen = this.resumen();
+    return resumen.ocupaciones.map(grupo => ({ ...grupo, porcentaje: resumen.total ? grupo.cantidad / resumen.total * 100 : 0 }));
   }
 
   ngOnInit(): void { this.cargarUsuarios(); }
 
   cargarUsuarios(): void {
-    this.cargando = true;
-    this.mensajeError = '';
-    this.registroService.obtenerPersonas().subscribe({
-      next: data => { this.usuarios = data; this.cargando = false; },
-      error: () => { this.mensajeError = 'No se pudieron cargar los registros. Intenta nuevamente.'; this.cargando = false; }
+    this.cargando.set(true);
+    this.mensajeError.set('');
+    this.registroService.obtenerResumen().subscribe({
+      next: data => { this.resumen.set(data); this.cargando.set(false); },
+      error: () => { this.mensajeError.set('No se pudo cargar el resumen. Intenta nuevamente.'); this.cargando.set(false); }
     });
   }
 

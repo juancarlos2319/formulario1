@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
@@ -41,6 +41,7 @@ export class RegistroComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     const borrador = this.registroService.obtenerBorrador();
     if (id === null && borrador) {
+      this.cargarComunicaciones(borrador);
       this.registroForm.patchValue(borrador);
       this.cargarDireccion(borrador.direccion, borrador.ciudad);
     }
@@ -60,10 +61,9 @@ export class RegistroComponent implements OnInit {
             this.mensajeError.set('No se encontró la persona.');
             return;
           }
+          this.cargarComunicaciones(persona);
           this.registroForm.patchValue({
             ...persona,
-            correosAdicionales: [persona.correosAdicionales?.[0] ?? ''],
-            telefonosAdicionales: [persona.telefonosAdicionales?.[0] ?? ''],
             aceptaTerminos: true
           });
           this.cargarDireccion(persona.direccion, persona.ciudad);
@@ -92,32 +92,35 @@ export class RegistroComponent implements OnInit {
       numero: ['', Validators.required],
 
       // Contacto Principal y Listas
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      correosAdicionales: this.fb.array([this.fb.control('', [Validators.required, Validators.email])]),
-      telefonosAdicionales: this.fb.array([this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')])]),
+      correos: this.fb.array([this.fb.control('', [Validators.required, Validators.email]), this.fb.control('', [Validators.required, Validators.email])]),
+      telefonos: this.fb.array([this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')]), this.fb.control('', [Validators.required, Validators.pattern('^[0-9]{10}$')])]),
 
       aceptaTerminos: [false, Validators.requiredTrue]
     }, { validators: this.datosContactoDistintos });
   }
 
-  private datosContactoDistintos(control: AbstractControl): ValidationErrors | null {
-    const email = control.get('email')?.value?.trim().toLowerCase();
-    const emailSecundario = control.get('correosAdicionales.0')?.value?.trim().toLowerCase();
-    const telefono = control.get('telefono')?.value?.trim();
-    const telefonoSecundario = control.get('telefonosAdicionales.0')?.value?.trim();
-    const errores: ValidationErrors = {};
+  get correos(): FormArray { return this.registroForm.get('correos') as FormArray; }
+  get telefonos(): FormArray { return this.registroForm.get('telefonos') as FormArray; }
 
-    if (email && emailSecundario && email === emailSecundario) errores['emailRepetido'] = true;
-    if (telefono && telefonoSecundario && telefono === telefonoSecundario) errores['telefonoRepetido'] = true;
-    return Object.keys(errores).length ? errores : null;
+  private cargarComunicaciones(persona: { correos?: string[]; telefonos?: string[] }): void {
+    for (const tipo of ['correos', 'telefonos'] as const) {
+      const array = this.registroForm.get(tipo) as FormArray;
+      array.clear();
+      for (const valor of persona[tipo]?.length ? persona[tipo]! : ['']) {
+        array.push(this.fb.control(valor, tipo === 'correos'
+          ? [Validators.required, Validators.email]
+          : [Validators.required, Validators.pattern('^[0-9]{10}$')]));
+      }
+    }
   }
 
-  contactoRepetido(tipo: 'email' | 'telefono'): boolean {
-    const campoPrincipal = this.registroForm.get(tipo);
-    const campoSecundario = this.registroForm.get(tipo === 'email' ? 'correosAdicionales.0' : 'telefonosAdicionales.0');
-    const error = tipo === 'email' ? 'emailRepetido' : 'telefonoRepetido';
-    return this.registroForm.hasError(error) && !!(campoPrincipal?.touched || campoSecundario?.touched);
+  private datosContactoDistintos(control: AbstractControl): ValidationErrors | null {
+    const errores: ValidationErrors = {};
+    for (const tipo of ['correos', 'telefonos']) {
+      const valores: string[] = (control.get(tipo)?.value ?? []).map((v: string) => v.trim().toLowerCase()).filter(Boolean);
+      if (new Set(valores).size !== valores.length) errores[tipo + 'Repetidos'] = true;
+    }
+    return Object.keys(errores).length ? errores : null;
   }
 
   private cargarDireccion(direccion: string, ciudad: string): void {
@@ -212,7 +215,9 @@ export class RegistroComponent implements OnInit {
   const direccionFormateada = `${rawVal.calle} #${rawVal.numero}, Col. ${rawVal.colonia}, C.P. ${rawVal.cp}, ${rawVal.estado}`;
 
   const payload = {
-    ...rawVal,
+    nombre: rawVal.nombre, apellido: rawVal.apellido, genero: rawVal.genero,
+    fechaNacimiento: rawVal.fechaNacimiento, ocupacion: rawVal.ocupacion,
+    correos: rawVal.correos, telefonos: rawVal.telefonos,
     ciudad: rawVal.municipio,
     direccion: direccionFormateada
   };
@@ -229,15 +234,10 @@ export class RegistroComponent implements OnInit {
     ? this.registroService.actualizarPersona(this.personaId, payload)
     : this.registroService.crearPersona(payload);
   solicitud.subscribe({
-    next: (res) => {
+    next: () => {
       this.guardando.set(false);
-      if (this.editando) {
-        this.router.navigate(['/personas']);
-        return;
-      }
-      // Redirige directamente al formulario de contactos pasando el ID generado
-      if (res.id) this.router.navigate(['/contactos', res.id]);
-      else this.mensajeError.set('La respuesta del registro no contiene un ID para añadir los contactos.');
+      this.feedbackService.notify('Datos guardados correctamente.', 'success');
+      this.router.navigate(['/personas']);
     },
     error: (err) => {
       this.guardando.set(false);

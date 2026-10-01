@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
@@ -19,10 +19,10 @@ export class ContactosListaComponent implements OnInit {
   private readonly feedbackService = inject(FeedbackService);
 
   personaId = 0;
-  contactos: ContactoEmergencia[] = [];
-  cargando = true;
-  mensajeError = '';
-  quitando = false;
+  readonly contactos = signal<ContactoEmergencia[]>([]);
+  readonly cargando = signal(true);
+  readonly mensajeError = signal('');
+  readonly quitando = signal(false);
 
   ngOnInit(): void {
     this.personaId = Number(this.route.snapshot.paramMap.get('id'));
@@ -30,25 +30,25 @@ export class ContactosListaComponent implements OnInit {
   }
 
   cargarContactos(): void {
-    if (this.quitando) return;
-    this.cargando = true;
-    this.mensajeError = '';
+    if (this.quitando()) return;
+    this.cargando.set(true);
+    this.mensajeError.set('');
     this.registroService.obtenerContactos(this.personaId).subscribe({
       next: contactos => {
-        this.contactos = contactos;
-        this.cargando = false;
+        this.contactos.set(contactos);
+        this.cargando.set(false);
       },
       error: () => {
-        this.mensajeError = 'No se pudieron cargar los contactos. Intenta nuevamente.';
-        this.cargando = false;
+        this.mensajeError.set('No se pudieron cargar los contactos. Intenta nuevamente.');
+        this.cargando.set(false);
       }
     });
   }
 
   async quitarContacto(contacto: ContactoEmergencia): Promise<void> {
-    if (this.cargando || this.quitando || this.mensajeError || this.contactos.length <= 1 ||
-        contacto.idContacto == null || !this.contactos.some(item => item.idContacto === contacto.idContacto)) return;
-    this.quitando = true;
+    if (this.cargando() || this.quitando() || this.mensajeError() || this.contactos().length <= 1 ||
+        contacto.idContacto == null || !this.contactos().some(item => item.idContacto === contacto.idContacto)) return;
+    this.quitando.set(true);
     try {
       const confirmado = await this.feedbackService.confirm({
         title: 'Quitar contacto',
@@ -57,15 +57,16 @@ export class ContactosListaComponent implements OnInit {
         tone: 'danger'
       });
       if (!confirmado) return;
-      const restantes = this.contactos
+      const restantes = this.contactos()
         .filter(item => item.idContacto !== contacto.idContacto)
         .map(item => ({ idContacto: item.idContacto, idParentesco: item.idParentesco }));
-      this.contactos = await firstValueFrom(this.registroService.guardarContactos(this.personaId, restantes));
+      await firstValueFrom(this.registroService.guardarContactos(this.personaId, restantes));
+      this.contactos.set(this.contactos().filter(item => item.idContacto !== contacto.idContacto));
       this.feedbackService.notify('Contacto desvinculado correctamente.', 'success');
     } catch {
-      this.mensajeError = 'No se pudo quitar el contacto. Recarga la lista antes de intentar nuevamente.';
+      this.mensajeError.set('No se pudo quitar el contacto. Recarga la lista antes de intentar nuevamente.');
     } finally {
-      this.quitando = false;
+      this.quitando.set(false);
     }
   }
 
