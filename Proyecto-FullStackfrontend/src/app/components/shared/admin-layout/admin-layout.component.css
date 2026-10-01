@@ -4,3 +4,6 @@
 main{padding:30px;max-width:1600px;margin:auto;box-sizing:border-box}
 footer{text-align:center;font-size:11px;color:#a298ad;padding:0 15px 28px}
 @media(max-width:760px){.main{margin:0}header{height:55px;padding:0 18px}main{padding:20px 15px}}
+
+.account{display:flex;align-items:center;gap:12px;min-width:0}.account-data{min-width:0;text-align:right}.account-data strong,.account-data small{display:block;overflow-wrap:anywhere}.account-data small{color:#928a9d;margin-top:4px}.account button{border:1px solid #e9e3f2;background:#faf8fe;color:#7155b8;border-radius:7px;padding:8px;flex-shrink:0}.account button:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:760px){header{height:auto;min-height:55px;padding-top:12px;padding-bottom:12px;flex-wrap:wrap}.account{margin-left:auto}}

@@ -8,13 +8,6 @@
       <a routerLink="/registro" routerLinkActive="active" ariaCurrentWhenActive="page"><span aria-hidden="true">＋</span> Registro</a>
     </nav>
     <div class="session">
-      <section class="account-data">
-        <strong>{{ usuarioActual()?.nombre || 'Cuenta' }}</strong>
-        <small *ngIf="usuarioActual()?.correo">{{ usuarioActual()?.correo }}</small>
-        <small *ngIf="cargandoCuenta()" role="status">Cargando cuenta...</small>
-        <small *ngIf="errorCuenta()" role="alert">No se pudieron cargar tus datos.</small>
-      </section>
-      <button type="button" disabled title="Disponible en el punto de edición de cuenta">Editar cuenta</button>
       <button type="button" (click)="logout()">Cerrar sesión</button>
     </div>
   </aside>

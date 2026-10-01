@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { SidebarComponent } from './sidebar.component';
+import { AdminLayoutComponent } from '../admin-layout/admin-layout.component';
 
-describe('SidebarComponent: cuenta autenticada', () => {
+describe('AdminLayoutComponent: cuenta autenticada', () => {
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
@@ -12,7 +12,7 @@ describe('SidebarComponent: cuenta autenticada', () => {
     authService.obtenerUsuarioActual.and.returnValue(of({ nombre: 'Nombre de prueba', correo: 'persona@example.com' }));
 
     await TestBed.configureTestingModule({
-      imports: [SidebarComponent],
+      imports: [AdminLayoutComponent],
       providers: [
         provideRouter([]),
         { provide: AuthService, useValue: authService }
@@ -21,16 +21,17 @@ describe('SidebarComponent: cuenta autenticada', () => {
   });
 
   it('muestra nombre y correo del usuario actual', () => {
-    const fixture = TestBed.createComponent(SidebarComponent);
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Nombre de prueba');
+    expect(fixture.nativeElement.querySelector('header').textContent).toContain('Nombre de prueba');
+    expect(authService.obtenerUsuarioActual).toHaveBeenCalledTimes(1);
     expect(fixture.nativeElement.textContent).toContain('persona@example.com');
   });
 
   it('muestra error si falla la consulta y mantiene pendiente la edición de cuenta', () => {
     authService.obtenerUsuarioActual.and.returnValue(throwError(() => new Error('fallo')));
-    const fixture = TestBed.createComponent(SidebarComponent);
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
     fixture.detectChanges();
 
     const root = fixture.nativeElement as HTMLElement;
