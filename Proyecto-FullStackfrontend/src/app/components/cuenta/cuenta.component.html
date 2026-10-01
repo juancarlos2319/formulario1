@@ -1,0 +1,26 @@
+<section class="cuenta">
+  <h1>Editar cuenta</h1>
+  <p>Actualiza tus datos de inicio de sesión. Al guardar tendrás que iniciar sesión nuevamente.</p>
+  <p *ngIf="cargando()" role="status">Cargando cuenta...</p>
+  <p *ngIf="error()" role="alert" class="error">{{ error() }}</p>
+  <form *ngIf="!cargando()" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <label for="username">Nombre de usuario</label>
+    <input id="username" formControlName="username" autocomplete="username" maxlength="255">
+    <small class="error" *ngIf="formulario.controls.username.touched && formulario.controls.username.invalid">Introduce un usuario sin espacios.</small>
+    <label for="passwordActual">Contraseña actual</label>
+    <input id="passwordActual" type="password" formControlName="passwordActual" autocomplete="current-password">
+    <small class="error" *ngIf="formulario.controls.passwordActual.touched && formulario.controls.passwordActual.invalid">Introduce tu contraseña actual.</small>
+    <label for="passwordNueva">Contraseña nueva (opcional)</label>
+    <input id="passwordNueva" type="password" formControlName="passwordNueva" autocomplete="new-password">
+    <small>Déjala vacía para conservar la actual. Mínimo 8 caracteres.</small>
+    <label for="confirmarPassword">Confirmar contraseña nueva</label>
+    <input id="confirmarPassword" type="password" formControlName="confirmarPassword" autocomplete="new-password">
+    <small class="error" *ngIf="formulario.controls.passwordNueva.touched && formulario.controls.passwordNueva.invalid">Usa al menos 8 caracteres.</small>
+    <small class="error" *ngIf="formulario.hasError('passwordLarga')">La contraseña supera el máximo de 72 bytes.</small>
+    <small class="error" *ngIf="formulario.controls.confirmarPassword.touched && formulario.hasError('passwordsDistintas')">Las contraseñas nuevas no coinciden.</small>
+    <div class="acciones">
+      <a routerLink="/dashboard">Cancelar</a>
+      <button type="submit" [disabled]="guardando() || formulario.invalid">{{ guardando() ? 'Guardando...' : 'Guardar cambios' }}</button>
+    </div>
+  </form>
+</section>

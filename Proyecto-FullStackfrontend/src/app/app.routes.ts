@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { CuentaComponent } from './components/cuenta/cuenta.component';
 import { authGuard, guestGuard } from './guards/auth.guard';
 import { InicioComponent } from './components/inicio/inicio.component';
 import { AdminLayoutComponent } from './components/shared/admin-layout/admin-layout.component';
@@ -18,6 +19,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     canActivateChild: [authGuard],
     children: [
+      { path: 'cuenta', component: CuentaComponent, data: { titulo: 'Editar cuenta' } },
       { path: 'dashboard', component: DashboardComponent, data: { titulo: 'Resumen' } },
       { path: 'personas/desactivadas', component: PersonasDesactivadasComponent, data: { titulo: 'Personas desactivadas' } },
       { path: 'personas', component: PersonasComponent, data: { titulo: 'Personas' } },

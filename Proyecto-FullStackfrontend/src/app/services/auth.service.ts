@@ -3,6 +3,7 @@ import { PersonasService } from './personas.service';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { UsuarioActual } from '../interfaces/usuario-actual.interface';
+import { Resultado } from '../interfaces/usuario.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,14 @@ export class AuthService {
 
   obtenerUsuarioActual(): Observable<UsuarioActual> {
     return this.http.get<UsuarioActual>(`${this.apiUrl}/me`);
+  }
+
+  obtenerDatosLogin(): Observable<{ username: string }> {
+    return this.http.get<{ username: string }>(`${this.apiUrl}/me/login`);
+  }
+
+  actualizarLogin(datos: { username: string; passwordActual: string; passwordNueva: string }): Observable<Resultado> {
+    return this.http.put<Resultado>(`${this.apiUrl}/me/login`, datos);
   }
 
   logout(): void {
