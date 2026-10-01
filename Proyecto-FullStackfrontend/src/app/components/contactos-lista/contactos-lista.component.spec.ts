@@ -1,20 +1,20 @@
-﻿import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ContactosListaComponent } from './contactos-lista.component';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 
 describe('ContactosListaComponent: quitar vínculos', () => {
   let component: ContactosListaComponent;
-  let servicio: jasmine.SpyObj<RegistroService>;
+  let servicio: jasmine.SpyObj<PersonasService>;
   let feedback: jasmine.SpyObj<FeedbackService>;
   beforeEach(() => {
-    servicio = jasmine.createSpyObj('RegistroService', ['guardarContactos']);
+    servicio = jasmine.createSpyObj('PersonasService', ['guardarContactos']);
     feedback = jasmine.createSpyObj('FeedbackService', ['confirm', 'notify']);
     feedback.confirm.and.resolveTo(true);
     TestBed.configureTestingModule({ providers: [
-      { provide: RegistroService, useValue: servicio },
+      { provide: PersonasService, useValue: servicio },
       { provide: FeedbackService, useValue: feedback },
       { provide: ActivatedRoute, useValue: {} }
     ] });

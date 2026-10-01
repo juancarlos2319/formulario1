@@ -13,17 +13,17 @@
 - `src/app/app.routes.ts`: rutas. `InicioComponent` usa `guestGuard`; el layout administrativo y sus páginas requieren `authGuard`.
 - La ruta `personas/desactivadas` muestra titulares dados de baja y permite reactivarlos; el enlace se ofrece desde la pantalla de personas.
 - `components/`: pantallas de inicio, dashboard, personas, registro, contactos y componentes compartidos.
-- `services/`: `RegistroService` consume formularios, contactos y catálogos; `AuthService` gestiona el inicio/cierre de sesión y vigencia JWT.
+- `services/`: `PersonasService` consume formularios, contactos y catálogos; `AuthService` gestiona el inicio/cierre de sesión y vigencia JWT.
 - `interfaces/`: contratos TypeScript; `guards/` y `interceptors/`: control de navegación y solicitudes.
 - `app.config.ts` registra Router y HttpClient con `jwtInterceptor`.
 
 ## Contratos y comportamiento
 
-- Prefijos actuales: `/api/auth/login`, `/api/formularios`, `/api/ocupaciones`, `/api/parentescos`.
+- Prefijos actuales: `/api/auth/login`, `/api/personas`, `/api/ocupaciones`, `/api/parentescos`.
 - `/contactos/:id` lista los datos de contacto; editar un vínculo abre `/contactos/:id/editar/:contactoId` y agregar uno usa `/contactos/:id/agregar`.
 - Las rutas protegidas requieren `Authorization: Bearer <token>`; el login devuelve un objeto con `token` y `username`.
 - Los contactos de emergencia pueden ser varios; al editar se conserva `idContacto`. Enviar solo el ID y el parentesco cambia el vínculo; enviar también todos los datos personales modifica la persona compartida y afecta a los demás titulares relacionados.
-- `RegistroService` mantiene un borrador del registro en memoria y `sessionStorage`; no persistir esos datos más allá del flujo previsto.
+- `PersonasService` mantiene un borrador del registro en memoria y `sessionStorage`; no persistir esos datos más allá del flujo previsto.
 - URLs, campos, validaciones y detalles completos están definidos en `Proyecto-FullStackbackend/demo/README.md`; esa documentación es la fuente compartida del contrato vigente.
 
 ## Reglas de cambios

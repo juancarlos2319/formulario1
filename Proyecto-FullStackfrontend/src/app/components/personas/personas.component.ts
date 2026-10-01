@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 
@@ -14,7 +14,7 @@ import { FeedbackService } from '../shared/feedback/feedback.service';
   styleUrls: ['../shared/admin-pages.css', './personas.component.css']
 })
 export class PersonasComponent implements OnInit {
-  private registroService = inject(RegistroService);
+  private registroService = inject(PersonasService);
   private feedbackService = inject(FeedbackService);
   usuarios: Usuario[] = [];
   cargando = true;
@@ -40,7 +40,7 @@ export class PersonasComponent implements OnInit {
     this.detalle = null;
     this.cargando = true;
     this.mensajeError = '';
-    this.registroService.obtenerFormularios().subscribe({
+    this.registroService.obtenerPersonas().subscribe({
       next: data => { this.usuarios = data; this.cargando = false; },
       error: () => { this.mensajeError = 'No se pudieron cargar los registros. Intenta nuevamente.'; this.cargando = false; }
     });
@@ -58,7 +58,7 @@ export class PersonasComponent implements OnInit {
     if (!confirmada) return;
     this.eliminando = id;
     this.mensajeError = '';
-    this.registroService.eliminarFormulario(id).subscribe({
+    this.registroService.eliminarPersona(id).subscribe({
       next: () => {
         this.usuarios = this.usuarios.filter(u => u.id !== id);
         if (this.detalle?.id === id) this.detalle = null;

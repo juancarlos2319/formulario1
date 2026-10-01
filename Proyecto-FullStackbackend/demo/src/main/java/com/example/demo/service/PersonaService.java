@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.FormularioDTO;
+import com.example.demo.dto.PersonaDTO;
 import com.example.demo.model.*;
 import com.example.demo.repository.CatalogoOcupacionRepository;
 import com.example.demo.repository.PersonaRepository;
@@ -47,26 +47,26 @@ public class PersonaService {
     private CatalogoOcupacionRepository ocupacionRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public FormularioDTO obtenerPorId(Long id) {
+    public PersonaDTO obtenerPorId(Long id) {
         return convertirADTO(titularActivo(id));
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<FormularioDTO> obtenerTodos() {
+    public List<PersonaDTO> obtenerTodos() {
         return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<FormularioDTO> obtenerInactivos() {
+    public List<PersonaDTO> obtenerInactivos() {
         return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public FormularioDTO reactivar(Long id) {
+    public PersonaDTO reactivar(Long id) {
         Persona persona = personaRepository.findById(id)
                 .filter(p -> p.getPerfilTitular() != null && p.getPerfilTitular().getFechaBaja() != null)
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
@@ -82,7 +82,7 @@ public class PersonaService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public FormularioDTO guardar(FormularioDTO dto) {
+    public PersonaDTO guardar(PersonaDTO dto) {
         personaRepository.bloquearContactos();
         validarTitular(dto);
         validarContactos(dto.getContactosEmergencia());
@@ -100,7 +100,7 @@ public class PersonaService {
     }
 
     @org.springframework.transaction.annotation.Transactional
-    public FormularioDTO actualizar(Long id, FormularioDTO dto) {
+    public PersonaDTO actualizar(Long id, PersonaDTO dto) {
         validarTitular(dto);
         validarComunicacion(dto);
         Persona persona = titularActivo(id);
@@ -137,8 +137,8 @@ public class PersonaService {
         personaRepository.save(persona);
     }
 
-    private FormularioDTO convertirADTO(Persona p) {
-        FormularioDTO dto = new FormularioDTO();
+    private PersonaDTO convertirADTO(Persona p) {
+        PersonaDTO dto = new PersonaDTO();
         dto.setId(p.getId());
         dto.setNombre(p.getNombre());
         dto.setApellido(p.getApellido());
@@ -171,7 +171,7 @@ public class PersonaService {
         return dto;
     }
 
-    private Persona convertirAEntidad(FormularioDTO dto) {
+    private Persona convertirAEntidad(PersonaDTO dto) {
         Persona p = new Persona();
         p.setNombre(dto.getNombre());
         p.setApellido(dto.getApellido());
@@ -200,7 +200,7 @@ public class PersonaService {
         return p;
     }
 
-    private void validarTitular(FormularioDTO dto) {
+    private void validarTitular(PersonaDTO dto) {
         if (dto == null || dto.getNombre() == null || dto.getNombre().isBlank() || dto.getNombre().length() > 100 ||
                 dto.getApellido() == null || dto.getApellido().isBlank() || dto.getApellido().length() > 100 ||
                 dto.getFechaNacimiento() == null) {
@@ -359,7 +359,7 @@ public class PersonaService {
                 relacion.getParentesco().getId(), relacion.getParentesco().getNombre());
     }
 
-    private void validarComunicacion(FormularioDTO dto) {
+    private void validarComunicacion(PersonaDTO dto) {
         if (dto.getCorreosAdicionales() == null || dto.getCorreosAdicionales().size() != 1 ||
             dto.getTelefonosAdicionales() == null || dto.getTelefonosAdicionales().size() != 1) {
             throw new IllegalArgumentException("Se requieren un correo y un telÃƒÂ©fono secundarios.");
@@ -376,7 +376,7 @@ public class PersonaService {
         }
     }
 
-    private void actualizarComunicacion(Persona persona, FormularioDTO dto) {
+    private void actualizarComunicacion(Persona persona, PersonaDTO dto) {
         String[] correos = {dto.getEmail(), dto.getCorreosAdicionales().get(0)};
         String[] telefonos = {dto.getTelefono(), dto.getTelefonosAdicionales().get(0)};
         for (int i = 0; i < 2; i++) {

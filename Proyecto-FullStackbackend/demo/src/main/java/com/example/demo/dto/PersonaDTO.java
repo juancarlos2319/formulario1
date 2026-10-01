@@ -2,7 +2,7 @@ package com.example.demo.dto;
 
 import java.time.LocalDate;
 
-public class FormularioDTO {
+public class PersonaDTO {
     private java.util.List<String> correosAdicionales = java.util.List.of();
     private java.util.List<String> telefonosAdicionales = java.util.List.of();
     private java.util.List<ContactoDTO> contactosEmergencia;
@@ -30,7 +30,7 @@ public class FormularioDTO {
     private String contactoEmergenciaParentesco;
     private LocalDate fechaBaja;
 
-    public FormularioDTO() {}
+    public PersonaDTO() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

@@ -35,16 +35,16 @@ Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, reg
 | Método y ruta | Función |
 | --- | --- |
 | POST `/api/auth/login` | Obtener token de una hora |
-| GET `/api/formularios` | Listar titulares activos con lista completa de contactos |
-| GET `/api/formularios/{id}` | Consultar únicamente el titular activo indicado; devuelve 404 si no existe, es solo contacto o está dado de baja |
-| POST `/api/formularios` | Registrar titular y al menos un contacto |
-| PUT `/api/formularios/{id}` | Actualizar datos y comunicaciones de titular activo |
-| DELETE `/api/formularios/{id}` | Baja lógica del titular |
-| GET `/api/formularios/inactivos` | Listar titulares dados de baja |
-| PUT `/api/formularios/{id}/reactivar` | Reactivar un titular dado de baja |
-| POST `/api/formularios/contactos/coincidencias` | Buscar contactos por correo o teléfono para confirmar su reutilización |
-| GET `/api/formularios/{id}/contactos` | Consultar todas las relaciones de contacto |
-| PUT `/api/formularios/{id}/contactos` | Sustituir la lista de relaciones (mínimo una) |
+| GET `/api/personas` | Listar titulares activos con lista completa de contactos |
+| GET `/api/personas/{id}` | Consultar únicamente el titular activo indicado; devuelve 404 si no existe, es solo contacto o está dado de baja |
+| POST `/api/personas` | Registrar titular y al menos un contacto |
+| PUT `/api/personas/{id}` | Actualizar datos y comunicaciones de titular activo |
+| DELETE `/api/personas/{id}` | Baja lógica del titular |
+| GET `/api/personas/inactivos` | Listar titulares dados de baja |
+| PUT `/api/personas/{id}/reactivar` | Reactivar un titular dado de baja |
+| POST `/api/personas/contactos/coincidencias` | Buscar contactos por correo o teléfono para confirmar su reutilización |
+| GET `/api/personas/{id}/contactos` | Consultar todas las relaciones de contacto |
+| PUT `/api/personas/{id}/contactos` | Sustituir la lista de relaciones (mínimo una) |
 | GET `/api/ocupaciones` | Catálogo de ocupaciones |
 | GET `/api/parentescos` | Catálogo de parentescos, ordenado por ID |
 
@@ -98,7 +98,7 @@ El frontend permite listas variables. Desde la lista de contactos se puede edita
 
 ## Detección y reutilización de contactos
 
-`POST /api/formularios/contactos/coincidencias` requiere JWT y recibe `email`, `telefono` y, opcionalmente, `excluirId` (el contacto que se está editando). Debe recibirse al menos un correo válido o un teléfono de diez dígitos. Devuelve una lista de `ContactoDTO` con datos personales; `idParentesco` y `parentesco` son nulos porque pertenecen a cada vínculo. La consulta no modifica datos y usa un cuerpo JSON para evitar datos personales en la URL.
+`POST /api/personas/contactos/coincidencias` requiere JWT y recibe `email`, `telefono` y, opcionalmente, `excluirId` (el contacto que se está editando). Debe recibirse al menos un correo válido o un teléfono de diez dígitos. Devuelve una lista de `ContactoDTO` con datos personales; `idParentesco` y `parentesco` son nulos porque pertenecen a cada vínculo. La consulta no modifica datos y usa un cuerpo JSON para evitar datos personales en la URL.
 
 La comparación del correo ignora mayúsculas y espacios exteriores. Busca comunicaciones de personas usadas como contactos y contactos sin perfil ni cuenta, incluidos registros previos sin referencias. Si hay varias coincidencias, el frontend pide revisar los datos sin elegir una persona arbitrariamente. Las personas dadas de baja no pueden vincularse; deben reactivarse antes.
 
@@ -181,18 +181,18 @@ Recibe las credenciales y genera el token. El login usa directamente UsuarioRepo
 - Línea 53: Emite un JWT con el nombre de usuario.
 - Línea 55: Devuelve message, username y token. No hay comprobación de rol ni de baja en el método.
 
-### FormularioController.java
+### PersonaController.java
 
-Archivo: [src/main/java/com/example/demo/controller/FormularioController.java](src/main/java/com/example/demo/controller/FormularioController.java). 104 líneas.
+Archivo: [src/main/java/com/example/demo/controller/PersonaController.java](src/main/java/com/example/demo/controller/PersonaController.java). 104 líneas.
 
 Expone las rutas de personas y contactos. Delega reglas en PersonaService y transforma resultados/excepciones en respuestas HTTP.
 
-- Línea 13: Prefijo /api/formularios.
+- Línea 13: Prefijo /api/personas.
 - Línea 14: Permite el origen localhost:4200 y los métodos/encabezados declarados.
 - Línea 21: Consulta contactos de una persona identificada por la URL.
 - Línea 26: Recibe una lista de ContactoDTO para guardarla.
 - Línea 50: Lista activos; captura RuntimeException como 500 con texto.
-- Línea 64: Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400.
+- Línea 64: Recibe PersonaDTO, devuelve 201 y convierte RuntimeException en 400.
 - Línea 78: Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación.
 - Línea 92: Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción.
 
@@ -280,9 +280,9 @@ Construye la autenticación que Spring Security utiliza para permitir las rutas 
 - Línea 45: Guarda la identidad en el contexto para las siguientes reglas de seguridad.
 - Línea 48: Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación.
 
-### FormularioDTO.java
+### PersonaDTO.java
 
-Archivo: [src/main/java/com/example/demo/dto/FormularioDTO.java](src/main/java/com/example/demo/dto/FormularioDTO.java). 65 líneas.
+Archivo: [src/main/java/com/example/demo/dto/PersonaDTO.java](src/main/java/com/example/demo/dto/PersonaDTO.java). 65 líneas.
 
 Contrato del titular con comunicaciones y lista variable de contactos.
 

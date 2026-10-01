@@ -66,8 +66,8 @@ class RegistroCompletoTest {
     private ContactoDTO existente(long id) {
         return new ContactoDTO(id, null, null, null, 9L, null);
     }
-    private FormularioDTO datos(int cantidad) {
-        FormularioDTO dto = new FormularioDTO();
+    private PersonaDTO datos(int cantidad) {
+        PersonaDTO dto = new PersonaDTO();
         dto.setNombre("Titular"); dto.setApellido("Prueba");
         dto.setFechaNacimiento(LocalDate.of(1990, 1, 1));
         dto.setEmail("principal@example.com"); dto.setTelefono("5512345678");
@@ -95,14 +95,14 @@ class RegistroCompletoTest {
         verify(personas, never()).save(any()); verify(personas, never()).saveAndFlush(any());
     }
     @Test void permiteUnContactoYDevuelveIdentidadCompleta() {
-        FormularioDTO resultado = service.guardar(datos(1));
+        PersonaDTO resultado = service.guardar(datos(1));
         assertEquals(1, resultado.getContactosEmergencia().size());
         assertNotNull(resultado.getContactosEmergencia().getFirst().idContacto());
         assertEquals("PÃƒÂ©rez", resultado.getContactosEmergencia().getFirst().apellido());
         assertEquals("Amigo(a)", resultado.getContactosEmergencia().getFirst().parentesco());
     }
     @Test void permiteMasDeDosContactosSinContarlosComoTitulares() {
-        FormularioDTO resultado = service.guardar(datos(4));
+        PersonaDTO resultado = service.guardar(datos(4));
         assertEquals(4, resultado.getContactosEmergencia().size());
         verify(personas, times(4)).save(argThat(p -> !p.isTitular() && p.getTelefonos().size() == 1));
         verify(personas, times(2)).saveAndFlush(argThat(p -> p.isTitular() && p.getCorreos().size() == 2));
@@ -189,7 +189,7 @@ class RegistroCompletoTest {
         desactivada.getPerfilTitular().setOcupacion(ocupacion);
         when(personas.countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(19L);
 
-        FormularioDTO resultado = service.reactivar(4L);
+        PersonaDTO resultado = service.reactivar(4L);
 
         assertNull(desactivada.getPerfilTitular().getFechaBaja());
         assertEquals(4L, resultado.getId());
@@ -208,7 +208,7 @@ class RegistroCompletoTest {
         verify(personas, never()).save(any());
     }
     @Test void rechazaTelefonoSecundarioInvalido() {
-        FormularioDTO dto=datos(1); dto.setTelefonosAdicionales(List.of("123"));
+        PersonaDTO dto=datos(1); dto.setTelefonosAdicionales(List.of("123"));
         assertThrows(IllegalArgumentException.class, () -> service.guardar(dto));
         verify(personas, never()).save(any());
     }

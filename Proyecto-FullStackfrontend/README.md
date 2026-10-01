@@ -16,7 +16,7 @@ El formulario de contactos pide nombre, apellido, fecha de nacimiento, género, 
 
 ## Integración con la API
 
-La URL local de la API es `http://localhost:8080`. Al cambiar de entorno, revisa `AuthService`, `RegistroService` y `jwt.interceptor.ts`; el backend debe permitir el origen `http://localhost:4200`.
+La URL local de la API es `http://localhost:8080`. Al cambiar de entorno, revisa `AuthService`, `PersonasService` y `jwt.interceptor.ts`; el backend debe permitir el origen `http://localhost:4200`.
 
 ## Autenticación
 
@@ -24,10 +24,10 @@ El JWT se almacena en `localStorage`; el borrador de alta usa `sessionStorage`. 
 
 ## Validación
 
-La edición de un titular consulta `GET /api/formularios/{id}` directamente, sin descargar la lista completa. Los estados de carga, guardado, errores y disponibilidad del formulario se gestionan con señales. Si falla la carga, se bloquea la edición.
+La edición de un titular consulta `GET /api/personas/{id}` directamente, sin descargar la lista completa. Los estados de carga, guardado, errores y disponibilidad del formulario se gestionan con señales. Si falla la carga, se bloquea la edición.
 
 Ejecuta `npm run build` para compilar y `npm test` para las pruebas unitarias con Jasmine/Karma. `package.json` no configura pruebas E2E.
 
 La lista permite quitar un contacto previa confirmación, conservando al menos uno. Se retira el vínculo con el titular actual; al retirar la última referencia el backend borra el contacto y sus comunicaciones si no tiene perfil propio ni cuenta. El formulario bloquea el guardado hasta cargar los contactos existentes; si falla la consulta, permite reintentar.
 
-Al escribir correo o teléfono se consulta `POST /api/formularios/contactos/coincidencias` tras 350 ms sin cambios. Si la persona ya existe, se pide confirmar el autocompletado: aceptar reutiliza su ID y conserva el parentesco elegido; rechazar borra el campo que disparó la búsqueda. Los datos autocompletados se muestran bloqueados para evitar sobrescribir a la persona compartida. El guardado espera a que terminen la consulta y la confirmación. Si falla la consulta, se ofrece reintentar; las respuestas antiguas se ignoran. Si hay varias personas coincidentes, se solicita revisar los datos sin escoger automáticamente.
+Al escribir correo o teléfono se consulta `POST /api/personas/contactos/coincidencias` tras 350 ms sin cambios. Si la persona ya existe, se pide confirmar el autocompletado: aceptar reutiliza su ID y conserva el parentesco elegido; rechazar borra el campo que disparó la búsqueda. Los datos autocompletados se muestran bloqueados para evitar sobrescribir a la persona compartida. El guardado espera a que terminen la consulta y la confirmación. Si falla la consulta, se ofrece reintentar; las respuestas antiguas se ignoran. Si hay varias personas coincidentes, se solicita revisar los datos sin escoger automáticamente.

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { RegistroService } from './registro.service';
+import { PersonasService } from './personas.service';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private registroService = inject(RegistroService);
+  private registroService = inject(PersonasService);
   private apiUrl = 'http://localhost:8080/api/auth';
   private readonly tokenSubject = new BehaviorSubject<string | null>(this.readToken());
   readonly tokenChanges$ = this.tokenSubject.asObservable();

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, merge, of, debounceTime, map, tap, switchMap, catchError } from 'rxjs';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../../interfaces/contacto-emergencia.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
@@ -46,7 +46,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   parentescos: Parentesco[] = [];
 
   private fb = inject(FormBuilder);
-  private registroService = inject(RegistroService);
+  private registroService = inject(PersonasService);
   private feedbackService = inject(FeedbackService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);

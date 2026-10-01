@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.FormularioDTO;
+import com.example.demo.dto.PersonaDTO;
 import com.example.demo.service.PersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/formularios")
+@RequestMapping("/api/personas")
 @CrossOrigin(
         origins = "http://localhost:4200",
         allowedHeaders = "*",
         methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
 )
-public class FormularioController {
+public class PersonaController {
     @PostMapping("/contactos/coincidencias")
     public List<com.example.demo.dto.ContactoDTO> buscarContactos(
             @RequestBody com.example.demo.dto.BusquedaContactoDTO busqueda) {
@@ -38,12 +38,12 @@ public class FormularioController {
     private PersonaService personaService;
 
     @GetMapping("/inactivos")
-    public ResponseEntity<List<FormularioDTO>> obtenerInactivos() {
+    public ResponseEntity<List<PersonaDTO>> obtenerInactivos() {
         return ResponseEntity.ok(personaService.obtenerInactivos());
     }
 
     @GetMapping("/{id}")
-    public FormularioDTO obtenerPorId(@PathVariable Long id) {
+    public PersonaDTO obtenerPorId(@PathVariable Long id) {
         return personaService.obtenerPorId(id);
     }
 
@@ -57,9 +57,9 @@ public class FormularioController {
     }
 
     @GetMapping
-    public ResponseEntity<?> obtenerFormularios() {
+    public ResponseEntity<?> obtenerPersonas() {
         try {
-            List<FormularioDTO> lista = personaService.obtenerTodos();
+            List<PersonaDTO> lista = personaService.obtenerTodos();
             return ResponseEntity.ok(lista);
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -71,9 +71,9 @@ public class FormularioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> guardarFormulario(@RequestBody FormularioDTO dto) {
+    public ResponseEntity<?> guardarPersona(@RequestBody PersonaDTO dto) {
         try {
-            FormularioDTO guardado = personaService.guardar(dto);
+            PersonaDTO guardado = personaService.guardar(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -85,9 +85,9 @@ public class FormularioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarFormulario(@PathVariable Long id, @RequestBody FormularioDTO dto) {
+    public ResponseEntity<?> actualizarPersona(@PathVariable Long id, @RequestBody PersonaDTO dto) {
         try {
-            FormularioDTO actualizado = personaService.actualizar(id, dto);
+            PersonaDTO actualizado = personaService.actualizar(id, dto);
             return ResponseEntity.ok(actualizado);
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -99,7 +99,7 @@ public class FormularioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarFormulario(@PathVariable Long id) {
+    public ResponseEntity<?> eliminarPersona(@PathVariable Long id) {
         try {
             personaService.eliminarLogico(id);
             return ResponseEntity.noContent().build();

@@ -27,14 +27,14 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                          'lista completa; exige al menos uno y no impone máximo.\n'
                          'findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull | Lista titulares activos, no '
                          'personas creadas solo como contacto.\n'
-                         'public FormularioDTO guardar | Valida titular, contactos y comunicaciones antes '
+                         'public PersonaDTO guardar | Valida titular, contactos y comunicaciones antes '
                          'del alta transaccional.\n'
                          'personasActivas >= 20 | El límite de 20 cuenta solo titulares; no '
                          'hay bloqueo concurrente.\n'
                          'Persona guardada = personaRepository.saveAndFlush(persona) | Identifica y persiste el registro principal como titular.\n'
                          'reemplazarContactos(guardada, dto.getContactosEmergencia()) | Persiste las relaciones dentro de la misma '
                          'transacción.\n'
-                         'public FormularioDTO actualizar | Actualiza datos/comunicaciones de titular '
+                         'public PersonaDTO actualizar | Actualiza datos/comunicaciones de titular '
                          'activo; los contactos se gestionan en su propia ruta.\n'
                          'setFechaBaja(LocalDate.now()) | Baja lógica del titular, sin borrar personas ni '
                          'relaciones compartidas.\n'
@@ -77,7 +77,7 @@ UPDATES = {'PersonaService.java': ('Registra titulares y relaciona personas de c
                       '\n'
                       'public record | Sin ID se exigen los datos personales requeridos; con ID solo se cambia el vínculo. idParentesco o parentesco identifican el '
                       'catálogo.\n'),
- 'FormularioDTO.java': ('Contrato del titular con comunicaciones y lista variable de contactos.',
+ 'PersonaDTO.java': ('Contrato del titular con comunicaciones y lista variable de contactos.',
                         '\n'
                         'private java.util.List<String> correosAdicionales | Exactamente un correo '
                         'secundario exigido por el servicio.\n'
@@ -224,15 +224,15 @@ passwordEncoder.matches | Compara la contraseña recibida con BCrypt. Si falla s
 jwtUtil.generateToken | Emite un JWT con el nombre de usuario.
 return ResponseEntity.ok | Devuelve message, username y token. No hay comprobación de rol ni de baja en el método.
 ''')
-add('FormularioController.java', 'Expone las rutas de personas y contactos. Delega reglas en PersonaService y transforma resultados/excepciones en respuestas HTTP.', '''
-@RequestMapping | Prefijo /api/formularios.
+add('PersonaController.java', 'Expone las rutas de personas y contactos. Delega reglas en PersonaService y transforma resultados/excepciones en respuestas HTTP.', '''
+@RequestMapping | Prefijo /api/personas.
 @CrossOrigin | Permite el origen localhost:4200 y los métodos/encabezados declarados.
 @GetMapping("/{id}/contactos") | Consulta contactos de una persona identificada por la URL.
 @PutMapping("/{id}/contactos") | Recibe una lista de ContactoDTO para guardarla.
-obtenerFormularios() | Lista activos; captura RuntimeException como 500 con texto.
-guardarFormulario( | Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400.
-actualizarFormulario( | Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación.
-eliminarFormulario( | Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción.
+obtenerPersonas() | Lista activos; captura RuntimeException como 500 con texto.
+guardarPersona( | Recibe PersonaDTO, devuelve 201 y convierte RuntimeException en 400.
+actualizarPersona( | Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación.
+eliminarPersona( | Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción.
 ''')
 add('OcupacionController.java', 'Consulta el catálogo directamente a través de su repositorio.', '''
 @RequestMapping | Ruta /api/ocupaciones.
@@ -243,15 +243,15 @@ add('PersonaService.java', 'Reglas, transacciones y conversiones del formulario.
 obtenerContactos(Long | Busca una persona activa y convierte sus contactos a DTO; devuelve 404 si falta o está dada de baja. Tiene transacción de solo lectura.
 guardarContactos(Long | Valida dos contactos y los guarda dentro de una transacción.
 for (int i = 0; i < 2; i++) | Actualiza o añade los dos primeros contactos; no elimina un tercero preexistente.
-obtenerTodos() | Lista personas con fechaBaja nula y las transforma a FormularioDTO.
-public FormularioDTO guardar( | Alta transaccional: valida contactos y comunicaciones antes de consultar o escribir.
+obtenerTodos() | Lista personas con fechaBaja nula y las transforma a PersonaDTO.
+public PersonaDTO guardar( | Alta transaccional: valida contactos y comunicaciones antes de consultar o escribir.
 personasActivas >= 20 | Rechaza el alta cuando ya hay 20 activos. No hay bloqueo que garantice el límite ante altas concurrentes.
 for (var datos : dto.getContactosEmergencia()) | Construye ambos contactos, asigna el padre y recorta nombre/parentesco.
 saveAndFlush(persona) | Guarda y fuerza la sincronización con la base dentro de la transacción del alta; las relaciones se propagan por cascada.
-public FormularioDTO actualizar( | Actualización transaccional. Exige comunicaciones completas; no filtra personas dadas de baja ni actualiza contactos de emergencia.
+public PersonaDTO actualizar( | Actualización transaccional. Exige comunicaciones completas; no filtra personas dadas de baja ni actualiza contactos de emergencia.
 actualizarComunicacion(persona, dto) | Crea posiciones faltantes o modifica los dos primeros correos/teléfonos.
 setFechaBaja(LocalDate.now()) | Marca la baja lógica conservando el registro.
-private FormularioDTO convertirADTO | Prepara la respuesta con datos personales, ocupación y los campos singulares del primer contacto.
+private PersonaDTO convertirADTO | Prepara la respuesta con datos personales, ocupación y los campos singulares del primer contacto.
 dto.setCorreosAdicionales | Devuelve los correos después del primero. La línea siguiente hace lo mismo con teléfonos; no rellena la lista contactosEmergencia.
 private Persona convertirAEntidad | Construye una entidad nueva, resuelve la ocupación y prepara comunicaciones. Los contactos se añaden en guardar.
 La ocupación es obligatoria | Rechaza nombre de ocupación vacío/nulo al crear; luego busca o crea el catálogo.
@@ -292,7 +292,7 @@ Collections.emptyList() | Construye autenticación sin autoridades/roles.
 SecurityContextHolder.getContext().setAuthentication | Guarda la identidad en el contexto para las siguientes reglas de seguridad.
 filterChain.doFilter | Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación.
 ''')
-add('FormularioDTO.java', 'Contrato JSON del formulario. Contiene datos personales, comunicación principal/secundaria y una lista de contactos para el alta; conserva los campos singulares del primer contacto para la respuesta.', '''
+add('PersonaDTO.java', 'Contrato JSON del formulario. Contiene datos personales, comunicación principal/secundaria y una lista de contactos para el alta; conserva los campos singulares del primer contacto para la respuesta.', '''
 private java.util.List<String> correosAdicionales | Lista secundaria inicialmente vacía. El servicio exige exactamente un elemento en alta y actualización.
 private java.util.List<String> telefonosAdicionales | Lista secundaria de teléfonos, también obligatoria con un elemento.
 private java.util.List<ContactoDTO> contactosEmergencia | Lista exigida con dos contactos en alta. convertirADTO no la rellena en respuesta.
@@ -387,7 +387,7 @@ add('RegistroCompletoTest.java','Nueva prueba unitaria con Mockito. Verifica val
 mock(PersonaRepository.class) | Sustituye el repositorio por un doble de prueba.
 new PersonaService() | Construye el servicio directamente, sin proxy transaccional de Spring.
 ReflectionTestUtils.setField | Inyecta repositorios simulados en campos privados.
-private FormularioDTO datos() | Construye comunicaciones completas y dos contactos para las pruebas.
+private PersonaDTO datos() | Construye comunicaciones completas y dos contactos para las pruebas.
 rechazaRegistroSinDosContactosAntesDeEscribir | Comprueba rechazo de contactos vacíos y ausencia de interacciones con repositorios.
 guardaPersonaConDosContactosYDevuelveSecundarios | Simula catálogo/guardado; comprueba dos elementos por relación, referencias al padre y listas secundarias devueltas.
 rechazaTelefonoSecundarioInvalido | Rechaza teléfono secundario corto antes de consultar o guardar.
@@ -402,7 +402,7 @@ void simultaneousCreates | Espera control concurrente del límite no implementad
 void failedCreate | Intenta comprobar rollback. Hay transacción en el alta actual, pero su fixture falla antes por datos obligatorios faltantes.
 void loginAndExisting | Depende de AuthService y comprobación de roles/baja ausentes del flujo actual.
 void invalidBirthDate | Espera validación de fecha futura no implementada.
-private FormularioDTO formulario | Fixture incompleto: no incluye comunicaciones ni contactos que exige el alta actual.
+private PersonaDTO formulario | Fixture incompleto: no incluye comunicaciones ni contactos que exige el alta actual.
 ''')
 add('maven-wrapper.properties','Distribución Maven usada por los lanzadores.', '''
 wrapperVersion | Versión del wrapper.

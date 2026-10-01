@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 
@@ -13,7 +13,7 @@ import { FeedbackService } from '../shared/feedback/feedback.service';
   styleUrls: ['../shared/admin-pages.css', './personas-desactivadas.component.css']
 })
 export class PersonasDesactivadasComponent implements OnInit {
-  private readonly registroService = inject(RegistroService);
+  private readonly registroService = inject(PersonasService);
   private readonly feedbackService = inject(FeedbackService);
   personas: Usuario[] = [];
   cargando = true;
@@ -27,7 +27,7 @@ export class PersonasDesactivadasComponent implements OnInit {
   cargarPersonas(): void {
     this.cargando = true;
     this.mensajeError = '';
-    this.registroService.obtenerFormulariosInactivos().subscribe({
+    this.registroService.obtenerPersonasInactivas().subscribe({
       next: personas => {
         this.personas = personas;
         this.cargando = false;
@@ -50,7 +50,7 @@ export class PersonasDesactivadasComponent implements OnInit {
 
     this.reactivando = persona.id;
     this.mensajeError = '';
-    this.registroService.reactivarFormulario(persona.id).subscribe({
+    this.registroService.reactivarPersona(persona.id).subscribe({
       next: () => {
         this.personas = this.personas.filter(item => item.id !== persona.id);
         this.reactivando = null;

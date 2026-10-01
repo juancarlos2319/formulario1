@@ -1,4 +1,4 @@
-- `GET /api/formularios/inactivos` lista solo titulares con baja lógica; `PUT /api/formularios/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
+- `GET /api/personas/inactivos` lista solo titulares con baja lógica; `PUT /api/personas/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
 # Especificación de contexto — Backend
 
 ## Stack y ejecución
@@ -20,7 +20,7 @@
 - `persona.es_titular` distingue titulares de personas creadas solo como contactos. El listado principal contiene titulares activos; el límite de negocio documentado es 20 titulares activos.
 - Cada titular registrado requiere al menos un contacto; no hay máximo. Una misma persona puede estar compartida por varios titulares y tener parentescos distintos.
 - `persona_contacto_emergencia` representa el vínculo y su parentesco. No permitas autorreferencias ni IDs duplicados dentro de una solicitud.
-- `GET /api/formularios/inactivos` lista titulares con baja lógica; `PUT /api/formularios/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
+- `GET /api/personas/inactivos` lista titulares con baja lógica; `PUT /api/personas/{id}/reactivar` restaura uno si el límite de 20 titulares activos no se ha alcanzado.
 - Al quitar un vínculo conserva contactos compartidos. Si pierde la última referencia, elimina persona y comunicaciones solo si no tiene perfil de titular, cuenta ni vínculos salientes; hazlo en la misma transacción.
 - Para reutilizar contacto existente se envía `idContacto`; para un contacto nuevo se envían sus datos. Al reemplazar la lista de contactos, IDs omitidos se desvinculan y los presentes se conservan.
 - Para reutilizar un contacto existente se envía `idContacto`; solo con `idParentesco` se modifica el vínculo, y enviando todos los datos personales también se actualiza la persona compartida. Al reemplazar la lista, conserva IDs de los demás vínculos.
@@ -32,4 +32,4 @@
 - No registres credenciales, tokens, secretos JWT ni datos personales. Si un secreto fue versionado, recomienda rotarlo y externalizarlo; no lo repitas.
 - Las pruebas de integración pueden crear tablas y vaciar datos. Úsalas solo con una base local desechable independiente configurada por las variables TEST_* documentadas en el README, nunca con la base de desarrollo.
 - Actualiza entidades, DTOs, frontend y README al modificar persistencia o contratos.
-- `POST /api/formularios/contactos/coincidencias` consulta por correo/teléfono antes de confirmar reutilización. El guardado rechaza duplicados sin ID (409). La migración `20260930_contactos_compartidos.sql` añade índices; no fusiona duplicados existentes.
+- `POST /api/personas/contactos/coincidencias` consulta por correo/teléfono antes de confirmar reutilización. El guardado rechaza duplicados sin ID (409). La migración `20260930_contactos_compartidos.sql` añade índices; no fusiona duplicados existentes.

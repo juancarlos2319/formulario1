@@ -34,8 +34,8 @@ class DemoApplicationTests {
         jdbc.execute("TRUNCATE TABLE persona, catalogo_ocupacion, catalogo_parentesco RESTART IDENTITY CASCADE");
         jdbc.update("INSERT INTO catalogo_parentesco(id,nombre) VALUES (1,'Amigo')");
     }
-    private FormularioDTO formulario(int cantidad) {
-        FormularioDTO d = new FormularioDTO();
+    private PersonaDTO formulario(int cantidad) {
+        PersonaDTO d = new PersonaDTO();
         d.setNombre("Titular"); d.setApellido("Prueba");
         d.setGenero("No especificado"); d.setDireccion("Calle de prueba"); d.setCiudad("Ciudad de prueba");
         d.setFechaNacimiento(LocalDate.of(1990,1,1)); d.setOcupacion("Docente");

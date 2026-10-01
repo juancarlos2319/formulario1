@@ -59,14 +59,14 @@
     ]
   },
   {
-    "archivo": "src/main/java/com/example/demo/controller/FormularioController.java",
+    "archivo": "src/main/java/com/example/demo/controller/PersonaController.java",
     "lineas": 104,
     "sha256": "183e5d7da1a1d22d8617e5f38a4e9f3a7dc9ca4e770b1af8fbb354a3ae3cb9c3",
     "referencias": [
       {
         "linea": 13,
         "ancla": "@RequestMapping",
-        "explicacion": "Prefijo /api/formularios."
+        "explicacion": "Prefijo /api/personas."
       },
       {
         "linea": 14,
@@ -85,22 +85,22 @@
       },
       {
         "linea": 50,
-        "ancla": "obtenerFormularios()",
+        "ancla": "obtenerPersonas()",
         "explicacion": "Lista activos; captura RuntimeException como 500 con texto."
       },
       {
         "linea": 64,
-        "ancla": "guardarFormulario(",
-        "explicacion": "Recibe FormularioDTO, devuelve 201 y convierte RuntimeException en 400."
+        "ancla": "guardarPersona(",
+        "explicacion": "Recibe PersonaDTO, devuelve 201 y convierte RuntimeException en 400."
       },
       {
         "linea": 78,
-        "ancla": "actualizarFormulario(",
+        "ancla": "actualizarPersona(",
         "explicacion": "Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación."
       },
       {
         "linea": 92,
-        "ancla": "eliminarFormulario(",
+        "ancla": "eliminarPersona(",
         "explicacion": "Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción."
       }
     ]
@@ -149,7 +149,7 @@
       },
       {
         "linea": 80,
-        "ancla": "public FormularioDTO guardar",
+        "ancla": "public PersonaDTO guardar",
         "explicacion": "Valida titular, contactos y comunicaciones antes del alta transaccional."
       },
       {
@@ -169,7 +169,7 @@
       },
       {
         "linea": 98,
-        "ancla": "public FormularioDTO actualizar",
+        "ancla": "public PersonaDTO actualizar",
         "explicacion": "Actualiza datos/comunicaciones de titular activo; los contactos se gestionan en su propia ruta."
       },
       {
@@ -386,7 +386,7 @@
     ]
   },
   {
-    "archivo": "src/main/java/com/example/demo/dto/FormularioDTO.java",
+    "archivo": "src/main/java/com/example/demo/dto/PersonaDTO.java",
     "lineas": 65,
     "sha256": "8b607daa694ac4c19cd212d29a970bc3b5bbc714dd2b442e33185f2495a05535",
     "referencias": [

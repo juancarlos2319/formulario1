@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 
 @Component({
@@ -12,7 +12,7 @@ import { Usuario } from '../../interfaces/usuario.interface';
   styleUrls: ['../shared/admin-pages.css', './dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private registroService = inject(RegistroService);
+  private registroService = inject(PersonasService);
   usuarios: Usuario[] = [];
   cargando = true;
   mensajeError = '';
@@ -38,7 +38,7 @@ export class DashboardComponent implements OnInit {
   cargarUsuarios(): void {
     this.cargando = true;
     this.mensajeError = '';
-    this.registroService.obtenerFormularios().subscribe({
+    this.registroService.obtenerPersonas().subscribe({
       next: data => { this.usuarios = data; this.cargando = false; },
       error: () => { this.mensajeError = 'No se pudieron cargar los registros. Intenta nuevamente.'; this.cargando = false; }
     });

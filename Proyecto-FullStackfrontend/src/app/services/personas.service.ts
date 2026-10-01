@@ -7,7 +7,7 @@ import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergenci
 @Injectable({
   providedIn: 'root'
 })
-export class RegistroService {
+export class PersonasService {
   private readonly borradorKey = 'registro_borrador';
   // Borrador en memoria: no se persiste hasta completar ambos pasos.
   borrador: Usuario | null = null;
@@ -47,7 +47,7 @@ export class RegistroService {
   }
 
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/formularios';
+  private apiUrl = 'http://localhost:8080/api/personas';
 
   // 1. Método auxiliar para adjuntar el token en cada petición
   private getHeaders(): HttpHeaders {
@@ -74,22 +74,22 @@ export class RegistroService {
       .pipe(catchError(this.manejarError('guardar los contactos')));
   }
 
-  guardarFormulario(datos: Usuario): Observable<Usuario> {
+  crearPersona(datos: Usuario): Observable<Usuario> {
     return this.http.post<Usuario>(this.apiUrl, datos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('guardar el formulario')));
   }
 
-  obtenerFormularios(): Observable<Usuario[]> {
+  obtenerPersonas(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(this.apiUrl, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('obtener los formularios')));
   }
 
-  obtenerFormulariosInactivos(): Observable<Usuario[]> {
+  obtenerPersonasInactivas(): Observable<Usuario[]> {
     return this.http.get<Usuario[]>(`${this.apiUrl}/inactivos`, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('obtener las personas desactivadas')));
   }
 
-  reactivarFormulario(id: number): Observable<Usuario> {
+  reactivarPersona(id: number): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.apiUrl}/${id}/reactivar`, null, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('reactivar la persona')));
   }
@@ -99,12 +99,12 @@ export class RegistroService {
       .pipe(catchError(this.manejarError('obtener la persona')));
   }
 
-  actualizarFormulario(id: number, datos: Usuario): Observable<Usuario> {
+  actualizarPersona(id: number, datos: Usuario): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('actualizar el formulario')));
   }
 
-  eliminarFormulario(id: number): Observable<void> {
+  eliminarPersona(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
       .pipe(catchError(this.manejarError('eliminar el formulario')));
   }
@@ -123,7 +123,7 @@ export class RegistroService {
     return (error: HttpErrorResponse) => {
       const detalle = typeof error.error === 'string' ? error.error : error.error?.message;
       const mensaje = detalle || `No se pudo ${operacion}. Codigo HTTP: ${error.status || 'sin respuesta'}.`;
-      console.error(`RegistroService: fallo al ${operacion}.`, error);
+      console.error(`PersonasService: fallo al ${operacion}.`, error);
       return throwError(() => new Error(mensaje));
     };
   }

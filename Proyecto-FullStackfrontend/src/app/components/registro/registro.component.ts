@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 
@@ -15,7 +15,7 @@ import { FeedbackService } from '../shared/feedback/feedback.service';
 })
 export class RegistroComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private registroService = inject(RegistroService);
+  private registroService = inject(PersonasService);
   private codigoPostalService = inject(CodigoPostalService);
   private feedbackService = inject(FeedbackService);
   private router = inject(Router);
@@ -226,8 +226,8 @@ export class RegistroComponent implements OnInit {
   this.guardando.set(true);
   this.mensajeError.set('');
   const solicitud = this.personaId !== null
-    ? this.registroService.actualizarFormulario(this.personaId, payload)
-    : this.registroService.guardarFormulario(payload);
+    ? this.registroService.actualizarPersona(this.personaId, payload)
+    : this.registroService.crearPersona(payload);
   solicitud.subscribe({
     next: (res) => {
       this.guardando.set(false);

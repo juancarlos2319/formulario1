@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { ContactoEmergencia } from '../../interfaces/contacto-emergencia.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 import { firstValueFrom } from 'rxjs';
@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class ContactosListaComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly registroService = inject(RegistroService);
+  private readonly registroService = inject(PersonasService);
   private readonly feedbackService = inject(FeedbackService);
 
   personaId = 0;

@@ -1,26 +1,26 @@
-﻿import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { RegistroComponent } from './registro.component';
-import { RegistroService } from '../../services/registro.service';
+import { PersonasService } from '../../services/personas.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 import { Usuario } from '../../interfaces/usuario.interface';
 
 describe('RegistroComponent: carga por ID', () => {
   let component: RegistroComponent;
-  let servicio: jasmine.SpyObj<RegistroService>;
+  let servicio: jasmine.SpyObj<PersonasService>;
   let respuesta: Subject<Usuario>;
   let ruta: { snapshot: { paramMap: ReturnType<typeof convertToParamMap> } };
   beforeEach(() => {
     respuesta = new Subject<Usuario>();
-    servicio = jasmine.createSpyObj('RegistroService', ['obtenerPersonaPorId', 'obtenerOcupaciones', 'obtenerBorrador', 'actualizarFormulario']);
+    servicio = jasmine.createSpyObj('PersonasService', ['obtenerPersonaPorId', 'obtenerOcupaciones', 'obtenerBorrador', 'actualizarPersona']);
     servicio.obtenerPersonaPorId.and.returnValue(respuesta);
     servicio.obtenerOcupaciones.and.returnValue(of([]));
     servicio.obtenerBorrador.and.returnValue(null);
     ruta = { snapshot: { paramMap: convertToParamMap({ id: '7' }) } };
     TestBed.configureTestingModule({ providers: [
-      { provide: RegistroService, useValue: servicio },
+      { provide: PersonasService, useValue: servicio },
       { provide: CodigoPostalService, useValue: jasmine.createSpyObj('CodigoPostalService', ['consultar']) },
       { provide: FeedbackService, useValue: jasmine.createSpyObj('FeedbackService', ['notify']) },
       { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
@@ -46,7 +46,7 @@ describe('RegistroComponent: carga por ID', () => {
     expect(component.mensajeError()).toBeTruthy();
     expect(component.edicionBloqueada()).toBeTrue();
     component.onSubmit();
-    expect(servicio.actualizarFormulario).not.toHaveBeenCalled();
+    expect(servicio.actualizarPersona).not.toHaveBeenCalled();
   });
   it('no consulta IDs invalidos', () => {
     ruta.snapshot.paramMap = convertToParamMap({ id: 'invalido' });
