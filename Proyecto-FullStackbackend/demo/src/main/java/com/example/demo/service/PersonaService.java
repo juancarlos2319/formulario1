@@ -56,16 +56,12 @@ public class PersonaService {
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.PersonaResumenDTO> obtenerTodos() {
-        return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull().stream()
-                .map(this::convertirAResumen)
-                .collect(Collectors.toList());
+        return resumirPersonas(personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull());
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.PersonaResumenDTO> obtenerInactivos() {
-        return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull().stream()
-                .map(this::convertirAResumen)
-                .collect(Collectors.toList());
+        return resumirPersonas(personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull());
     }
 
     @org.springframework.transaction.annotation.Transactional
@@ -439,12 +435,19 @@ public class PersonaService {
         }
     }
 
-    private com.example.demo.dto.PersonaResumenDTO convertirAResumen(Persona p) {
+    private List<com.example.demo.dto.PersonaResumenDTO> resumirPersonas(List<Persona> personas) {
+        if (personas.isEmpty()) return List.of();
+        java.util.Set<Long> administradores = usuarioRepository.buscarPersonasConRol(
+                personas.stream().map(Persona::getId).toList(), "ROLE_ADMIN");
+        return personas.stream().map(p -> convertirAResumen(p, !administradores.contains(p.getId()))).toList();
+    }
+
+    private com.example.demo.dto.PersonaResumenDTO convertirAResumen(Persona p, boolean puedeEliminar) {
         return new com.example.demo.dto.PersonaResumenDTO(p.getId(), p.getNombre(), p.getApellido(),
                 p.getPerfilTitular().getCiudad(), p.getPerfilTitular().getOcupacion().getNombre(),
                 p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
                 p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), p.getFechaBaja(),
-                convertirDirecciones(p.getPerfilTitular()));
+                convertirDirecciones(p.getPerfilTitular()), puedeEliminar);
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)

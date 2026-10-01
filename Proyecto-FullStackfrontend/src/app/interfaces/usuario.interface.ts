@@ -10,6 +10,7 @@ export interface PersonaResumen {
   ocupacion: string;
   fechaBaja?: string | null;
   direcciones?: Direccion[];
+  puedeEliminar?: boolean;
 }
 
 export interface Direccion {

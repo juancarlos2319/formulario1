@@ -284,6 +284,21 @@ class RegistroCompletoTest {
         verify(usuarios, never()).existsByIdPersonaAndRol(anyLong(), anyString());
         verify(personas, never()).save(any());
     }
+    @Test void listadoIndicaQueSoloLosNoAdministradoresPuedenEliminarse() {
+        Persona admin = persona(1, true);
+        Persona normal = persona(2, true);
+        CatalogoOcupacion ocupacion = new CatalogoOcupacion(); ocupacion.setNombre("Docente");
+        admin.getPerfilTitular().setOcupacion(ocupacion);
+        normal.getPerfilTitular().setOcupacion(ocupacion);
+        when(personas.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull()).thenReturn(List.of(admin, normal));
+        when(usuarios.buscarPersonasConRol(List.of(1L, 2L), "ROLE_ADMIN")).thenReturn(java.util.Set.of(1L));
+        var listado = service.obtenerTodos();
+        assertFalse(listado.get(0).puedeEliminar());
+        assertTrue(listado.get(1).puedeEliminar());
+        verify(usuarios).buscarPersonasConRol(List.of(1L, 2L), "ROLE_ADMIN");
+        verify(usuarios, never()).existsByIdPersonaAndRol(anyLong(), anyString());
+    }
+
     @Test void listaSoloTitulares() {
         Persona titular = persona(1,true);
         CatalogoOcupacion ocupacion = new CatalogoOcupacion();
