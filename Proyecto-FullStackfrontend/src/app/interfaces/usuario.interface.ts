@@ -9,6 +9,7 @@ export interface PersonaResumen {
   ciudad: string;
   ocupacion: string;
   fechaBaja?: string | null;
+  puedeEliminar?: boolean;
 }
 
 export interface Usuario extends PersonaResumen {

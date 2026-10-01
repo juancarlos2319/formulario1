@@ -64,6 +64,7 @@ export class PersonasComponent implements OnInit {
   async eliminar(id: number | undefined): Promise<void> {
     if (id == null || this.eliminando() !== null) return;
     const persona = this.usuarios().find(usuario => usuario.id === id);
+    if (persona?.puedeEliminar !== true) return;
     const confirmada = await this.feedbackService.confirm({
       title: 'Dar de baja a esta persona',
       message: `¿Deseas dar de baja a ${persona?.nombre ?? 'esta persona'} ${persona?.apellido ?? ''}? Podrás reactivarla después.`,
