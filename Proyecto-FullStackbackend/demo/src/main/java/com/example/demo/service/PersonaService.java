@@ -113,8 +113,7 @@ public class PersonaService {
         persona.setFechaNacimiento(dto.getFechaNacimiento());
         persona.setGenero(dto.getGenero());
         PerfilTitular perfil = persona.getPerfilTitular();
-        perfil.setDireccion(dto.getDireccion());
-        perfil.setCiudad(dto.getCiudad());
+        reemplazarDirecciones(perfil, dto);
 
         if (dto.getOcupacion() != null && !dto.getOcupacion().trim().isEmpty()) {
             CatalogoOcupacion ocupacion = ocupacionRepository.findByNombre(dto.getOcupacion())
@@ -151,8 +150,15 @@ public class PersonaService {
         dto.setApellido(p.getApellido());
         dto.setFechaNacimiento(p.getFechaNacimiento());
         dto.setGenero(p.getGenero());
-        dto.setDireccion(p.getPerfilTitular().getDireccion());
-        dto.setCiudad(p.getPerfilTitular().getCiudad());
+        PerfilTitular perfil = p.getPerfilTitular();
+        List<PersonaDTO.DireccionDTO> direcciones = perfil.getDirecciones().stream()
+            .map(d -> new PersonaDTO.DireccionDTO(d.getPais(), d.getEstado(), d.getMunicipio(),
+                d.getColonia(), d.getCodigoPostal(), d.getCalle(), d.getNumero()))
+            .toList();
+        if (direcciones.isEmpty()) direcciones = direccionesAntiguas(perfil);
+        dto.setDirecciones(direcciones);
+        dto.setDireccion(perfil.getDireccion());
+        dto.setCiudad(perfil.getCiudad());
         dto.setFechaBaja(p.getPerfilTitular().getFechaBaja());
         dto.setOcupacion(p.getPerfilTitular().getOcupacion().getNombre());
 
@@ -180,9 +186,8 @@ public class PersonaService {
                     return ocupacionRepository.save(nueva);
                 });
         PerfilTitular perfil = new PerfilTitular();
-        perfil.setDireccion(dto.getDireccion());
-        perfil.setCiudad(dto.getCiudad());
         perfil.setOcupacion(ocupacion);
+        reemplazarDirecciones(perfil, dto);
         p.setPerfilTitular(perfil);
 
         actualizarComunicacion(p, dto);
@@ -196,6 +201,72 @@ public class PersonaService {
                 dto.getFechaNacimiento() == null) {
             throw invalido("El titular requiere nombre, apellido (hasta 100 caracteres) y fecha de nacimiento");
         }
+    }
+
+    private List<PersonaDTO.DireccionDTO> direccionesDe(PersonaDTO dto) {
+        if (dto.getDirecciones() != null && !dto.getDirecciones().isEmpty()) return dto.getDirecciones();
+        if (dto.getDireccion() != null || dto.getCiudad() != null) {
+            return List.of(new PersonaDTO.DireccionDTO("México", "", dto.getCiudad(), "", "",
+                    dto.getDireccion(), ""));
+        }
+        throw invalido("Se requiere al menos una dirección");
+    }
+
+    private List<PersonaDTO.DireccionDTO> direccionesAntiguas(PerfilTitular perfil) {
+        return List.of(new PersonaDTO.DireccionDTO("México", "", perfil.getCiudad(), "", "",
+                perfil.getDireccion(), ""));
+    }
+
+        private List<PersonaDTO.DireccionDTO> convertirDirecciones(PerfilTitular perfil) {
+        List<PersonaDTO.DireccionDTO> direcciones = perfil.getDirecciones().stream()
+            .map(d -> new PersonaDTO.DireccionDTO(d.getPais(), d.getEstado(), d.getMunicipio(),
+                d.getColonia(), d.getCodigoPostal(), d.getCalle(), d.getNumero()))
+            .toList();
+        return direcciones.isEmpty() ? direccionesAntiguas(perfil) : direcciones;
+        }
+
+    private void reemplazarDirecciones(PerfilTitular perfil, PersonaDTO dto) {
+        List<PersonaDTO.DireccionDTO> direcciones = direccionesDe(dto);
+        if (direcciones.size() > 20) throw invalido("No se pueden registrar más de 20 direcciones");
+        perfil.getDirecciones().clear();
+        for (int index = 0; index < direcciones.size(); index++) {
+            PersonaDTO.DireccionDTO datos = direcciones.get(index);
+            if (datos == null || datos.calle() == null || datos.calle().isBlank() || datos.calle().length() > 255 ||
+                    datos.municipio() == null || datos.municipio().isBlank() || datos.municipio().length() > 100 ||
+                    length(datos.pais()) > 100 || length(datos.estado()) > 100 || length(datos.colonia()) > 150 ||
+                    length(datos.numero()) > 100 || length(datos.codigoPostal()) > 5 ||
+                    (datos.codigoPostal() != null && !datos.codigoPostal().isBlank() && !datos.codigoPostal().matches("[0-9]{5}"))) {
+                throw invalido("Revisa los campos de cada dirección");
+            }
+            DireccionTitular direccion = new DireccionTitular();
+            direccion.setPerfilTitular(perfil);
+            direccion.setOrden(index);
+            direccion.setPais(valor(datos.pais(), "México"));
+            direccion.setEstado(valor(datos.estado(), ""));
+            direccion.setMunicipio(datos.municipio().trim());
+            direccion.setColonia(valor(datos.colonia(), ""));
+            direccion.setCodigoPostal(valor(datos.codigoPostal(), ""));
+            direccion.setCalle(datos.calle().trim());
+            direccion.setNumero(valor(datos.numero(), ""));
+            perfil.getDirecciones().add(direccion);
+        }
+        PersonaDTO.DireccionDTO principal = direcciones.getFirst();
+        perfil.setDireccion(formatoLegacy(principal));
+        perfil.setCiudad(principal.municipio().trim());
+    }
+
+    private int length(String value) { return value == null ? 0 : value.length(); }
+
+    private String valor(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value.trim();
+    }
+
+    private String formatoLegacy(PersonaDTO.DireccionDTO direccion) {
+        if (direccion.numero() == null || direccion.numero().isBlank()) return direccion.calle().trim();
+        return direccion.calle().trim() + " #" + direccion.numero().trim() +
+                (direccion.colonia() == null || direccion.colonia().isBlank() ? "" : ", Col. " + direccion.colonia().trim()) +
+                (direccion.codigoPostal() == null || direccion.codigoPostal().isBlank() ? "" : ", C.P. " + direccion.codigoPostal().trim()) +
+                (direccion.estado() == null || direccion.estado().isBlank() ? "" : ", " + direccion.estado().trim());
     }
 
     private Persona titularActivo(Long id) {
@@ -372,7 +443,8 @@ public class PersonaService {
         return new com.example.demo.dto.PersonaResumenDTO(p.getId(), p.getNombre(), p.getApellido(),
                 p.getPerfilTitular().getCiudad(), p.getPerfilTitular().getOcupacion().getNombre(),
                 p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
-                p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), p.getFechaBaja());
+                p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), p.getFechaBaja(),
+                convertirDirecciones(p.getPerfilTitular()));
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)

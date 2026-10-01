@@ -5,6 +5,7 @@ import java.time.LocalDate;
 public class PersonaDTO {
     private java.util.List<String> telefonos = java.util.List.of();
     private java.util.List<String> correos = java.util.List.of();
+    private java.util.List<DireccionDTO> direcciones = java.util.List.of();
     @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
     private java.util.List<ContactoDTO> contactosEmergencia;
 
@@ -12,6 +13,8 @@ public class PersonaDTO {
     public void setCorreos(java.util.List<String> valores) { correos = valores; }
     public java.util.List<String> getTelefonos() { return telefonos; }
     public void setTelefonos(java.util.List<String> valores) { telefonos = valores; }
+    public java.util.List<DireccionDTO> getDirecciones() { return direcciones; }
+    public void setDirecciones(java.util.List<DireccionDTO> valores) { direcciones = valores; }
     public java.util.List<ContactoDTO> getContactosEmergencia() { return contactosEmergencia; }
     public void setContactosEmergencia(java.util.List<ContactoDTO> valores) { contactosEmergencia = valores; }
 
@@ -26,6 +29,9 @@ public class PersonaDTO {
     private LocalDate fechaBaja;
 
     public PersonaDTO() {}
+
+    public record DireccionDTO(String pais, String estado, String municipio, String colonia,
+                               String codigoPostal, String calle, String numero) {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

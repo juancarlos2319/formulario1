@@ -59,52 +59,57 @@
 
     <!-- Dirección con CP Autocompletable -->
     <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">02</span> Ubicación y dirección</legend><p class="section-help">Ingresa el código postal para consultar tu estado, municipio y colonia.</p>
+      <legend><span class="section-number">02</span> Ubicación y direcciones</legend><p class="section-help">Cada dirección tiene su propio código postal y consulta de ubicación.</p>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="cp">Código Postal *</label>
-          <input id="cp" type="text" formControlName="cp" class="form-control" (input)="buscarCodigoPostal()" inputmode="numeric" autocomplete="postal-code" placeholder="5 dígitos" maxlength="5" [attr.aria-invalid]="campoInvalido('cp')" [attr.aria-describedby]="campoInvalido('cp') ? 'cp-error' : null" />
-          <small class="field-error" id="cp-error" *ngIf="campoInvalido('cp')">{{ errorCampo('cp') }}</small>
-          <small *ngIf="cargandoCP" class="text-muted">Buscando CP...</small>
-        </div>
-        <div class="form-group">
-          <label for="pais">País</label>
-          <input id="pais" type="text" formControlName="pais" class="form-control disabled-input" />
-        </div>
-        <div class="form-group">
-          <label for="estado">Estado</label>
-          <input id="estado" type="text" formControlName="estado" class="form-control disabled-input" />
-        </div>
+      <div formArrayName="direcciones">
+        <fieldset class="address-section" *ngFor="let direccion of direcciones.controls; let i = index" [formGroupName]="i">
+          <legend>Dirección {{ i + 1 }}</legend>
+          <div class="form-row">
+            <div class="form-group">
+              <label [for]="'cp-' + i">Código Postal *</label>
+              <input [id]="'cp-' + i" type="text" formControlName="cp" class="form-control" (input)="buscarCodigoPostal(i)" inputmode="numeric" autocomplete="postal-code" placeholder="5 dígitos" maxlength="5" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.cp')" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.cp')">{{ errorCampo('direcciones.' + i + '.cp') }}</small>
+              <small *ngIf="direccionesCargando()[i]" class="text-muted" role="status">Buscando CP...</small>
+            </div>
+            <div class="form-group">
+              <label [for]="'pais-' + i">País</label>
+              <input [id]="'pais-' + i" type="text" formControlName="pais" class="form-control disabled-input" />
+            </div>
+            <div class="form-group">
+              <label [for]="'estado-' + i">Estado</label>
+              <input [id]="'estado-' + i" type="text" formControlName="estado" class="form-control disabled-input" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label [for]="'municipio-' + i">Municipio / Ciudad</label>
+              <input [id]="'municipio-' + i" type="text" formControlName="municipio" class="form-control disabled-input" />
+            </div>
+            <div class="form-group">
+              <label [for]="'colonia-' + i">Colonia *</label>
+              <select [id]="'colonia-' + i" formControlName="colonia" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.colonia')">
+                <option value="">-- Seleccione Colonia --</option>
+                <option *ngFor="let col of coloniasPorDireccion[i]" [value]="col">{{ col }}</option>
+              </select>
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.colonia')">{{ errorCampo('direcciones.' + i + '.colonia') }}</small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+              <label [for]="'calle-' + i">Calle *</label>
+              <input [id]="'calle-' + i" type="text" formControlName="calle" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.calle')" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.calle')">{{ errorCampo('direcciones.' + i + '.calle') }}</small>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label [for]="'numero-' + i">Número Ext/Int *</label>
+              <input [id]="'numero-' + i" type="text" formControlName="numero" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.numero')" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.numero')">{{ errorCampo('direcciones.' + i + '.numero') }}</small>
+            </div>
+            <button *ngIf="direcciones.length > 1" type="button" class="btn-remove" (click)="quitarDireccion(i)" [attr.aria-label]="'Quitar dirección ' + (i + 1)">Quitar</button>
+          </div>
+        </fieldset>
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="municipio">Municipio / Ciudad</label>
-          <input id="municipio" type="text" formControlName="municipio" class="form-control disabled-input" />
-        </div>
-        <div class="form-group">
-          <label for="colonia">Colonia *</label>
-          <select id="colonia" formControlName="colonia" class="form-control" [attr.aria-invalid]="campoInvalido('colonia')" [attr.aria-describedby]="campoInvalido('colonia') ? 'colonia-error' : null">
-            <option value="">-- Seleccione Colonia --</option>
-            <option *ngFor="let col of colonias" [value]="col">{{ col }}</option>
-          </select>
-          <small class="field-error" id="colonia-error" *ngIf="campoInvalido('colonia')">{{ errorCampo('colonia') }}</small>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group" style="flex: 2;">
-          <label for="calle">Calle *</label>
-          <input id="calle" type="text" formControlName="calle" class="form-control" [attr.aria-invalid]="campoInvalido('calle')" [attr.aria-describedby]="campoInvalido('calle') ? 'calle-error' : null" />
-          <small class="field-error" id="calle-error" *ngIf="campoInvalido('calle')">{{ errorCampo('calle') }}</small>
-        </div>
-        <div class="form-group" style="flex: 1;">
-          <label for="numero">Número Ext/Int *</label>
-          <input id="numero" type="text" formControlName="numero" class="form-control" [attr.aria-invalid]="campoInvalido('numero')" [attr.aria-describedby]="campoInvalido('numero') ? 'numero-error' : null" />
-          <small class="field-error" id="numero-error" *ngIf="campoInvalido('numero')">{{ errorCampo('numero') }}</small>
-        </div>
-      </div>
+      <button type="button" class="btn-add" (click)="agregarDireccion()">＋ Agregar dirección</button>
     </fieldset>
 
     <!-- Contactos -->
@@ -149,7 +154,7 @@
     <p *ngIf="registroForm.touched && registroForm.invalid" class="field-error" role="status">Revisa los campos marcados, los contactos adicionales y la aceptación de términos.</p>
     <div class="form-actions">
       <a *ngIf="!guardando()" routerLink="/personas" class="btn-secondary">Cancelar</a>
-      <button type="submit" [disabled]="edicionBloqueada() || cargandoCP" class="btn-primary">
+      <button type="submit" [disabled]="edicionBloqueada() || hayDireccionCargando" class="btn-primary">
         {{ guardando() ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
       </button>
     </div>

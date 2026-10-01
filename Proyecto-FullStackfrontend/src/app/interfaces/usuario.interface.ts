@@ -9,6 +9,17 @@ export interface PersonaResumen {
   ciudad: string;
   ocupacion: string;
   fechaBaja?: string | null;
+  direcciones?: Direccion[];
+}
+
+export interface Direccion {
+  pais: string;
+  estado: string;
+  municipio: string;
+  colonia: string;
+  codigoPostal: string;
+  calle: string;
+  numero: string;
 }
 
 export interface Usuario extends PersonaResumen {

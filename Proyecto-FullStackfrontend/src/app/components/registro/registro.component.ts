@@ -27,11 +27,12 @@ export class RegistroComponent implements OnInit {
 
   readonly personaCargada = signal(false);
   readonly edicionBloqueada = computed(() => this.guardando() || this.cargandoPersona() || (this.editando && !this.personaCargada()));
+  get hayDireccionCargando(): boolean { return this.direccionesCargando().some(estado => estado); }
 
   registroForm!: FormGroup;
   ocupaciones: any[] = [];
-  colonias: string[] = [];
-  cargandoCP = false;
+  coloniasPorDireccion: string[][] = [];
+  readonly direccionesCargando = signal<boolean[]>([]);
   readonly mensajeError = signal('');
 
 
@@ -42,9 +43,10 @@ export class RegistroComponent implements OnInit {
     const borrador = this.registroService.obtenerBorrador();
     if (id === null && borrador) {
       this.cargarComunicaciones(borrador);
+      this.cargarDirecciones(borrador);
       this.registroForm.patchValue(borrador);
-      this.cargarDireccion(borrador.direccion, borrador.ciudad);
     }
+    if (id === null && !borrador) this.agregarDireccion();
     if (id !== null) {
       this.personaId = Number(id);
       this.registroForm.get('aceptaTerminos')?.disable();
@@ -66,7 +68,7 @@ export class RegistroComponent implements OnInit {
             ...persona,
             aceptaTerminos: true
           });
-          this.cargarDireccion(persona.direccion, persona.ciudad);
+          this.cargarDirecciones(persona);
           this.personaCargada.set(true);
         },
         error: () => { this.cargandoPersona.set(false); this.mensajeError.set('No se pudo cargar la persona. Vuelve a intentarlo desde el dashboard.'); }
@@ -82,14 +84,7 @@ export class RegistroComponent implements OnInit {
       fechaNacimiento: ['', Validators.required],
       ocupacion: ['', Validators.required],
 
-      // Campos detallados de Dirección
-      cp: ['', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
-      pais: [{ value: 'México', disabled: true }, Validators.required],
-      estado: [{ value: '', disabled: true }, Validators.required],
-      municipio: [{ value: '', disabled: true }, Validators.required],
-      colonia: ['', Validators.required],
-      calle: ['', Validators.required],
-      numero: ['', Validators.required],
+      direcciones: this.fb.array([], Validators.required),
 
       // Contacto Principal y Listas
       correos: this.fb.array([this.crearControlCorreo()]),
@@ -101,6 +96,58 @@ export class RegistroComponent implements OnInit {
 
   get correos(): FormArray { return this.registroForm.get('correos') as FormArray; }
   get telefonos(): FormArray { return this.registroForm.get('telefonos') as FormArray; }
+  get direcciones(): FormArray { return this.registroForm.get('direcciones') as FormArray; }
+
+  private crearDireccionGroup(datos?: Partial<DireccionPersistida>): FormGroup {
+    return this.fb.group({
+      pais: [{ value: datos?.pais ?? 'México', disabled: true }, Validators.required],
+      estado: [{ value: datos?.estado ?? '', disabled: true }, Validators.required],
+      municipio: [{ value: datos?.municipio ?? '', disabled: true }, Validators.required],
+      colonia: [datos?.colonia ?? '', Validators.required],
+      cp: [datos?.codigoPostal ?? '', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
+      calle: [datos?.calle ?? '', Validators.required],
+      numero: [datos?.numero ?? '', Validators.required]
+    });
+  }
+
+  agregarDireccion(datos?: Partial<DireccionFormulario>): void {
+    this.direcciones.push(this.crearDireccionGroup(datos));
+    this.coloniasPorDireccion.push(datos?.colonia ? [datos.colonia] : []);
+    this.direccionesCargando.update(estados => [...estados, false]);
+  }
+
+  quitarDireccion(index: number): void {
+    if (this.direcciones.length <= 1) return;
+    this.direcciones.removeAt(index);
+    this.coloniasPorDireccion.splice(index, 1);
+    this.direccionesCargando.update(estados => estados.filter((_, i) => i !== index));
+  }
+
+  private cargarDirecciones(persona: { direcciones?: DireccionPersistida[]; direccion?: string; ciudad?: string }): void {
+    this.direcciones.clear();
+    this.coloniasPorDireccion = [];
+    this.direccionesCargando.set([]);
+    if (persona.direcciones?.length) {
+      persona.direcciones.forEach(direccion => this.agregarDireccion(direccion));
+    } else {
+      this.agregarDireccion(this.convertirDireccionAntigua(persona.direccion ?? '', persona.ciudad ?? ''));
+    }
+    this.direcciones.controls.forEach((_, index) => this.buscarCodigoPostal(index));
+  }
+
+  private convertirDireccionAntigua(direccion: string, ciudad: string): DireccionPersistida {
+    const partes = /^(.*?) #(.+?), Col\. (.*?), C\.P\. (\d{5}), (.+)$/.exec(direccion);
+    if (partes) {
+      const [, calle, numero, colonia, codigoPostal, estado] = partes;
+      return { pais: 'México', estado, municipio: ciudad, colonia, codigoPostal, calle, numero };
+    }
+    const sinFormato = /^(.*?)\s+(\d+[A-Za-z]?(?:\s*[-/]\s*\w+)?)\s*$/.exec(direccion.trim());
+    if (sinFormato) {
+      const [, calle, numero] = sinFormato;
+      return { pais: 'México', estado: '', municipio: ciudad, colonia: '', codigoPostal: '', calle, numero };
+    }
+    return { pais: 'México', estado: '', municipio: ciudad, colonia: '', codigoPostal: '', calle: direccion, numero: '' };
+  }
 
   agregarCorreo(): void {
     this.correos.push(this.crearControlCorreo());
@@ -145,52 +192,32 @@ export class RegistroComponent implements OnInit {
     return Object.keys(errores).length ? errores : null;
   }
 
-  private cargarDireccion(direccion: string, ciudad: string): void {
-    // Formato usado al guardar: calle #numero, Col. colonia, C.P. cp, estado.
-    const partes = /^(.*?) #(.+?), Col\. (.*?), C\.P\. (\d{5}), (.+)$/.exec(direccion || '');
-    this.registroForm.patchValue({ municipio: ciudad });
-    if (partes) {
-      const [, calle, numero, colonia, cp, estado] = partes;
-      this.colonias = [colonia];
-      this.registroForm.patchValue({ calle, numero, colonia, cp, estado });
-      this.buscarCodigoPostal();
-    } else {
-      const direccionAnterior = /^(.*?)\s+(\d+[A-Za-z]?(?:\s*[-/]\s*\w+)?)\s*$/.exec((direccion || '').trim());
-      if (direccionAnterior) {
-        const [, calle, numero] = direccionAnterior;
-        this.registroForm.patchValue({ calle, numero });
-        this.mensajeError.set('La dirección guardada no incluye código postal, colonia ni estado. Completa esos datos para consultar la ubicación.');
-        return;
-      }
-
-      this.registroForm.patchValue({ calle: direccion || '' });
-      this.mensajeError.set('La dirección guardada no tiene un formato reconocido. Completa calle, número, código postal, colonia y estado.');
+  buscarCodigoPostal(index: number): void {
+    const grupo = this.direcciones.at(index);
+    const cp = grupo.get('cp')?.value;
+    if (!cp || cp.length !== 5) {
+      this.direccionesCargando.update(estados => estados.map((valor, i) => i === index ? false : valor));
+      return;
     }
-  }
 
-  buscarCodigoPostal(): void {
-  const cp = this.registroForm.get('cp')?.value;
-  if (cp && cp.length === 5) {
-    this.cargandoCP = true;
+    this.direccionesCargando.update(estados => estados.map((valor, i) => i === index ? true : valor));
     this.codigoPostalService.consultar(cp).subscribe({
       next: (res) => {
-        this.cargandoCP = false;
+        const indiceActual = this.direcciones.controls.indexOf(grupo);
+        if (indiceActual < 0 || grupo.get('cp')?.value !== cp) return;
+        this.direccionesCargando.update(estados => estados.map((valor, i) => i === indiceActual ? false : valor));
 
         if (res && res.resultados && res.resultados.length > 0) {
           const primerResultado = res.resultados[0];
-          const estado = primerResultado.estado;
-          const municipio = primerResultado.municipio; // Devuelve "Coyuca de Benítez"
+          const colonias = res.resultados.map((r) => r.asentamiento);
+          this.coloniasPorDireccion[indiceActual] = colonias;
+          const coloniaActual = grupo.get('colonia')?.value;
+          const colonia = colonias.includes(coloniaActual) ? coloniaActual : colonias[0] || '';
 
-          // Mapeamos los asentamientos/colonias correspondientes
-          this.colonias = res.resultados.map((r) => r.asentamiento);
-          const coloniaActual = this.registroForm.get('colonia')?.value;
-          const colonia = this.colonias.includes(coloniaActual) ? coloniaActual : this.colonias[0] || '';
-
-          // Asignamos a los campos bloqueados
-          this.registroForm.patchValue({
+          grupo.patchValue({
             pais: 'México',
-            estado: estado,
-            municipio: municipio,
+            estado: primerResultado.estado,
+            municipio: primerResultado.municipio,
             colonia
           });
         } else {
@@ -198,12 +225,13 @@ export class RegistroComponent implements OnInit {
         }
       },
       error: () => {
-        this.cargandoCP = false;
+        const indiceActual = this.direcciones.controls.indexOf(grupo);
+        if (indiceActual < 0 || grupo.get('cp')?.value !== cp) return;
+        this.direccionesCargando.update(estados => estados.map((valor, i) => i === indiceActual ? false : valor));
         this.feedbackService.notify('Error al consultar el servicio de código postal.', 'error');
       }
     });
   }
-}
 
   cargarOcupaciones(): void {
     this.registroService.obtenerOcupaciones().subscribe({
@@ -227,20 +255,31 @@ export class RegistroComponent implements OnInit {
   }
 
   onSubmit(): void {
-  if (this.edicionBloqueada() || this.cargandoCP) return;
+  if (this.edicionBloqueada() || this.hayDireccionCargando) return;
   if (this.registroForm.invalid) {
     this.registroForm.markAllAsTouched();
     return;
   }
 
   const rawVal = this.registroForm.getRawValue();
-  const direccionFormateada = `${rawVal.calle} #${rawVal.numero}, Col. ${rawVal.colonia}, C.P. ${rawVal.cp}, ${rawVal.estado}`;
+  const direcciones = rawVal.direcciones.map((direccion: DireccionFormulario) => ({
+    pais: direccion.pais,
+    estado: direccion.estado,
+    municipio: direccion.municipio,
+    colonia: direccion.colonia,
+    codigoPostal: direccion.cp,
+    calle: direccion.calle,
+    numero: direccion.numero
+  }));
+  const direccionPrincipal = direcciones[0];
+  const direccionFormateada = `${direccionPrincipal.calle} #${direccionPrincipal.numero}, Col. ${direccionPrincipal.colonia}, C.P. ${direccionPrincipal.codigoPostal}, ${direccionPrincipal.estado}`;
 
   const payload = {
     nombre: rawVal.nombre, apellido: rawVal.apellido, genero: rawVal.genero,
     fechaNacimiento: rawVal.fechaNacimiento, ocupacion: rawVal.ocupacion,
     correos: rawVal.correos, telefonos: rawVal.telefonos,
-    ciudad: rawVal.municipio,
+    direcciones,
+    ciudad: direccionPrincipal.municipio,
     direccion: direccionFormateada
   };
 
@@ -267,4 +306,24 @@ export class RegistroComponent implements OnInit {
     }
   });
 }
+}
+
+interface DireccionFormulario {
+  pais: string;
+  estado: string;
+  municipio: string;
+  colonia: string;
+  cp: string;
+  calle: string;
+  numero: string;
+}
+
+interface DireccionPersistida {
+  pais: string;
+  estado: string;
+  municipio: string;
+  colonia: string;
+  codigoPostal: string;
+  calle: string;
+  numero: string;
 }

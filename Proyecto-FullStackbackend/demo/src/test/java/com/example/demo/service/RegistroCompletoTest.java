@@ -84,6 +84,7 @@ class RegistroCompletoTest {
         PersonaDTO dto = new PersonaDTO();
         dto.setNombre("Titular"); dto.setApellido("Prueba");
         dto.setFechaNacimiento(LocalDate.of(1990, 1, 1));
+        dto.setDireccion("Calle de prueba 1"); dto.setCiudad("Ciudad de prueba");
         dto.setCorreos(List.of("principal@example.com")); dto.setTelefonos(List.of("5512345678"));
         dto.setCorreos(List.of("principal@example.com", "secundario@example.com"));
         dto.setTelefonos(List.of("5512345678", "5587654321"));
@@ -118,6 +119,35 @@ class RegistroCompletoTest {
 
         assertEquals(List.of("uno@example.com"), resultado.getCorreos());
         assertEquals(List.of("5512345678"), resultado.getTelefonos());
+    }
+
+    @Test void guardaYDevuelveVariasDireccionesDelTitular() {
+        PersonaDTO dto = datos(1);
+        dto.setDirecciones(List.of(
+                new PersonaDTO.DireccionDTO("México", "Hidalgo", "Pachuca", "Centro", "42000", "Calle Uno", "10"),
+                new PersonaDTO.DireccionDTO("México", "Hidalgo", "Mineral de la Reforma", "La Providencia", "42186", "Calle Dos", "20A")
+        ));
+
+        PersonaDTO resultado = guardarConDatos(dto);
+
+        assertEquals(2, resultado.getDirecciones().size());
+        assertEquals("42000", resultado.getDirecciones().get(0).codigoPostal());
+        assertEquals("42186", resultado.getDirecciones().get(1).codigoPostal());
+        assertEquals(2, guardadas.get(resultado.getId()).getPerfilTitular().getDirecciones().size());
+    }
+
+    @Test void requiereUnaDireccionYValidaElCodigoPostalCuandoSeProporciona() {
+        PersonaDTO sinDirecciones = datos(1);
+        sinDirecciones.setDirecciones(List.of());
+        sinDirecciones.setDireccion(null);
+        sinDirecciones.setCiudad(null);
+        PersonaDTO cpInvalido = datos(1);
+        cpInvalido.setDirecciones(List.of(new PersonaDTO.DireccionDTO(
+                "México", "Hidalgo", "Pachuca", "Centro", "4200", "Calle Uno", "10")));
+
+        assertThrows(ResponseStatusException.class, () -> service.guardar(sinDirecciones));
+        assertThrows(ResponseStatusException.class, () -> service.guardar(cpInvalido));
+        verify(personas, never()).saveAndFlush(any());
     }
 
     @Test void guardaTodosLosCorreosYTelefonosRecibidos() {

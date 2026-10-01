@@ -19,6 +19,20 @@ CREATE TABLE IF NOT EXISTS perfil_titular (
     fecha_baja DATE
 );
 
+CREATE TABLE IF NOT EXISTS direccion_titular (
+    id BIGSERIAL PRIMARY KEY,
+    id_persona BIGINT NOT NULL REFERENCES perfil_titular(id_persona) ON DELETE CASCADE,
+    orden INTEGER NOT NULL,
+    pais VARCHAR(100) NOT NULL DEFAULT 'México',
+    estado VARCHAR(100) NOT NULL DEFAULT '',
+    municipio VARCHAR(100) NOT NULL,
+    colonia VARCHAR(150) NOT NULL DEFAULT '',
+    codigo_postal VARCHAR(5) NOT NULL DEFAULT '',
+    calle VARCHAR(255) NOT NULL,
+    numero VARCHAR(100) NOT NULL DEFAULT '',
+    CONSTRAINT ck_direccion_codigo_postal CHECK (codigo_postal = '' OR codigo_postal ~ '^[0-9]{5}$')
+);
+
 CREATE TABLE IF NOT EXISTS persona_correo (
     id BIGSERIAL PRIMARY KEY,
     id_persona BIGINT NOT NULL REFERENCES persona(id) ON DELETE CASCADE,
