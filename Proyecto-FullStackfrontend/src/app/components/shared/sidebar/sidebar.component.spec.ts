@@ -29,19 +29,17 @@ describe('AdminLayoutComponent: cuenta autenticada', () => {
     expect(fixture.nativeElement.textContent).toContain('persona@example.com');
   });
 
-  it('muestra error si falla la consulta y mantiene pendiente la edición de cuenta', () => {
+  it('muestra error si falla la consulta y permite abrir la edición de cuenta', () => {
     authService.obtenerUsuarioActual.and.returnValue(throwError(() => new Error('fallo')));
     const fixture = TestBed.createComponent(AdminLayoutComponent);
     fixture.detectChanges();
 
     const root = fixture.nativeElement as HTMLElement;
     const error = root.querySelector('[role="alert"]') as HTMLElement;
-    const buttons = root.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const editButton = Array.from(buttons)
-      .find(button => button.textContent?.includes('Editar cuenta'));
+    const editLink = root.querySelector('a.editar-cuenta') as HTMLAnchorElement;
 
     expect(error.textContent).toContain('No se pudieron cargar tus datos.');
-    expect(editButton).toBeDefined();
-    expect(editButton?.disabled).toBeTrue();
+    expect(editLink).toBeTruthy();
+    expect(editLink.getAttribute('href')).toBe('/cuenta');
   });
 });

@@ -16,7 +16,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       }
     });
     return next(cloned).pipe(catchError(error => {
-      if (error.status === 401 || error.status === 403) {
+      if (error.status === 401) {
         authService.logout();
         router.navigate(['/inicio'], { replaceUrl: true });
       }

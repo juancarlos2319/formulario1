@@ -7,7 +7,7 @@
         <small *ngIf="cargandoCuenta()" role="status">Cargando cuenta...</small>
         <small *ngIf="errorCuenta()" role="alert">No se pudieron cargar tus datos.</small>
       </section>
-      <button type="button" disabled title="Disponible al habilitar la pantalla de cuenta">Editar cuenta</button>
+      <a class="editar-cuenta" routerLink="/cuenta">Editar cuenta</a>
     </div></header>
   <main><router-outlet></router-outlet></main>
   <footer>PortalSystem · Administración de personas</footer>

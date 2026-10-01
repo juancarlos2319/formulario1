@@ -35,6 +35,18 @@ public class AuthController {
         return cuentaService.obtenerUsuarioActual(authentication.getName());
     }
 
+    @GetMapping("/me/login")
+    public Map<String, String> obtenerDatosLogin(Authentication authentication) {
+        return cuentaService.obtenerDatosLogin(authentication.getName());
+    }
+
+    @PutMapping("/me/login")
+    public com.example.demo.dto.ResultadoDTO actualizarLogin(Authentication authentication,
+            @RequestBody com.example.demo.dto.EditarCuentaDTO datos) {
+        cuentaService.actualizarLogin(authentication.getName(), datos);
+        return new com.example.demo.dto.ResultadoDTO(true);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");

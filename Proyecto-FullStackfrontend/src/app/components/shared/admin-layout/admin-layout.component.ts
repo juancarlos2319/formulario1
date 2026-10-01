@@ -3,13 +3,13 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { UsuarioActual } from '../../../interfaces/usuario-actual.interface';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, SidebarComponent],
   templateUrl: './admin-layout.component.html',
   styleUrl: './admin-layout.component.css'
 })
