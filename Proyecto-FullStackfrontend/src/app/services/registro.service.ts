@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, map, throwError } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { Usuario } from '../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergencia.interface';
 
@@ -94,10 +94,9 @@ export class RegistroService {
       .pipe(catchError(this.manejarError('reactivar la persona')));
   }
 
-  obtenerPersonaPorId(id: number): Observable<Usuario | undefined> {
-    return this.obtenerFormularios().pipe(
-      map((personas) => personas.find((persona) => persona.id === id))
-    );
+  obtenerPersonaPorId(id: number): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
+      .pipe(catchError(this.manejarError('obtener la persona')));
   }
 
   actualizarFormulario(id: number, datos: Usuario): Observable<Usuario> {

@@ -8,13 +8,13 @@
         </aside>
         <div class="form-container">
   <h2>{{ editando ? 'Editar persona' : 'Nuevo Registro de Persona' }}</h2>
-  <p role="status" *ngIf="cargandoPersona && !mensajeError">Cargando persona...</p>
+  <p role="status" *ngIf="cargandoPersona() && !mensajeError()">Cargando persona...</p>
   
-  <div *ngIf="mensajeError" class="error-alert" role="alert">{{ mensajeError }}</div>
+  <div *ngIf="mensajeError()" class="error-alert" role="alert">{{ mensajeError() }}</div>
 
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" [attr.aria-busy]="guardando || cargandoPersona">
+  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" [attr.aria-busy]="guardando() || cargandoPersona()">
     <!-- Datos Personales -->
-    <fieldset [disabled]="guardando || cargandoPersona">
+    <fieldset [disabled]="edicionBloqueada()">
       <legend><span class="section-number">01</span> Información personal</legend>
       
       <div class="form-row">
@@ -58,7 +58,7 @@
     </fieldset>
 
     <!-- Dirección con CP Autocompletable -->
-    <fieldset [disabled]="guardando || cargandoPersona">
+    <fieldset [disabled]="edicionBloqueada()">
       <legend><span class="section-number">02</span> Ubicación y dirección</legend><p class="section-help">Ingresa el código postal para consultar tu estado, municipio y colonia.</p>
 
       <div class="form-row">
@@ -108,8 +108,8 @@
     </fieldset>
 
     <!-- Contactos -->
-    <fieldset [disabled]="guardando || cargandoPersona">
-      <legend><span class="section-number">03</span> Datos de contacto</legend><p class="section-help">Registra dos correos y dos teléfonos. Todos son obligatorios.</p>
+    <fieldset [disabled]="edicionBloqueada()">
+      <legend><span class="section-number">03</span> Contacto</legend><p class="section-help">Registra dos correos y dos teléfonos. Todos son obligatorios.</p>
       <div class="form-row">
         <div class="form-group">
           <label for="email">Email Principal *</label>
@@ -153,9 +153,9 @@
 
     <p *ngIf="registroForm.touched && registroForm.invalid" class="field-error" role="status">Revisa los campos marcados, los contactos adicionales y la aceptación de términos.</p>
     <div class="form-actions">
-      <a *ngIf="!guardando" routerLink="/personas" class="btn-secondary">Cancelar</a>
-      <button type="submit" [disabled]="cargandoPersona || guardando || cargandoCP" class="btn-primary">
-        {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
+      <a *ngIf="!guardando()" routerLink="/personas" class="btn-secondary">Cancelar</a>
+      <button type="submit" [disabled]="edicionBloqueada() || cargandoCP" class="btn-primary">
+        {{ guardando() ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
       </button>
     </div>
   </form>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -21,15 +21,18 @@ export class RegistroComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   personaId: number | null = null;
-  cargandoPersona = false;
-  guardando = false;
+  readonly cargandoPersona = signal(false);
+  readonly guardando = signal(false);
   get editando(): boolean { return this.personaId !== null; }
+
+  readonly personaCargada = signal(false);
+  readonly edicionBloqueada = computed(() => this.guardando() || this.cargandoPersona() || (this.editando && !this.personaCargada()));
 
   registroForm!: FormGroup;
   ocupaciones: any[] = [];
   colonias: string[] = [];
   cargandoCP = false;
-  mensajeError = '';
+  readonly mensajeError = signal('');
 
 
   ngOnInit(): void {
@@ -44,15 +47,17 @@ export class RegistroComponent implements OnInit {
     if (id !== null) {
       this.personaId = Number(id);
       this.registroForm.get('aceptaTerminos')?.disable();
-      this.cargandoPersona = true;
+
       if (!Number.isSafeInteger(this.personaId) || this.personaId <= 0) {
-        this.mensajeError = 'El ID de la persona no es válido.';
+        this.mensajeError.set('El ID de la persona no es válido.');
         return;
       }
+      this.cargandoPersona.set(true);
       this.registroService.obtenerPersonaPorId(this.personaId).subscribe({
         next: persona => {
+          this.cargandoPersona.set(false);
           if (!persona) {
-            this.mensajeError = 'No se encontró la persona.';
+            this.mensajeError.set('No se encontró la persona.');
             return;
           }
           this.registroForm.patchValue({
@@ -62,9 +67,9 @@ export class RegistroComponent implements OnInit {
             aceptaTerminos: true
           });
           this.cargarDireccion(persona.direccion, persona.ciudad);
-          this.cargandoPersona = false;
+          this.personaCargada.set(true);
         },
-        error: () => { this.mensajeError = 'No se pudo cargar la persona. Vuelve a intentarlo desde el dashboard.'; }
+        error: () => { this.cargandoPersona.set(false); this.mensajeError.set('No se pudo cargar la persona. Vuelve a intentarlo desde el dashboard.'); }
       });
     }
   }
@@ -129,12 +134,12 @@ export class RegistroComponent implements OnInit {
       if (direccionAnterior) {
         const [, calle, numero] = direccionAnterior;
         this.registroForm.patchValue({ calle, numero });
-        this.mensajeError = 'La dirección guardada no incluye código postal, colonia ni estado. Completa esos datos para consultar la ubicación.';
+        this.mensajeError.set('La dirección guardada no incluye código postal, colonia ni estado. Completa esos datos para consultar la ubicación.');
         return;
       }
 
       this.registroForm.patchValue({ calle: direccion || '' });
-      this.mensajeError = 'La dirección guardada no tiene un formato reconocido. Completa calle, número, código postal, colonia y estado.';
+      this.mensajeError.set('La dirección guardada no tiene un formato reconocido. Completa calle, número, código postal, colonia y estado.');
     }
   }
 
@@ -178,7 +183,7 @@ export class RegistroComponent implements OnInit {
   cargarOcupaciones(): void {
     this.registroService.obtenerOcupaciones().subscribe({
       next: (data) => this.ocupaciones = data,
-      error: () => this.mensajeError = 'No se pudieron cargar las ocupaciones.'
+      error: () => this.mensajeError.set('No se pudieron cargar las ocupaciones.')
     });
   }
 
@@ -197,7 +202,7 @@ export class RegistroComponent implements OnInit {
   }
 
   onSubmit(): void {
-  if (this.cargandoPersona || this.guardando || this.cargandoCP) return;
+  if (this.edicionBloqueada() || this.cargandoCP) return;
   if (this.registroForm.invalid) {
     this.registroForm.markAllAsTouched();
     return;
@@ -218,25 +223,25 @@ export class RegistroComponent implements OnInit {
     return;
   }
 
-  this.guardando = true;
-  this.mensajeError = '';
+  this.guardando.set(true);
+  this.mensajeError.set('');
   const solicitud = this.personaId !== null
     ? this.registroService.actualizarFormulario(this.personaId, payload)
     : this.registroService.guardarFormulario(payload);
   solicitud.subscribe({
     next: (res) => {
-      this.guardando = false;
+      this.guardando.set(false);
       if (this.editando) {
         this.router.navigate(['/personas']);
         return;
       }
       // Redirige directamente al formulario de contactos pasando el ID generado
       if (res.id) this.router.navigate(['/contactos', res.id]);
-      else this.mensajeError = 'La respuesta del registro no contiene un ID para añadir los contactos.';
+      else this.mensajeError.set('La respuesta del registro no contiene un ID para añadir los contactos.');
     },
     error: (err) => {
-      this.guardando = false;
-      this.mensajeError = err.error?.message || 'Error al guardar el registro.';
+      this.guardando.set(false);
+      this.mensajeError.set(err.error?.message || 'Error al guardar el registro.');
     }
   });
 }

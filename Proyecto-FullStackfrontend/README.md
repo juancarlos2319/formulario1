@@ -24,6 +24,8 @@ El JWT se almacena en `localStorage`; el borrador de alta usa `sessionStorage`. 
 
 ## Validación
 
+La edición de un titular consulta `GET /api/formularios/{id}` directamente, sin descargar la lista completa. Los estados de carga, guardado, errores y disponibilidad del formulario se gestionan con señales. Si falla la carga, se bloquea la edición.
+
 Ejecuta `npm run build` para compilar y `npm test` para las pruebas unitarias con Jasmine/Karma. `package.json` no configura pruebas E2E.
 
 La lista permite quitar un contacto previa confirmación, conservando al menos uno. Se retira el vínculo con el titular actual; al retirar la última referencia el backend borra el contacto y sus comunicaciones si no tiene perfil propio ni cuenta. El formulario bloquea el guardado hasta cargar los contactos existentes; si falla la consulta, permite reintentar.

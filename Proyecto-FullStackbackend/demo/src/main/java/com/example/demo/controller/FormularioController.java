@@ -42,6 +42,11 @@ public class FormularioController {
         return ResponseEntity.ok(personaService.obtenerInactivos());
     }
 
+    @GetMapping("/{id}")
+    public FormularioDTO obtenerPorId(@PathVariable Long id) {
+        return personaService.obtenerPorId(id);
+    }
+
     @PutMapping("/{id}/reactivar")
     public ResponseEntity<?> reactivar(@PathVariable Long id) {
         try {

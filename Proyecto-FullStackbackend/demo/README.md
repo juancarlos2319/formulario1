@@ -36,6 +36,7 @@ Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, reg
 | --- | --- |
 | POST `/api/auth/login` | Obtener token de una hora |
 | GET `/api/formularios` | Listar titulares activos con lista completa de contactos |
+| GET `/api/formularios/{id}` | Consultar únicamente el titular activo indicado; devuelve 404 si no existe, es solo contacto o está dado de baja |
 | POST `/api/formularios` | Registrar titular y al menos un contacto |
 | PUT `/api/formularios/{id}` | Actualizar datos y comunicaciones de titular activo |
 | DELETE `/api/formularios/{id}` | Baja lógica del titular |

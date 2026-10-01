@@ -47,6 +47,11 @@ public class PersonaService {
     private CatalogoOcupacionRepository ocupacionRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public FormularioDTO obtenerPorId(Long id) {
+        return convertirADTO(titularActivo(id));
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<FormularioDTO> obtenerTodos() {
         return personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull().stream()
                 .map(this::convertirADTO)

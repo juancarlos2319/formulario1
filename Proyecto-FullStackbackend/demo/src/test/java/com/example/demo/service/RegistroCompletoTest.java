@@ -13,6 +13,25 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RegistroCompletoTest {
+    @Test void consultaSoloElTitularSolicitado() {
+        Persona titular = persona(7, true);
+        CatalogoOcupacion ocupacion = new CatalogoOcupacion();
+        ocupacion.setNombre("Docente");
+        titular.getPerfilTitular().setOcupacion(ocupacion);
+        assertEquals(7L, service.obtenerPorId(7L).getId());
+        verify(personas).findById(7L);
+        verify(personas, never()).findAll();
+        verify(personas, never()).findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
+    }
+
+    @Test void consultaPorIdRechazaInexistentesContactosYTitularesInactivos() {
+        persona(2, false);
+        persona(3, true).setFechaBaja(LocalDate.now());
+        for (long id : new long[] { 99, 2, 3 }) {
+            assertEquals(404, assertThrows(ResponseStatusException.class,
+                    () -> service.obtenerPorId(id)).getStatusCode().value());
+        }
+    }
     private final PersonaRepository personas = mock(PersonaRepository.class);
     private final CatalogoOcupacionRepository ocupaciones = mock(CatalogoOcupacionRepository.class);
     private final CatalogoParentescoRepository parentescos = mock(CatalogoParentescoRepository.class);
