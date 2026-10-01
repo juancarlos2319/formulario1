@@ -4,6 +4,7 @@ import com.example.demo.dto.PersonaDTO;
 import com.example.demo.model.*;
 import com.example.demo.repository.CatalogoOcupacionRepository;
 import com.example.demo.repository.PersonaRepository;
+import com.example.demo.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,9 @@ public class PersonaService {
 
     @Autowired
     private CatalogoOcupacionRepository ocupacionRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PersonaDTO obtenerPorId(Long id) {
@@ -133,6 +137,11 @@ public class PersonaService {
     @org.springframework.transaction.annotation.Transactional
     public void eliminarLogico(Long id) {
         Persona persona = titularActivo(id);
+        if (usuarioRepository.existsByIdPersonaAndRol(id, "ROLE_ADMIN")) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "No se puede eliminar ni desactivar una cuenta administradora.");
+        }
         persona.getPerfilTitular().setFechaBaja(LocalDate.now());
         personaRepository.save(persona);
     }

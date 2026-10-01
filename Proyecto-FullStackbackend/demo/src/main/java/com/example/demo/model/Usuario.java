@@ -18,6 +18,9 @@ public class Usuario {
 
     private String rol;
 
+    @Column(name = "id_persona", nullable = false, unique = true)
+    private Long idPersona;
+
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -30,4 +33,7 @@ public class Usuario {
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
+
+    public Long getIdPersona() { return idPersona; }
+    public void setIdPersona(Long idPersona) { this.idPersona = idPersona; }
 }

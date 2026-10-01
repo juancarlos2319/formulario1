@@ -35,6 +35,7 @@ class RegistroCompletoTest {
     private final PersonaRepository personas = mock(PersonaRepository.class);
     private final CatalogoOcupacionRepository ocupaciones = mock(CatalogoOcupacionRepository.class);
     private final CatalogoParentescoRepository parentescos = mock(CatalogoParentescoRepository.class);
+    private final UsuarioRepository usuarios = mock(UsuarioRepository.class);
     private final PersonaService service = new PersonaService();
     private final CatalogoParentesco parentesco = new CatalogoParentesco();
     private long siguienteId = 100;
@@ -43,6 +44,7 @@ class RegistroCompletoTest {
         ReflectionTestUtils.setField(service, "personaRepository", personas);
         ReflectionTestUtils.setField(service, "ocupacionRepository", ocupaciones);
         ReflectionTestUtils.setField(service, "parentescoRepository", parentescos);
+        ReflectionTestUtils.setField(service, "usuarioRepository", usuarios);
         parentesco.setId(9L);
         parentesco.setNombre("Amigo(a)");
         when(parentescos.findById(9L)).thenReturn(Optional.of(parentesco));
@@ -165,6 +167,38 @@ class RegistroCompletoTest {
         persona(3,false);
         assertEquals(404, assertThrows(ResponseStatusException.class, () -> service.actualizar(3L,datos(1))).getStatusCode().value());
         assertThrows(ResponseStatusException.class, () -> service.eliminarLogico(3L));
+    }
+
+    @Test void noPermiteDarDeBajaUnaPersonaConCuentaAdministradora() {
+        Persona titular = persona(1, true);
+        when(usuarios.existsByIdPersonaAndRol(1L, "ROLE_ADMIN")).thenReturn(true);
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.eliminarLogico(1L));
+
+        assertEquals(403, error.getStatusCode().value());
+        assertEquals("No se puede eliminar ni desactivar una cuenta administradora.", error.getReason());
+        assertNull(titular.getPerfilTitular().getFechaBaja());
+        verify(personas, never()).save(any());
+    }
+
+    @Test void permiteDarDeBajaUnaPersonaSinCuentaAdministradora() {
+        Persona titular = persona(2, true);
+        when(usuarios.existsByIdPersonaAndRol(2L, "ROLE_ADMIN")).thenReturn(false);
+
+        service.eliminarLogico(2L);
+
+        assertNotNull(titular.getPerfilTitular().getFechaBaja());
+        verify(personas).save(titular);
+    }
+
+    @Test void conserva404AlIntentarDarDeBajaUnaPersonaInexistente() {
+        ResponseStatusException error = assertThrows(ResponseStatusException.class,
+                () -> service.eliminarLogico(99L));
+
+        assertEquals(404, error.getStatusCode().value());
+        verify(usuarios, never()).existsByIdPersonaAndRol(anyLong(), anyString());
+        verify(personas, never()).save(any());
     }
     @Test void listaSoloTitulares() {
         Persona titular = persona(1,true);
