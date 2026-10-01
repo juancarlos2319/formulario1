@@ -3,9 +3,12 @@ package com.example.demo.controller;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.security.JwtUtil;
+import com.example.demo.dto.UsuarioActualDTO;
+import com.example.demo.service.CuentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -23,6 +26,14 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private CuentaService cuentaService;
+
+    @GetMapping("/me")
+    public UsuarioActualDTO obtenerUsuarioActual(Authentication authentication) {
+        return cuentaService.obtenerUsuarioActual(authentication.getName());
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {

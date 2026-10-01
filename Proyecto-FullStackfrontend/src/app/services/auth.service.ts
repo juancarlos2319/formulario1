@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { PersonasService } from './personas.service';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { UsuarioActual } from '../interfaces/usuario-actual.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,10 @@ export class AuthService {
     })
   );
 }
+
+  obtenerUsuarioActual(): Observable<UsuarioActual> {
+    return this.http.get<UsuarioActual>(`${this.apiUrl}/me`);
+  }
 
   logout(): void {
     this.registroService.limpiarBorrador();
