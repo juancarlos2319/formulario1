@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { UsuarioActual } from '../../../interfaces/usuario-actual.interface';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -15,7 +14,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 })
 export class AdminLayoutComponent implements OnInit {
   private authService = inject(AuthService);
-  readonly usuarioActual = signal<UsuarioActual | null>(null);
+  readonly usuarioActual = this.authService.usuarioActual;
   readonly cargandoCuenta = signal(true);
   readonly errorCuenta = signal(false);
 
@@ -23,7 +22,6 @@ export class AdminLayoutComponent implements OnInit {
     this.authService.obtenerUsuarioActual().pipe(
       finalize(() => this.cargandoCuenta.set(false))
     ).subscribe({
-      next: usuario => this.usuarioActual.set(usuario),
       error: () => this.errorCuenta.set(true)
     });
   }

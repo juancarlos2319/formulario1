@@ -22,6 +22,8 @@
 - Prefijos actuales: `/api/auth/login`, `/api/personas`, `/api/ocupaciones`, `/api/parentescos`.
 - `/contactos/:id` lista los datos de contacto; editar un vínculo abre `/contactos/:id/editar/:contactoId` y agregar uno usa `/contactos/:id/agregar`.
 - Las rutas protegidas requieren `Authorization: Bearer <token>`; el login devuelve un objeto con `token` y `username`.
+- El login también devuelve `usuarioActual` con nombre y correo del backend. `AuthService` conserva esos datos en memoria y el header lee su señal durante la navegación; cerrar, cambiar o expirar la sesión borra los datos. Una recarga recupera la cuenta una sola vez mediante `/api/auth/me`.
+- Un guardado exitoso de datos de personas o contactos dispara una consulta de `/api/auth/me` para actualizar el header, incluyendo cuentas compartidas como contactos. Un guardado fallido no dispara la consulta; una respuesta anterior o de una sesión cerrada no reemplaza datos vigentes. No hay consultas periódicas de perfil.
 - Los contactos de emergencia pueden ser varios; al editar se conserva `idContacto`. Enviar solo el ID y el parentesco cambia el vínculo; enviar también todos los datos personales modifica la persona compartida y afecta a los demás titulares relacionados.
 - `PersonasService` mantiene un borrador del registro en memoria y `sessionStorage`; no persistir esos datos más allá del flujo previsto.
 - El formulario conserva las direcciones guardadas sin consultar el código postal al abrir una edición. País, estado, municipio y colonia permiten captura manual si la consulta de CP falla; el payload usa `direcciones[].codigoPostal`, convertido desde el control `cp`. Los errores de guardado muestran el mensaje devuelto por el servicio.
