@@ -36,6 +36,9 @@ export class AdminLayoutComponent implements OnInit {
 
 
   private route = inject(ActivatedRoute);
+  get esDashboard(): boolean {
+    return this.route.firstChild?.snapshot.routeConfig?.path === 'dashboard';
+  }
   get titulo(): string {
     return this.route.firstChild?.snapshot.data['titulo'] ?? 'Administración';
   }

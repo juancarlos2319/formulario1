@@ -16,3 +16,6 @@ footer{text-align:center;font-size:11px;color:#a298ad;padding:0 15px 28px}
 .menu-toggle{flex-shrink:0;color:#7155d9}
 button:focus-visible,a:focus-visible{outline:3px solid #a58ade;outline-offset:3px}
 @media(max-width:760px){.header-toolbar{padding:10px 16px;min-height:64px;gap:8px;flex-wrap:wrap}.account{flex:1 1 240px;justify-content:flex-end}main{padding:20px 15px}.side{width:min(280px,85vw)}}
+.dashboard-view main{padding:clamp(12px,2dvh,22px) 24px}
+.dashboard-view footer{padding-bottom:12px}
+@media(max-width:760px){.dashboard-view main{padding:12px 15px}}

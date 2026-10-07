@@ -3,7 +3,7 @@
     <app-sidebar (navegacion)="esMovil() && menu.close()"></app-sidebar>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div class="main">
+    <div class="main" [class.dashboard-view]="esDashboard">
       <header>
         <mat-toolbar class="header-toolbar">
           <button mat-icon-button *ngIf="esMovil()" type="button" class="menu-toggle" (click)="menu.toggle()" aria-label="Abrir menú principal" aria-controls="menu-principal" [attr.aria-expanded]="menu.opened"><span aria-hidden="true">☰</span></button>
