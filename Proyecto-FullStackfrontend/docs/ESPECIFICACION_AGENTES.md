@@ -24,6 +24,8 @@
 - Las rutas protegidas requieren `Authorization: Bearer <token>`; el login devuelve un objeto con `token` y `username`.
 - Los contactos de emergencia pueden ser varios; al editar se conserva `idContacto`. Enviar solo el ID y el parentesco cambia el vínculo; enviar también todos los datos personales modifica la persona compartida y afecta a los demás titulares relacionados.
 - `PersonasService` mantiene un borrador del registro en memoria y `sessionStorage`; no persistir esos datos más allá del flujo previsto.
+- El formulario conserva las direcciones guardadas sin consultar el código postal al abrir una edición. País, estado, municipio y colonia permiten captura manual si la consulta de CP falla; el payload usa `direcciones[].codigoPostal`, convertido desde el control `cp`. Los errores de guardado muestran el mensaje devuelto por el servicio.
+- Al crear y editar contactos de emergencia se pueden agregar y quitar correos y teléfonos, manteniendo al menos uno de cada tipo. Cada campo se valida y las listas rechazan repetidos; las búsquedas de coincidencias incluyen todas las comunicaciones. Los contactos reutilizados mantienen sus datos bloqueados y se envían solo por ID y parentesco.
 - URLs, campos, validaciones y detalles completos están definidos en `Proyecto-FullStackbackend/demo/README.md`; esa documentación es la fuente compartida del contrato vigente.
 
 ## Reglas de cambios

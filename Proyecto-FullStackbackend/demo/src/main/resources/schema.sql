@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS perfil_titular (
     fecha_baja DATE
 );
 
+-- Direcciones de cada titular; orden 0 identifica la direccion principal.
 CREATE TABLE IF NOT EXISTS direccion_titular (
     id BIGSERIAL PRIMARY KEY,
     id_persona BIGINT NOT NULL REFERENCES perfil_titular(id_persona) ON DELETE CASCADE,

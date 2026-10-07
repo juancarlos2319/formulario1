@@ -59,7 +59,7 @@
 
     <!-- Dirección con CP Autocompletable -->
     <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">02</span> Ubicación y direcciones</legend><p class="section-help">Cada dirección tiene su propio código postal y consulta de ubicación.</p>
+      <legend><span class="section-number">02</span> Ubicación y direcciones</legend><p class="section-help">Consulta la ubicación con el código postal o completa los datos manualmente.</p>
 
       <div formArrayName="direcciones">
         <fieldset class="address-section" *ngFor="let direccion of direcciones.controls; let i = index" [formGroupName]="i">
@@ -73,24 +73,27 @@
             </div>
             <div class="form-group">
               <label [for]="'pais-' + i">País</label>
-              <input [id]="'pais-' + i" type="text" formControlName="pais" class="form-control disabled-input" />
+              <input [id]="'pais-' + i" type="text" formControlName="pais" class="form-control" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.pais')">{{ errorCampo('direcciones.' + i + '.pais') }}</small>
             </div>
             <div class="form-group">
               <label [for]="'estado-' + i">Estado</label>
-              <input [id]="'estado-' + i" type="text" formControlName="estado" class="form-control disabled-input" />
+              <input [id]="'estado-' + i" type="text" formControlName="estado" class="form-control" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.estado')">{{ errorCampo('direcciones.' + i + '.estado') }}</small>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label [for]="'municipio-' + i">Municipio / Ciudad</label>
-              <input [id]="'municipio-' + i" type="text" formControlName="municipio" class="form-control disabled-input" />
+              <input [id]="'municipio-' + i" type="text" formControlName="municipio" class="form-control" />
+              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.municipio')">{{ errorCampo('direcciones.' + i + '.municipio') }}</small>
             </div>
             <div class="form-group">
               <label [for]="'colonia-' + i">Colonia *</label>
-              <select [id]="'colonia-' + i" formControlName="colonia" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.colonia')">
-                <option value="">-- Seleccione Colonia --</option>
-                <option *ngFor="let col of coloniasPorDireccion[i]" [value]="col">{{ col }}</option>
-              </select>
+              <input [id]="'colonia-' + i" formControlName="colonia" class="form-control" [attr.list]="'colonias-' + i" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.colonia')" />
+              <datalist [id]="'colonias-' + i">
+                <option *ngFor="let col of coloniasPorDireccion[i]" [value]="col"></option>
+              </datalist>
               <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.colonia')">{{ errorCampo('direcciones.' + i + '.colonia') }}</small>
             </div>
           </div>

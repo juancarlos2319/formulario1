@@ -110,9 +110,9 @@ Para una base existente, ejecutar manualmente `src/main/resources/migrations/202
 
 ## SQL inicial
 
-Ejecuta primero [schema.sql](src/main/resources/schema.sql) y después [data.sql](src/main/resources/data.sql) sobre una base vacía. Estos scripts ya contienen el modelo actual: `catalogo_parentesco`, `persona.es_titular` y `persona_contacto_emergencia`.
+Ejecuta primero [schema.sql](src/main/resources/schema.sql) y después [data.sql](src/main/resources/data.sql) sobre una base vacía. Estos scripts incluyen `perfil_titular`, `direccion_titular`, los catálogos, las comunicaciones y los contactos de emergencia. No necesitas ejecutar la migración de direcciones al crear la base: la tabla se define en `schema.sql` y sus datos iniciales se insertan en `data.sql`.
 
-La semilla marca Carlos y Laura como titulares y las personas de soporte como contactos. Los scripts están pensados para una base nueva; para una base existente usa la migración de índices indicada arriba. Evita ejecutar `data.sql` más de una vez: correos y teléfonos no tienen una restricción de unicidad global por contenido y podrían duplicarse.
+La semilla crea perfiles de titular para Carlos y Laura, con una dirección principal por persona (orden 0), y las personas de soporte como contactos. Las direcciones conservan calle, número y municipio; estado, colonia y código postal quedan pendientes de completar desde el formulario. Los scripts están pensados para una base nueva; ejecuta `data.sql` una sola vez. El archivo de migración de direcciones se conserva para bases anteriores que todavía no tengan esta estructura y sus datos.
 
 ## Generar un hash
 

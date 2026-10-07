@@ -69,16 +69,22 @@
         <div formArrayName="correos">
           <div class="field" *ngFor="let correo of comunicaciones(i, 'correos').controls; let j = index">
             <label [for]="'correo_' + i + '_' + j">Correo {{ j + 1 }} *</label>
-            <input [id]="'correo_' + i + '_' + j" type="email" [formControlName]="j" />
+            <input [id]="'correo_' + i + '_' + j" type="email" [formControlName]="j" maxlength="150" [attr.aria-invalid]="campoInvalido(i, 'correos.' + j)" />
             <small class="field-error" *ngIf="campoInvalido(i, 'correos.' + j)">{{ errorCampo(i, 'correos.' + j) }}</small>
+            <button *ngIf="comunicaciones(i, 'correos').length > 1 && !comunicaciones(i, 'correos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'correos', j)" [attr.aria-label]="'Quitar correo ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar correo</button>
           </div>
+          <small class="field-error" *ngIf="comunicaciones(i, 'correos').hasError('repetidos')">Los correos no deben repetirse.</small>
+          <button *ngIf="!comunicaciones(i, 'correos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'correos')">＋ Agregar correo</button>
         </div>
         <div formArrayName="telefonos">
           <div class="field" *ngFor="let telefono of comunicaciones(i, 'telefonos').controls; let j = index">
             <label [for]="'telefono_' + i + '_' + j">Telefono {{ j + 1 }} *</label>
             <input [id]="'telefono_' + i + '_' + j" type="tel" inputmode="numeric" maxlength="10" [formControlName]="j" />
             <small class="field-error" *ngIf="campoInvalido(i, 'telefonos.' + j)">{{ errorCampo(i, 'telefonos.' + j) }}</small>
+            <button *ngIf="comunicaciones(i, 'telefonos').length > 1 && !comunicaciones(i, 'telefonos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'telefonos', j)" [attr.aria-label]="'Quitar teléfono ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar teléfono</button>
           </div>
+          <small class="field-error" *ngIf="comunicaciones(i, 'telefonos').hasError('repetidos')">Los teléfonos no deben repetirse.</small>
+          <button *ngIf="!comunicaciones(i, 'telefonos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'telefonos')">＋ Agregar teléfono</button>
         </div>
         <div class="field">
           <label [for]="'parentesco_' + i">Parentesco *</label>

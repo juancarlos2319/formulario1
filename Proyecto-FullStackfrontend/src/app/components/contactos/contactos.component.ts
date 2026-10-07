@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, ValidationErrors, FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, merge, of, debounceTime, map, tap, switchMap, catchError } from 'rxjs';
 import { PersonasService } from '../../services/personas.service';
@@ -102,14 +102,37 @@ export class ContactosComponent implements OnInit, OnDestroy {
       apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
       fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
       genero: [datos?.genero ?? '', Validators.required],
-      correos: this.fb.array((datos?.correos?.length ? datos.correos : ['']).map(valor => this.fb.control(valor, [Validators.required, Validators.email]))),
-      telefonos: this.fb.array((datos?.telefonos?.length ? datos.telefonos : ['']).map(valor => this.fb.control(valor, [Validators.required, Validators.pattern('^[0-9]{10}$')]))),
+      correos: this.fb.array((datos?.correos?.length ? datos.correos : ['']).map(valor => this.crearComunicacion('correos', valor)), [Validators.required, this.comunicacionesDistintas]),
+      telefonos: this.fb.array((datos?.telefonos?.length ? datos.telefonos : ['']).map(valor => this.crearComunicacion('telefonos', valor)), [Validators.required, this.comunicacionesDistintas]),
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
   }
 
   comunicaciones(index: number, tipo: 'correos' | 'telefonos'): FormArray {
     return this.contactos.at(index).get(tipo) as FormArray;
+  }
+
+  private crearComunicacion(tipo: 'correos' | 'telefonos', valor = '') {
+    return this.fb.control(valor, tipo === 'correos'
+      ? [Validators.required, Validators.email, Validators.maxLength(150)]
+      : [Validators.required, Validators.pattern('^[0-9]{10}$')]);
+  }
+
+  private comunicacionesDistintas(control: AbstractControl): ValidationErrors | null {
+    const valores: string[] = (control.value ?? []).map((valor: string) => valor.trim().toLowerCase()).filter(Boolean);
+    return new Set(valores).size === valores.length ? null : { repetidos: true };
+  }
+
+  agregarComunicacion(index: number, tipo: 'correos' | 'telefonos'): void {
+    const array = this.comunicaciones(index, tipo);
+    if (this.guardando() || array.disabled) return;
+    array.push(this.crearComunicacion(tipo));
+  }
+
+  quitarComunicacion(index: number, tipo: 'correos' | 'telefonos', posicion: number): void {
+    const array = this.comunicaciones(index, tipo);
+    if (this.guardando() || array.disabled || array.length <= 1) return;
+    array.removeAt(posicion);
   }
 
   campoInvalido(index: number, nombre: string): boolean {
@@ -120,7 +143,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   errorCampo(index: number, nombre: string): string {
     const errores = this.contactos.at(index).get(nombre)?.errors;
     if (errores?.['required']) return 'Este campo es obligatorio.';
-    if (errores?.['maxlength']) return 'No puede superar 100 caracteres.';
+    if (errores?.['maxlength']) return `No puede superar ${errores['maxlength'].requiredLength} caracteres.`;
     if (errores?.['email']) return 'Escribe un correo electrónico válido.';
     if (errores?.['pattern']) return 'Ingresa diez dígitos.';
     return 'Revisa este campo.';

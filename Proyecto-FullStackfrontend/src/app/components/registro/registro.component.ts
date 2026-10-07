@@ -100,9 +100,9 @@ export class RegistroComponent implements OnInit {
 
   private crearDireccionGroup(datos?: Partial<DireccionPersistida>): FormGroup {
     return this.fb.group({
-      pais: [{ value: datos?.pais ?? 'México', disabled: true }, Validators.required],
-      estado: [{ value: datos?.estado ?? '', disabled: true }, Validators.required],
-      municipio: [{ value: datos?.municipio ?? '', disabled: true }, Validators.required],
+      pais: [datos?.pais ?? 'México', Validators.required],
+      estado: [datos?.estado ?? '', Validators.required],
+      municipio: [datos?.municipio ?? '', Validators.required],
       colonia: [datos?.colonia ?? '', Validators.required],
       cp: [datos?.codigoPostal ?? '', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
       calle: [datos?.calle ?? '', Validators.required],
@@ -110,7 +110,7 @@ export class RegistroComponent implements OnInit {
     });
   }
 
-  agregarDireccion(datos?: Partial<DireccionFormulario>): void {
+  agregarDireccion(datos?: Partial<DireccionPersistida>): void {
     this.direcciones.push(this.crearDireccionGroup(datos));
     this.coloniasPorDireccion.push(datos?.colonia ? [datos.colonia] : []);
     this.direccionesCargando.update(estados => [...estados, false]);
@@ -128,11 +128,16 @@ export class RegistroComponent implements OnInit {
     this.coloniasPorDireccion = [];
     this.direccionesCargando.set([]);
     if (persona.direcciones?.length) {
-      persona.direcciones.forEach(direccion => this.agregarDireccion(direccion));
+      persona.direcciones.forEach(direccion => {
+        const datos = !direccion.numero && !direccion.codigoPostal
+          ? { ...direccion, ...this.convertirDireccionAntigua(direccion.calle, direccion.municipio) }
+          : direccion;
+        this.agregarDireccion(datos);
+      });
     } else {
       this.agregarDireccion(this.convertirDireccionAntigua(persona.direccion ?? '', persona.ciudad ?? ''));
     }
-    this.direcciones.controls.forEach((_, index) => this.buscarCodigoPostal(index));
+    // Conserva la ubicacion guardada sin depender de una consulta externa al abrir.
   }
 
   private convertirDireccionAntigua(direccion: string, ciudad: string): DireccionPersistida {
@@ -250,7 +255,7 @@ export class RegistroComponent implements OnInit {
     if (errores?.['required']) return 'Este campo es obligatorio.';
     if (errores?.['minlength']) return 'Escribe al menos dos caracteres.';
     if (errores?.['email']) return 'Escribe un correo electrónico válido.';
-    if (errores?.['pattern']) return nombre === 'cp' ? 'Ingresa cinco dígitos.' : 'Ingresa diez dígitos.';
+    if (errores?.['pattern']) return nombre.endsWith('.cp') || nombre === 'cp' ? 'Ingresa cinco dígitos.' : 'Ingresa diez dígitos.';
     return 'Revisa este campo.';
   }
 
@@ -302,7 +307,7 @@ export class RegistroComponent implements OnInit {
     },
     error: (err) => {
       this.guardando.set(false);
-      this.mensajeError.set(err.error?.message || 'Error al guardar el registro.');
+      this.mensajeError.set(err.message || err.error?.message || 'Error al guardar el registro.');
     }
   });
 }

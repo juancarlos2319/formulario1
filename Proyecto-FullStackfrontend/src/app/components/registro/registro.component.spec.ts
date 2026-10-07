@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { RegistroComponent } from './registro.component';
 import { PersonasService } from '../../services/personas.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
@@ -155,7 +155,7 @@ describe('RegistroComponent: carga por ID', () => {
       direcciones: [{ pais: 'México', estado: 'Hidalgo', municipio: 'Pachuca', colonia: 'Centro', codigoPostal: '', calle: 'Calle Uno', numero: '1' }]
     } as Usuario);
     component.registroForm.patchValue({ nombre: 'Titular', apellido: 'Prueba', genero: 'Otro', fechaNacimiento: '1990-01-01', ocupacion: 'Docente' });
-    component.direcciones.at(0).patchValue({ cp: '42000' });
+    component.direcciones.at(0).patchValue({ cp: '42000', calle: 'Calle Editada', numero: '25' });
     component.correos.at(0).setValue('titular@example.com');
     component.telefonos.at(0).setValue('5512345678');
 
@@ -164,6 +164,43 @@ describe('RegistroComponent: carga por ID', () => {
     const payload = servicio.actualizarPersona.calls.mostRecent().args[1];
     const direccion = payload.direcciones?.[0];
     expect(direccion?.codigoPostal).toBe('42000');
+    expect(direccion?.calle).toBe('Calle Editada');
+    expect(direccion?.numero).toBe('25');
     expect(Object.keys(direccion ?? {})).not.toContain('cp');
+  });
+
+  it('conserva la dirección guardada sin consultar CP y muestra el error real al guardar', () => {
+    servicio.actualizarPersona.and.returnValue(throwError(() => new Error('Revisa los campos de cada dirección')));
+    component.ngOnInit();
+    respuesta.next({ id: 7, nombre: 'Titular', apellido: 'Prueba', genero: 'Otro',
+      fechaNacimiento: '1990-01-01', ocupacion: 'Docente', correos: ['titular@example.com'],
+      telefonos: ['5512345678'], ciudad: 'Pachuca',
+      direcciones: [{ pais: 'México', estado: 'Hidalgo', municipio: 'Pachuca', colonia: 'Centro',
+        codigoPostal: '42000', calle: 'Calle Uno', numero: '1' }] } as Usuario);
+    expect(servicioCP.consultar).not.toHaveBeenCalled();
+    component.direcciones.at(0).patchValue({ calle: 'Calle Editada', colonia: 'Colonia manual' });
+    component.onSubmit();
+    expect(servicio.actualizarPersona).toHaveBeenCalled();
+    expect(component.mensajeError()).toBe('Revisa los campos de cada dirección');
+    expect(component.guardando()).toBeFalse();
+  });
+
+  it('permite completar manualmente una dirección antigua si falla la consulta de CP', () => {
+    servicioCP.consultar.and.returnValue(throwError(() => new Error('Sin conexión')));
+    servicio.actualizarPersona.and.returnValue(of({ ok: true }));
+    component.ngOnInit();
+    respuesta.next({ id: 7, nombre: 'Titular', apellido: 'Prueba', genero: 'Otro',
+      fechaNacimiento: '1990-01-01', ocupacion: 'Docente', correos: ['titular@example.com'],
+      telefonos: ['5512345678'], ciudad: 'Pachuca', direcciones: [{ pais: 'México',
+        estado: '', municipio: 'Pachuca', colonia: '', codigoPostal: '', calle: 'Av. Revolucion 101', numero: '' }] } as Usuario);
+    expect(component.direcciones.at(0).get('numero')?.value).toBe('101');
+    component.direcciones.at(0).patchValue({ cp: '123' });
+    expect(component.errorCampo('direcciones.0.cp')).toBe('Ingresa cinco dígitos.');
+    component.direcciones.at(0).patchValue({ cp: '42000' });
+    component.buscarCodigoPostal(0);
+    expect(component.hayDireccionCargando).toBeFalse();
+    component.direcciones.at(0).patchValue({ estado: 'Hidalgo', colonia: 'Centro', calle: 'Calle Nueva' });
+    component.onSubmit();
+    expect(servicio.actualizarPersona.calls.mostRecent().args[1].direcciones?.[0].calle).toBe('Calle Nueva');
   });
 });

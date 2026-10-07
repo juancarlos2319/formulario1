@@ -32,6 +32,78 @@ describe('ContactosComponent', () => {
   });
   afterEach(() => component.ngOnDestroy());
 
+  it('agrega y quita comunicaciones manteniendo al menos una de cada tipo por contacto', fakeAsync(() => {
+    component.ngOnInit();
+    component.agregarContacto(nuevo);
+    for (const tipo of ['correos', 'telefonos'] as const) {
+      component.agregarComunicacion(0, tipo);
+      expect(component.comunicaciones(0, tipo).length).toBe(2);
+      expect(component.comunicaciones(1, tipo).length).toBe(1);
+      component.quitarComunicacion(0, tipo, 1);
+      component.quitarComunicacion(0, tipo, 0);
+      expect(component.comunicaciones(0, tipo).length).toBe(1);
+    }
+    tick(350); flushMicrotasks();
+  }));
+
+  it('valida los nuevos campos y rechaza comunicaciones repetidas', fakeAsync(() => {
+    component.ngOnInit();
+    component.contactos.at(0).patchValue(nuevo);
+    component.agregarComunicacion(0, 'correos');
+    component.agregarComunicacion(0, 'telefonos');
+    const correos = component.comunicaciones(0, 'correos');
+    const telefonos = component.comunicaciones(0, 'telefonos');
+    expect(correos.at(1).hasError('required')).toBeTrue();
+    correos.at(1).setValue('incorrecto');
+    telefonos.at(1).setValue('123');
+    expect(correos.at(1).hasError('email')).toBeTrue();
+    expect(telefonos.at(1).hasError('pattern')).toBeTrue();
+    correos.at(1).setValue('ANA@example.com');
+    telefonos.at(1).setValue(nuevo.telefonos[0]);
+    expect(correos.hasError('repetidos')).toBeTrue();
+    expect(telefonos.hasError('repetidos')).toBeTrue();
+    tick(350); flushMicrotasks();
+    component.guardarContactos();
+    expect(servicio.guardarContactos).not.toHaveBeenCalled();
+  }));
+
+  it('guarda varios correos y teléfonos en un contacto nuevo', fakeAsync(() => {
+    spyOn(TestBed.inject(ActivatedRoute).snapshot.paramMap, 'get').and.returnValue(null);
+    servicio.obtenerBorrador.and.returnValue({ nombre: 'Titular' } as Usuario);
+    servicio.guardarRegistroCompleto.and.returnValue(of({ ok: true }));
+    component.ngOnInit();
+    component.contactos.at(0).patchValue(nuevo);
+    component.agregarComunicacion(0, 'correos');
+    component.agregarComunicacion(0, 'telefonos');
+    component.comunicaciones(0, 'correos').at(1).setValue('ana.extra@example.com');
+    component.comunicaciones(0, 'telefonos').at(1).setValue('5512345679');
+    tick(350); flushMicrotasks();
+    expect(servicio.buscarContactos.calls.mostRecent().args[0].correos).toEqual(['ana@example.com', 'ana.extra@example.com']);
+    component.guardarContactos();
+    expect(servicio.guardarRegistroCompleto).toHaveBeenCalledWith([{ ...nuevo, idContacto: null,
+      correos: ['ana@example.com', 'ana.extra@example.com'], telefonos: ['5512345678', '5512345679'] }]);
+  }));
+
+  it('edita las listas de comunicaciones sin perder los otros vínculos', fakeAsync(() => {
+    servicio.obtenerContactos.and.returnValue(of([{ ...nuevo, idContacto: 2,
+      correos: ['ana@example.com', 'anterior@example.com'], telefonos: ['5512345678', '5512345679'] },
+      { idContacto: 3, idParentesco: 7 }]));
+    component.ngOnInit();
+    component.modoAgregar = false;
+    component.modoEdicion = true;
+    component.contactoId = 2;
+    component.cargarContactos();
+    expect(component.comunicaciones(0, 'correos').length).toBe(2);
+    component.quitarComunicacion(0, 'correos', 1);
+    component.agregarComunicacion(0, 'correos');
+    component.comunicaciones(0, 'correos').at(1).setValue('nuevo@example.com');
+    component.quitarComunicacion(0, 'telefonos', 1);
+    tick(350); flushMicrotasks();
+    component.guardarContactos(); flushMicrotasks();
+    expect(servicio.guardarContactos).toHaveBeenCalledWith(1, [{ ...nuevo, idContacto: 2,
+      correos: ['ana@example.com', 'nuevo@example.com'] }, { idContacto: 3, idParentesco: 7 }]);
+  }));
+
   it('bloquea durante carga y error; conserva v?nculos al reintentar', fakeAsync(() => {
     const carga = new Subject<ContactoEmergencia[]>();
     servicio.obtenerContactos.and.returnValue(carga);
@@ -60,6 +132,10 @@ describe('ContactosComponent', () => {
     tick(350); flushMicrotasks();
     expect(feedback.confirm).toHaveBeenCalled();
     expect(component.contactos.at(0).getRawValue()).toEqual({ ...nuevo, idContacto: 8, idParentesco: 7 });
+    component.agregarComunicacion(0, 'correos');
+    component.quitarComunicacion(0, 'telefonos', 0);
+    expect(component.comunicaciones(0, 'correos').length).toBe(1);
+    expect(component.comunicaciones(0, 'telefonos').length).toBe(1);
     component.guardarContactos();
     expect(servicio.guardarContactos).toHaveBeenCalledWith(1, [{ idContacto: 2, idParentesco: 9 }, { idContacto: 8, idParentesco: 7 }]);
   }));

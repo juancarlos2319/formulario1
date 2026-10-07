@@ -19,6 +19,13 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO perfil_titular (id_persona, direccion, ciudad, id_ocupacion, fecha_baja) VALUES
 (1, 'Av. Revolucion 101', 'Pachuca', 2, NULL), (2, 'Calle Allende 202', 'Pachuca', 2, NULL)
 ON CONFLICT (id_persona) DO NOTHING;
+-- Direcciones iniciales definidas directamente, sin ejecutar una migracion.
+-- Completar estado, colonia y codigo postal desde el formulario al editar.
+INSERT INTO direccion_titular
+    (id_persona, orden, pais, estado, municipio, colonia, codigo_postal, calle, numero)
+VALUES
+    (1, 0, 'México', '', 'Pachuca', '', '', 'Av. Revolucion', '101'),
+    (2, 0, 'México', '', 'Pachuca', '', '', 'Calle Allende', '202');
 INSERT INTO persona_correo (id_persona, correo) VALUES
 (1, 'carlos.admin@sistema.com'), (1, 'carlos.soporte@sistema.com'),
 (2, 'laura.admin@sistema.com'), (2, 'laura.soporte@sistema.com'),
