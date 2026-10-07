@@ -44,7 +44,8 @@ export class RegistroComponent implements OnInit {
     if (id === null && borrador) {
       this.cargarComunicaciones(borrador);
       this.cargarDirecciones(borrador);
-      this.registroForm.patchValue(borrador);
+      this.aplicarNombreDesdePersona(borrador);
+      this.registroForm.patchValue({ ...borrador, ...this.separarNombre(borrador.nombre, borrador.apellido) });
     }
     if (id === null && !borrador) this.agregarDireccion();
     if (id !== null) {
@@ -66,6 +67,7 @@ export class RegistroComponent implements OnInit {
           this.cargarComunicaciones(persona);
           this.registroForm.patchValue({
             ...persona,
+            ...this.separarNombre(persona.nombre, persona.apellido),
             aceptaTerminos: true
           });
           this.cargarDirecciones(persona);
@@ -78,6 +80,9 @@ export class RegistroComponent implements OnInit {
 
   private initForm(): void {
     this.registroForm = this.fb.group({
+      nombres: ['', [Validators.required, Validators.minLength(2)]],
+      apellidoPaterno: ['', [Validators.required, Validators.minLength(2)]],
+      apellidoMaterno: ['', [Validators.minLength(2)]],
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       apellido: ['', [Validators.required, Validators.minLength(2)]],
       genero: ['', Validators.required],
@@ -92,6 +97,7 @@ export class RegistroComponent implements OnInit {
 
       aceptaTerminos: [false, Validators.requiredTrue]
     }, { validators: this.datosContactoDistintos });
+    this.sincronizarAliasNombre(this.registroForm);
   }
 
   get correos(): FormArray { return this.registroForm.get('correos') as FormArray; }
@@ -176,6 +182,52 @@ export class RegistroComponent implements OnInit {
 
   private crearControlTelefono(valor = '') {
     return this.fb.control(valor, [Validators.required, Validators.pattern('^[0-9]{10}$')]);
+  }
+
+  private separarNombre(nombre?: string, apellido?: string): { nombres: string; apellidoPaterno: string; apellidoMaterno: string } {
+    const apellidos = (apellido ?? '').trim();
+    const partesApellido = apellidos.split(/\s+/).filter(Boolean);
+    return {
+      nombres: (nombre ?? '').trim(),
+      apellidoPaterno: partesApellido[0] ?? '',
+      apellidoMaterno: partesApellido.slice(1).join(' ')
+    };
+  }
+
+  private sincronizarAliasNombre(form: FormGroup): void {
+    const actualizarDesdeNuevos = () => {
+      const nombres = (form.get('nombres')?.value ?? '').trim();
+      const apellidoPaterno = (form.get('apellidoPaterno')?.value ?? '').trim();
+      const apellidoMaterno = (form.get('apellidoMaterno')?.value ?? '').trim();
+      const apellido = `${apellidoPaterno} ${apellidoMaterno}`.trim();
+      if ((form.get('nombre')?.value ?? '') !== nombres) form.get('nombre')?.setValue(nombres, { emitEvent: false });
+      if ((form.get('apellido')?.value ?? '') !== apellido) form.get('apellido')?.setValue(apellido, { emitEvent: false });
+    };
+    const actualizarDesdeLegacy = () => {
+      const nombre = (form.get('nombre')?.value ?? '').trim();
+      const apellido = (form.get('apellido')?.value ?? '').trim();
+      const { nombres, apellidoPaterno, apellidoMaterno } = this.separarNombre(nombre, apellido);
+      if ((form.get('nombres')?.value ?? '') !== nombres) form.get('nombres')?.setValue(nombres, { emitEvent: false });
+      if ((form.get('apellidoPaterno')?.value ?? '') !== apellidoPaterno) form.get('apellidoPaterno')?.setValue(apellidoPaterno, { emitEvent: false });
+      if ((form.get('apellidoMaterno')?.value ?? '') !== apellidoMaterno) form.get('apellidoMaterno')?.setValue(apellidoMaterno, { emitEvent: false });
+    };
+
+    ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'nombre', 'apellido'].forEach(controlName => {
+      form.get(controlName)?.valueChanges.subscribe(() => {
+        if (controlName === 'nombre' || controlName === 'apellido') {
+          actualizarDesdeLegacy();
+        } else {
+          actualizarDesdeNuevos();
+        }
+      });
+    });
+
+    actualizarDesdeNuevos();
+  }
+
+  private aplicarNombreDesdePersona(persona: { nombre?: string; apellido?: string }): void {
+    this.registroForm.patchValue(this.separarNombre(persona.nombre, persona.apellido));
+    this.sincronizarAliasNombre(this.registroForm);
   }
 
   private cargarComunicaciones(persona: { correos?: string[]; telefonos?: string[] }): void {
@@ -279,8 +331,9 @@ export class RegistroComponent implements OnInit {
   const direccionPrincipal = direcciones[0];
   const direccionFormateada = `${direccionPrincipal.calle} #${direccionPrincipal.numero}, Col. ${direccionPrincipal.colonia}, C.P. ${direccionPrincipal.codigoPostal}, ${direccionPrincipal.estado}`;
 
+  const apellidoCompleto = `${rawVal.apellidoPaterno ?? ''} ${rawVal.apellidoMaterno ?? ''}`.trim();
   const payload = {
-    nombre: rawVal.nombre, apellido: rawVal.apellido, genero: rawVal.genero,
+    nombre: rawVal.nombres ?? rawVal.nombre, apellido: apellidoCompleto || rawVal.apellido || '', genero: rawVal.genero,
     fechaNacimiento: rawVal.fechaNacimiento, ocupacion: rawVal.ocupacion,
     correos: rawVal.correos, telefonos: rawVal.telefonos,
     direcciones,

@@ -19,14 +19,19 @@
       
       <div class="form-row">
         <div class="form-group">
-          <label for="nombre">Nombre *</label>
-          <input autocomplete="given-name" id="nombre" type="text" formControlName="nombre" class="form-control" [attr.aria-invalid]="campoInvalido('nombre')" [attr.aria-describedby]="campoInvalido('nombre') ? 'nombre-error' : null" />
-          <small class="field-error" id="nombre-error" *ngIf="campoInvalido('nombre')">{{ errorCampo('nombre') }}</small>
+          <label for="nombres">Nombre(s) *</label>
+          <input autocomplete="given-name" id="nombres" type="text" formControlName="nombres" class="form-control" [attr.aria-invalid]="campoInvalido('nombres')" [attr.aria-describedby]="campoInvalido('nombres') ? 'nombres-error' : null" />
+          <small class="field-error" id="nombres-error" *ngIf="campoInvalido('nombres')">{{ errorCampo('nombres') }}</small>
         </div>
         <div class="form-group">
-          <label for="apellido">Apellido *</label>
-          <input autocomplete="family-name" id="apellido" type="text" formControlName="apellido" class="form-control" [attr.aria-invalid]="campoInvalido('apellido')" [attr.aria-describedby]="campoInvalido('apellido') ? 'apellido-error' : null" />
-          <small class="field-error" id="apellido-error" *ngIf="campoInvalido('apellido')">{{ errorCampo('apellido') }}</small>
+          <label for="apellidoPaterno">Apellido paterno *</label>
+          <input autocomplete="family-name" id="apellidoPaterno" type="text" formControlName="apellidoPaterno" class="form-control" [attr.aria-invalid]="campoInvalido('apellidoPaterno')" [attr.aria-describedby]="campoInvalido('apellidoPaterno') ? 'apellidoPaterno-error' : null" />
+          <small class="field-error" id="apellidoPaterno-error" *ngIf="campoInvalido('apellidoPaterno')">{{ errorCampo('apellidoPaterno') }}</small>
+        </div>
+        <div class="form-group">
+          <label for="apellidoMaterno">Apellido materno</label>
+          <input autocomplete="family-name" id="apellidoMaterno" type="text" formControlName="apellidoMaterno" class="form-control" [attr.aria-invalid]="campoInvalido('apellidoMaterno')" [attr.aria-describedby]="campoInvalido('apellidoMaterno') ? 'apellidoMaterno-error' : null" />
+          <small class="field-error" id="apellidoMaterno-error" *ngIf="campoInvalido('apellidoMaterno')">{{ errorCampo('apellidoMaterno') }}</small>
         </div>
       </div>
 

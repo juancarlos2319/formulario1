@@ -96,16 +96,23 @@ export class ContactosComponent implements OnInit, OnDestroy {
 
   // Crea la estructura de un contacto
   crearContactoGroup(datos?: ContactoEmergencia): FormGroup {
-    return this.fb.group({
+    const nombre = datos?.nombre ?? '';
+    const apellidos = this.descomponerApellidos(datos?.apellido ?? '');
+    const grupo = this.fb.group({
       idContacto: [datos?.idContacto ?? null],
-      nombre: [datos?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
-      apellido: [datos?.apellido ?? '', [Validators.required, Validators.maxLength(100)]],
+      nombres: [nombre, [Validators.required, Validators.maxLength(100)]],
+      apellidoPaterno: [apellidos.paterno, [Validators.required, Validators.maxLength(100)]],
+      apellidoMaterno: [apellidos.materno, [Validators.maxLength(100)]],
+      nombre: [nombre, [Validators.required, Validators.maxLength(100)]],
+      apellido: [this.combinarApellidos(apellidos.paterno, apellidos.materno), [Validators.required, Validators.maxLength(100)]],
       fechaNacimiento: [datos?.fechaNacimiento ?? '', Validators.required],
       genero: [datos?.genero ?? '', Validators.required],
       correos: this.fb.array((datos?.correos?.length ? datos.correos : ['']).map(valor => this.crearComunicacion('correos', valor)), [Validators.required, this.comunicacionesDistintas]),
       telefonos: this.fb.array((datos?.telefonos?.length ? datos.telefonos : ['']).map(valor => this.crearComunicacion('telefonos', valor)), [Validators.required, this.comunicacionesDistintas]),
       idParentesco: [datos?.idParentesco ?? null, Validators.required]
     });
+    this.sincronizarAliasNombreContacto(grupo);
+    return grupo;
   }
 
   comunicaciones(index: number, tipo: 'correos' | 'telefonos'): FormArray {
@@ -147,6 +154,62 @@ export class ContactosComponent implements OnInit, OnDestroy {
     if (errores?.['email']) return 'Escribe un correo electrónico válido.';
     if (errores?.['pattern']) return 'Ingresa diez dígitos.';
     return 'Revisa este campo.';
+  }
+
+  private descomponerApellidos(apellido?: string): { paterno: string; materno: string } {
+    const apellidos = (apellido ?? '').trim();
+    const partes = apellidos.split(/\s+/).filter(Boolean);
+    return {
+      paterno: partes[0] ?? '',
+      materno: partes.slice(1).join(' ')
+    };
+  }
+
+  private combinarApellidos(apellidoPaterno: string, apellidoMaterno: string): string {
+    return `${apellidoPaterno} ${apellidoMaterno}`.trim();
+  }
+
+  private sincronizarAliasNombreContacto(grupo: FormGroup): void {
+    const actualizarDesdeNuevos = () => {
+      const nombres = (grupo.get('nombres')?.value ?? '').trim();
+      const paterno = (grupo.get('apellidoPaterno')?.value ?? '').trim();
+      const materno = (grupo.get('apellidoMaterno')?.value ?? '').trim();
+      const apellido = this.combinarApellidos(paterno, materno);
+      if ((grupo.get('nombre')?.value ?? '') !== nombres) grupo.get('nombre')?.setValue(nombres, { emitEvent: false });
+      if ((grupo.get('apellido')?.value ?? '') !== apellido) grupo.get('apellido')?.setValue(apellido, { emitEvent: false });
+    };
+    const actualizarDesdeLegacy = () => {
+      const nombre = (grupo.get('nombre')?.value ?? '').trim();
+      const apellido = (grupo.get('apellido')?.value ?? '').trim();
+      const { paterno, materno } = this.descomponerApellidos(apellido);
+      if ((grupo.get('nombres')?.value ?? '') !== nombre) grupo.get('nombres')?.setValue(nombre, { emitEvent: false });
+      if ((grupo.get('apellidoPaterno')?.value ?? '') !== paterno) grupo.get('apellidoPaterno')?.setValue(paterno, { emitEvent: false });
+      if ((grupo.get('apellidoMaterno')?.value ?? '') !== materno) grupo.get('apellidoMaterno')?.setValue(materno, { emitEvent: false });
+    };
+
+    ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'nombre', 'apellido'].forEach(controlName => {
+      grupo.get(controlName)?.valueChanges.subscribe(() => {
+        if (controlName === 'nombre' || controlName === 'apellido') {
+          actualizarDesdeLegacy();
+        } else {
+          actualizarDesdeNuevos();
+        }
+      });
+    });
+
+    actualizarDesdeNuevos();
+  }
+
+  private convertirContactoLegacy(raw: any): ContactoEmergencia {
+    const nombre = (raw?.nombres ?? raw?.nombre ?? '').trim();
+    const apellido = this.combinarApellidos(raw?.apellidoPaterno ?? raw?.apellido ?? '', raw?.apellidoMaterno ?? '');
+    const { nombres, apellidoPaterno, apellidoMaterno, ...resto } = raw ?? {};
+    return {
+      ...resto,
+      nombre: String(nombre).trim(),
+      apellido: String(apellido).trim(),
+      idParentesco: raw?.idParentesco ?? undefined
+    };
   }
 
   // Botón para agregar N contactos sin límite
@@ -191,7 +254,6 @@ export class ContactosComponent implements OnInit, OnDestroy {
             this.feedbackService.notify('El correo y/o teléfono coinciden con varias personas. Revisa los datos antes de continuar.', 'warning');
             (grupo.get(resultado.campo) as FormArray).at(resultado.indice).setValue('', { emitEvent: false });
             (grupo.get(resultado.campo) as FormArray).at(resultado.indice).markAsTouched();
-            // Obliga a consultar de nuevo el otro dato si todavía existe una coincidencia.
             estado.fallo = true;
             return;
           }
@@ -213,14 +275,20 @@ export class ContactosComponent implements OnInit, OnDestroy {
           if (!vigente()) return;
           if (aceptar) {
             const { idParentesco, parentesco, ...personales } = persona;
+            const apellidos = this.descomponerApellidos(persona.apellido ?? '');
             for (const tipo of ['correos', 'telefonos'] as const) {
               const array = grupo.get(tipo) as FormArray;
               array.clear({ emitEvent: false });
               for (const valor of persona[tipo] ?? []) array.push(this.fb.control(valor), { emitEvent: false });
             }
-            grupo.patchValue(personales, { emitEvent: false });
+            grupo.patchValue({
+              ...personales,
+              nombres: persona.nombre ?? '',
+              apellidoPaterno: apellidos.paterno,
+              apellidoMaterno: apellidos.materno,
+            }, { emitEvent: false });
             estado.reutilizado = true;
-            for (const campo of ['nombre', 'apellido', 'fechaNacimiento', 'genero', 'correos', 'telefonos']) {
+            for (const campo of ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'fechaNacimiento', 'genero', 'correos', 'telefonos']) {
               grupo.get(campo)!.disable({ emitEvent: false });
             }
           } else {
@@ -301,7 +369,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
 
     this.guardando.set(true);
     if (this.modoEdicion && !this.verificaciones.get(this.contactos.at(0) as FormGroup)?.reutilizado) {
-      const contacto = this.contactos.getRawValue()[0] as ContactoEmergencia;
+      const contacto = this.convertirContactoLegacy(this.contactos.getRawValue()[0]);
       const confirmado = await this.feedbackService.confirm({
         title: 'Actualizar datos del contacto',
         message: `Los cambios de ${contacto.nombre} ${contacto.apellido} se aplicarán a todos los titulares que comparten este contacto. ¿Deseas continuar?`,
@@ -311,7 +379,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     }
 
     const editados = this.contactos.controls.map(control => {
-      const contacto = control.getRawValue() as ContactoEmergencia;
+      const contacto = this.convertirContactoLegacy(control.getRawValue());
       return this.verificaciones.get(control as FormGroup)?.reutilizado
         ? { idContacto: contacto.idContacto, idParentesco: contacto.idParentesco }
         : contacto;

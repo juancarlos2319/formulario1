@@ -37,15 +37,21 @@
         </p>
         <p *ngIf="contacto.get('correos')?.disabled" class="shared-person-note">Se usará la persona registrada. El parentesco corresponde a este vínculo.</p>
         <div class="field">
-          <label [for]="'nombre_' + i">Nombre *</label>
-          <input [id]="'nombre_' + i" type="text" formControlName="nombre" placeholder="Nombre" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombre')" [attr.aria-describedby]="campoInvalido(i, 'nombre') ? 'nombre-error_' + i : null">
-          <small class="field-error" [id]="'nombre-error_' + i" *ngIf="campoInvalido(i, 'nombre')">{{ errorCampo(i, 'nombre') }}</small>
+          <label [for]="'nombres_' + i">Nombre(s) *</label>
+          <input [id]="'nombres_' + i" type="text" formControlName="nombres" placeholder="Nombre(s)" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombres')" [attr.aria-describedby]="campoInvalido(i, 'nombres') ? 'nombres-error_' + i : null">
+          <small class="field-error" [id]="'nombres-error_' + i" *ngIf="campoInvalido(i, 'nombres')">{{ errorCampo(i, 'nombres') }}</small>
         </div>
 
         <div class="field">
-          <label [for]="'apellido_' + i">Apellido *</label>
-          <input [id]="'apellido_' + i" type="text" formControlName="apellido" placeholder="Apellido" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellido')" [attr.aria-describedby]="campoInvalido(i, 'apellido') ? 'apellido-error_' + i : null">
-          <small class="field-error" [id]="'apellido-error_' + i" *ngIf="campoInvalido(i, 'apellido')">{{ errorCampo(i, 'apellido') }}</small>
+          <label [for]="'apellidoPaterno_' + i">Apellido paterno *</label>
+          <input [id]="'apellidoPaterno_' + i" type="text" formControlName="apellidoPaterno" placeholder="Apellido paterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoPaterno')" [attr.aria-describedby]="campoInvalido(i, 'apellidoPaterno') ? 'apellidoPaterno-error_' + i : null">
+          <small class="field-error" [id]="'apellidoPaterno-error_' + i" *ngIf="campoInvalido(i, 'apellidoPaterno')">{{ errorCampo(i, 'apellidoPaterno') }}</small>
+        </div>
+
+        <div class="field">
+          <label [for]="'apellidoMaterno_' + i">Apellido materno</label>
+          <input [id]="'apellidoMaterno_' + i" type="text" formControlName="apellidoMaterno" placeholder="Apellido materno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoMaterno')" [attr.aria-describedby]="campoInvalido(i, 'apellidoMaterno') ? 'apellidoMaterno-error_' + i : null">
+          <small class="field-error" [id]="'apellidoMaterno-error_' + i" *ngIf="campoInvalido(i, 'apellidoMaterno')">{{ errorCampo(i, 'apellidoMaterno') }}</small>
         </div>
 
         <div class="field">

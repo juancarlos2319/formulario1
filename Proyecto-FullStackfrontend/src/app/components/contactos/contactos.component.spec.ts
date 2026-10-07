@@ -131,7 +131,14 @@ describe('ContactosComponent', () => {
     expect(servicio.guardarContactos).not.toHaveBeenCalled();
     tick(350); flushMicrotasks();
     expect(feedback.confirm).toHaveBeenCalled();
-    expect(component.contactos.at(0).getRawValue()).toEqual({ ...nuevo, idContacto: 8, idParentesco: 7 });
+    expect(component.contactos.at(0).getRawValue()).toEqual({
+      ...nuevo,
+      idContacto: 8,
+      idParentesco: 7,
+      nombres: 'Ana',
+      apellidoPaterno: 'Perez',
+      apellidoMaterno: ''
+    });
     component.agregarComunicacion(0, 'correos');
     component.quitarComunicacion(0, 'telefonos', 0);
     expect(component.comunicaciones(0, 'correos').length).toBe(1);
