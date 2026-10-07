@@ -1,13 +1,12 @@
-  <aside class="sidebar" aria-label="Navegación principal">
-    <a class="brand" routerLink="/dashboard"><span class="mark">P</span>Portal<span>System</span></a>
-    <div class="workspace"><span class="tile">PS</span><div><small>Espacio de trabajo</small><strong>Administración de personas</strong></div></div>
-    <span class="eyebrow">MENÚ PRINCIPAL</span>
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page"><span aria-hidden="true">▦</span> Resumen</a>
-      <a routerLink="/personas" routerLinkActive="active" ariaCurrentWhenActive="page"><span aria-hidden="true">♙</span> Personas</a>
-      <a routerLink="/registro" routerLinkActive="active" ariaCurrentWhenActive="page"><span aria-hidden="true">＋</span> Registro</a>
-    </nav>
-    <div class="session">
-      <button type="button" (click)="logout()">Cerrar sesión</button>
-    </div>
-  </aside>
+﻿<aside class="sidebar" aria-label="Navegación principal">
+  <a class="brand" routerLink="/dashboard" (click)="navegacion.emit()"><span class="mark" aria-hidden="true">P</span><span class="brand-name">Portal<span>System</span></span></a>
+  <div class="workspace"><span class="tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 10h16v10H4zM8 10V6h8v4M9 15h6"/><path d="M12 12v6"/></svg></span><div><small>Tu espacio de trabajo</small><strong>Administración de personas</strong></div></div>
+  <span class="eyebrow">MENÚ PRINCIPAL</span>
+  <mat-nav-list aria-label="Secciones principales">
+    <a mat-list-item routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="navegacion.emit()"><span matListItemIcon class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><span matListItemTitle>Resumen</span></a>
+    <a mat-list-item routerLink="/personas" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="navegacion.emit()"><span matListItemIcon class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 4v2"/></svg></span><span matListItemTitle>Personas</span></a>
+    <a mat-list-item *ngIf="personaEditadaId() as id" class="sub-item" [routerLink]="['/registro', id]" routerLinkActive="active" [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored' }" ariaCurrentWhenActive="page" (click)="navegacion.emit()"><span matListItemIcon class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="m4 16-1 5 5-1L20 8l-4-4L4 16ZM13 7l4 4"/></svg></span><span matListItemTitle>Editar persona</span></a>
+    <a mat-list-item routerLink="/registro" routerLinkActive="active" [routerLinkActiveOptions]="{ paths: 'exact', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored' }" ariaCurrentWhenActive="page" (click)="navegacion.emit()"><span matListItemIcon class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></svg></span><span matListItemTitle>Registro</span></a>
+  </mat-nav-list>
+  <div class="session"><span class="session-label">TU CUENTA</span><button mat-stroked-button type="button" (click)="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h10"/></svg> Cerrar sesión</button></div>
+</aside>

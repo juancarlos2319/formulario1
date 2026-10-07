@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 import { PersonasComponent } from './personas.component';
 import { PersonasService } from '../../services/personas.service';
@@ -13,7 +14,7 @@ describe('PersonasComponent: proteccion de administradores', () => {
       { id: 1, nombre: 'Administrador prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', ciudad: '', puedeEliminar: false },
       { id: 2, nombre: 'Persona prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', ciudad: '', puedeEliminar: true }
     ]));
-    await TestBed.configureTestingModule({ imports: [PersonasComponent], providers: [provideRouter([]),
+    await TestBed.configureTestingModule({ imports: [PersonasComponent], providers: [provideRouter([]), provideNoopAnimations(),
       { provide: PersonasService, useValue: personas }, { provide: FeedbackService, useValue: feedback }
     ] }).compileComponents();
     const fixture = TestBed.createComponent(PersonasComponent);

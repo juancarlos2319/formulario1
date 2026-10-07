@@ -21,6 +21,12 @@ export class PersonasService {
     sessionStorage.removeItem(this.borradorKey);
   }
 
+  limpiarCacheSesion(): void {
+    this.contactosCache.clear();
+    this.parentescosCache = undefined;
+    this.solicitudes.clear();
+  }
+
   guardarBorrador(datos: Usuario): void {
     this.borrador = datos;
     sessionStorage.setItem(this.borradorKey, JSON.stringify(datos));
@@ -88,7 +94,8 @@ export class PersonasService {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
       .pipe(tap(resultado => {
         if (resultado.ok) {
-          this.contactosCache.delete(id);
+          // La persona editada puede estar compartida por otros titulares.
+          this.contactosCache.clear();
           this.cambiosPersonales.next();
         }
       }),
@@ -121,7 +128,12 @@ export class PersonasService {
 
   actualizarPersona(id: number, datos: Usuario): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
-      .pipe(tap(resultado => { if (resultado.ok) this.cambiosPersonales.next(); }),
+      .pipe(tap(resultado => {
+        if (resultado.ok) {
+          this.contactosCache.clear();
+          this.cambiosPersonales.next();
+        }
+      }),
         catchError(this.manejarError('actualizar el formulario')));
   }
 

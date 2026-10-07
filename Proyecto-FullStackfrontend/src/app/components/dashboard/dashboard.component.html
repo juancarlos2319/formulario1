@@ -1,25 +1,40 @@
-<section class="welcome"><div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div><a *ngIf="!cargando() && !mensajeError() && lugaresDisponibles > 0" class="primary" routerLink="/registro">＋ Registrar persona</a></section>
-
-      <div *ngIf="mensajeError()" class="notice error" role="alert">{{ mensajeError() }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando()">Reintentar</button></div>
-      <div *ngIf="cargando()" class="notice" role="status">Cargando información de tu comunidad…</div>
-      <ng-container *ngIf="!cargando() && (!mensajeError() || resumen().total > 0)">
-        <div *ngIf="lugaresDisponibles === 0" class="notice" role="status">Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</div>
-        <section class="stats" aria-label="Resumen de registros">
-          <article class="panel"><span class="tile">♙</span><p>Total de personas</p><strong>{{ resumen().total }}</strong><small>Registros en el sistema</small></article>
-          <article class="panel"><span class="tile green">＠</span><p>Con correo electrónico</p><strong>{{ conEmail }}</strong><small>Personas con email registrado</small></article>
-          <article class="panel"><span class="tile orange">☎</span><p>Con teléfono</p><strong>{{ conTelefono }}</strong><small>Personas con teléfono registrado</small></article>
-          <article class="panel"><span class="tile blue">＋</span><p>Lugares disponibles</p><strong>{{ lugaresDisponibles }}</strong><small>Capacidad de 20 personas</small></article>
-        </section>
-        <section class="overview">
-          <article class="panel distribution"><h2>Tu comunidad por ocupación</h2><p class="muted">Las cinco ocupaciones con más registros</p>
-            <div *ngFor="let grupo of ocupaciones" class="bar-row"><div><span>{{ grupo.nombre }}</span><strong>{{ grupo.cantidad }}</strong></div><div class="track"><span [style.width.%]="grupo.porcentaje"></span></div></div>
-            <p *ngIf="!resumen().total" class="empty">El resumen aparecerá cuando registres a tu primera persona.</p>
-          </article>
-          <article class="panel quick"><h2>Acciones rápidas</h2><p class="muted">Lo que necesitas, a un clic</p>
-            <a *ngIf="lugaresDisponibles > 0" routerLink="/registro"><span class="tile">＋</span><div><strong>Nueva persona</strong><small>Crear un registro completo</small></div><span>→</span></a>
-            <a routerLink="/personas"><span class="tile green">♙</span><div><strong>Consultar personas</strong><small>Busca, edita y gestiona contactos</small></div><span>→</span></a>
-            <button type="button" (click)="cargarUsuarios()"><span class="tile blue">↻</span><div><strong>Actualizar resumen</strong><small>Obtener la información más reciente</small></div><span>→</span></button>
-          </article>
-        </section>
-
-      </ng-container>
+﻿<section class="welcome">
+  <div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div>
+  <a mat-flat-button *ngIf="!cargando() && !mensajeError() && lugaresDisponibles > 0" class="register-action" routerLink="/registro">＋ Registrar persona</a>
+</section>
+<mat-card *ngIf="mensajeError()" appearance="outlined" class="error" role="alert">
+  <mat-card-content class="notice">{{ mensajeError() }} <button mat-button type="button" (click)="cargarUsuarios()" [disabled]="cargando()">Reintentar</button></mat-card-content>
+</mat-card>
+<div *ngIf="cargando()" class="loading" role="status">
+  <p>Cargando información de tu comunidad…</p>
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando resumen"></mat-progress-bar>
+</div>
+<ng-container *ngIf="!cargando() && (!mensajeError() || resumen().total > 0)">
+  <mat-card *ngIf="lugaresDisponibles === 0" appearance="outlined" role="status" class="capacity-notice">
+    <mat-card-content>Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</mat-card-content>
+  </mat-card>
+  <section class="stats" aria-label="Resumen de registros">
+    <mat-card appearance="outlined" class="panel"><mat-card-content><span class="tile" aria-hidden="true">♙</span><p>Total de personas</p><strong class="stat-value">{{ resumen().total }}</strong><small>Registros en el sistema</small></mat-card-content></mat-card>
+    <mat-card appearance="outlined" class="panel"><mat-card-content><span class="tile green" aria-hidden="true">＠</span><p>Con correo electrónico</p><strong class="stat-value">{{ conEmail }}</strong><small>Personas con email registrado</small></mat-card-content></mat-card>
+    <mat-card appearance="outlined" class="panel"><mat-card-content><span class="tile orange" aria-hidden="true">☎</span><p>Con teléfono</p><strong class="stat-value">{{ conTelefono }}</strong><small>Personas con teléfono registrado</small></mat-card-content></mat-card>
+    <mat-card appearance="outlined" class="panel"><mat-card-content><span class="tile blue" aria-hidden="true">＋</span><p>Lugares disponibles</p><strong class="stat-value">{{ lugaresDisponibles }}</strong><small>Capacidad de 20 personas</small></mat-card-content></mat-card>
+  </section>
+  <section class="overview">
+    <mat-card appearance="outlined" class="panel distribution"><mat-card-content>
+      <h2>Tu comunidad por ocupación</h2><p class="muted">Las cinco ocupaciones con más registros</p>
+      <div *ngFor="let grupo of ocupaciones" class="bar-row">
+        <div><span>{{ grupo.nombre }}</span><strong>{{ grupo.cantidad }}</strong></div>
+        <mat-progress-bar mode="determinate" [value]="grupo.porcentaje" [attr.aria-label]="'Porcentaje de personas con ocupación ' + grupo.nombre"></mat-progress-bar>
+      </div>
+      <p *ngIf="!resumen().total" class="empty">El resumen aparecerá cuando registres a tu primera persona.</p>
+    </mat-card-content></mat-card>
+    <mat-card appearance="outlined" class="panel quick"><mat-card-content>
+      <h2>Acciones rápidas</h2><p class="muted">Lo que necesitas, a un clic</p>
+      <mat-nav-list aria-label="Acciones de personas">
+        <a mat-list-item *ngIf="lugaresDisponibles > 0" routerLink="/registro"><span matListItemIcon class="tile" aria-hidden="true">＋</span><span matListItemTitle>Nueva persona</span><span matListItemLine>Crear un registro completo</span><span matListItemMeta aria-hidden="true">→</span></a>
+        <a mat-list-item routerLink="/personas"><span matListItemIcon class="tile green" aria-hidden="true">♙</span><span matListItemTitle>Consultar personas</span><span matListItemLine>Busca, edita y gestiona contactos</span><span matListItemMeta aria-hidden="true">→</span></a>
+      </mat-nav-list>
+      <button mat-stroked-button type="button" class="refresh-action" (click)="cargarUsuarios()" [disabled]="cargando()">↻ Actualizar resumen</button>
+    </mat-card-content></mat-card>
+  </section>
+</ng-container>

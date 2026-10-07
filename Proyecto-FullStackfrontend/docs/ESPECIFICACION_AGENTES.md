@@ -16,8 +16,20 @@
 - `services/`: `PersonasService` consume formularios, contactos y catálogos; `AuthService` gestiona el inicio/cierre de sesión y vigencia JWT.
 - `interfaces/`: contratos TypeScript; `guards/` y `interceptors/`: control de navegación y solicitudes.
 - `app.config.ts` registra Router y HttpClient con `jwtInterceptor`.
+- `app.config.ts` registra `provideAnimations()` para preparar el motor antes de renderizar la entrada del login y los componentes Material; las pruebas de interacción pueden usar `provideNoopAnimations()`.
 
 ## Contratos y comportamiento
+
+- La integración de formularios Material conserva `provideAnimations()` para la entrada del login. La caché de contactos de 30 segundos se invalida al guardar personas/contactos compartidos; contactos y parentescos se limpian al cambiar de sesión.
+
+- El layout administrativo usa `mat-sidenav` con navegación `mat-nav-list` y un header `mat-toolbar`. En escritorio el menú permanece abierto; hasta 760 px se abre mediante un botón, superpuesto con fondo y cierre al navegar. Conserva la señal de la cuenta activa y el subapartado de edición.
+
+- Al navegar a `/registro/:id`, el menú muestra el subapartado activo «Editar persona» debajo de Personas, vinculado al ID actual. Registro solo se marca activo en `/registro` (alta); el subapartado desaparece al salir de la edición.
+
+- El dashboard usa tarjetas `mat-card`, acciones `mat-button`/`mat-flat-button`/`mat-stroked-button`, navegación rápida con `mat-nav-list` y barras `mat-progress-bar` para carga y distribución por ocupación. Conserva las señales y el resumen del backend, las acciones de reintento y el límite de 20 titulares.
+
+- El login utiliza Angular Material: `mat-form-field` con `matInput` para credenciales y errores, botón de contraseña con `matSuffix`, botón de envío `mat-flat-button` y `mat-spinner` durante la petición. Conserva `ngModel`, `AuthService` y el control de autocompletado al recibir foco.
+- El login anima cada elemento con `@angular/animations` al abrir o recargar, con retrasos separados por 120 ms. Si el navegador indica `prefers-reduced-motion: reduce`, conserva la secuencia con apariciones de 250 ms sin desplazamiento; en modo normal combina opacidad y desplazamiento.
 
 - El login inicia vacío con `autocomplete="off"` y campos de solo lectura hasta recibir foco (clic o teclado). Al enfocar cada campo habilita escritura y sugerencias de usuario o contraseña. El navegador o gestor de contraseñas puede ignorar estas indicaciones; no se borran valores elegidos por el usuario.
 

@@ -3,11 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { Resumen } from '../../interfaces/usuario.interface';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['../shared/admin-pages.css', './dashboard.component.css']
 })

@@ -56,6 +56,18 @@ class RegistroCompletoTest {
         ReflectionTestUtils.setField(service, "parentescoRepository", parentescos);
         ReflectionTestUtils.setField(service, "usuarioRepository", usuarios);
         when(personas.findById(anyLong())).thenAnswer(i -> Optional.ofNullable(guardadas.get(i.getArgument(0))));
+        when(personas.obtenerContactosDetallados(anyLong())).thenAnswer(i -> {
+            Persona titular = guardadas.get(i.getArgument(0));
+            if (titular == null || !titular.isTitular() || titular.getFechaBaja() != null) return List.of();
+            return titular.getContactosEmergencia().stream().map(relacion -> {
+                Persona contacto = relacion.getContacto();
+                return new Object[] { contacto.getId(), contacto.getNombre(), contacto.getApellido(),
+                    contacto.getFechaNacimiento(), contacto.getGenero(),
+                    String.join(String.valueOf((char) 31), contacto.getCorreos().stream().map(PersonaCorreo::getCorreo).toList()),
+                    String.join(String.valueOf((char) 31), contacto.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList()),
+                    relacion.getParentesco().getId(), relacion.getParentesco().getNombre() };
+            }).toList();
+        });
         parentesco.setId(9L);
         parentesco.setNombre("Amigo(a)");
         when(parentescos.findById(9L)).thenReturn(Optional.of(parentesco));

@@ -12,6 +12,28 @@ describe('PersonasService: consulta individual', () => {
     http = TestBed.inject(HttpTestingController);
   });
   afterEach(() => http.verify());
+  it('reutiliza contactos durante la navegación y limpia las cachés al cambiar de sesión', () => {
+    service.obtenerContactos(7).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/7/contactos').flush([{ idContacto: 3 }]);
+    service.obtenerParentescos().subscribe();
+    http.expectOne('http://localhost:8080/api/parentescos').flush([{ id: 9, nombre: 'Amigo' }]);
+    service.obtenerContactos(7).subscribe(contactos => expect(contactos[0].idContacto).toBe(3));
+    http.expectNone('http://localhost:8080/api/personas/7/contactos');
+    service.limpiarCacheSesion();
+    service.obtenerContactos(7).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/7/contactos').flush([]);
+    service.obtenerParentescos().subscribe();
+    http.expectOne('http://localhost:8080/api/parentescos').flush([]);
+  });
+
+  it('invalida otros titulares al editar los datos de un contacto compartido', () => {
+    service.obtenerContactos(8).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/8/contactos').flush([{ idContacto: 3 }]);
+    service.guardarContactos(7, [{ idContacto: 3, nombre: 'Nuevo' }]).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/7/contactos').flush({ ok: true });
+    service.obtenerContactos(8).subscribe();
+    http.expectOne('http://localhost:8080/api/personas/8/contactos').flush([{ idContacto: 3, nombre: 'Nuevo' }]);
+  });
   it('comparte peticiones simultaneas sin conservar datos despues', () => {
     service.obtenerPersonaPorId(7).subscribe();
     service.obtenerPersonaPorId(7).subscribe();

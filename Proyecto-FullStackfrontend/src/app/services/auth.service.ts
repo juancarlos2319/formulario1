@@ -109,6 +109,7 @@ export class AuthService {
     if (token && !this.hasValidStructure(token)) token = null;
     if (token === this.tokenSubject.value) return;
     this.cuentaActual.set(null);
+    this.registroService.limpiarCacheSesion();
     this.revisionCuenta++;
     this.consultaCuenta = undefined;
     this.tokenSubject.next(token);

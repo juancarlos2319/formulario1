@@ -2,3 +2,34 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
 body { margin: 0; }
+
+/* Desplazamiento de las vistas y del menu administrativo Material. */
+app-admin-layout .mat-drawer-content,
+app-admin-layout .mat-drawer-inner-container {
+  scrollbar-width: thin;
+  scrollbar-color: #aa92d9 #f5f1fa;
+}
+
+app-admin-layout .mat-drawer-content::-webkit-scrollbar,
+app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+app-admin-layout .mat-drawer-content::-webkit-scrollbar-track,
+app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-track {
+  background: #f5f1fa;
+  border-radius: 12px;
+}
+
+app-admin-layout .mat-drawer-content::-webkit-scrollbar-thumb,
+app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb {
+  background: #aa92d9;
+  border: 2px solid #f5f1fa;
+  border-radius: 12px;
+}
+
+app-admin-layout .mat-drawer-content::-webkit-scrollbar-thumb:hover,
+app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb:hover {
+  background: #795ac5;
+}

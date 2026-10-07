@@ -1,14 +1,26 @@
-<app-sidebar></app-sidebar>
-<div class="main">
-  <header><span>Mi espacio <span class="muted">/ {{ titulo }}</span></span><div class="account">
-      <section class="account-data">
-        <strong>{{ usuarioActual()?.nombre || 'Cuenta' }}</strong>
-        <small *ngIf="usuarioActual()?.correo">{{ usuarioActual()?.correo }}</small>
-        <small *ngIf="cargandoCuenta()" role="status">Cargando cuenta...</small>
-        <small *ngIf="errorCuenta()" role="alert">No se pudieron cargar tus datos.</small>
-      </section>
-      <a class="editar-cuenta" routerLink="/cuenta">Editar cuenta</a>
-    </div></header>
-  <main><router-outlet></router-outlet></main>
-  <footer>PortalSystem · Administración de personas</footer>
-</div>
+﻿<mat-sidenav-container class="layout">
+  <mat-sidenav #menu id="menu-principal" class="side" [mode]="esMovil() ? 'over' : 'side'" [opened]="!esMovil()" [autoFocus]="esMovil()" aria-label="Menú principal">
+    <app-sidebar (navegacion)="esMovil() && menu.close()"></app-sidebar>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="main">
+      <header>
+        <mat-toolbar class="header-toolbar">
+          <button mat-icon-button *ngIf="esMovil()" type="button" class="menu-toggle" (click)="menu.toggle()" aria-label="Abrir menú principal" aria-controls="menu-principal" [attr.aria-expanded]="menu.opened"><span aria-hidden="true">☰</span></button>
+          <span class="page-title">Mi espacio <span class="muted">/ {{ titulo }}</span></span>
+          <div class="account">
+            <section class="account-data">
+              <strong>{{ usuarioActual()?.nombre || 'Cuenta' }}</strong>
+              <small *ngIf="usuarioActual()?.correo">{{ usuarioActual()?.correo }}</small>
+              <small *ngIf="cargandoCuenta()" role="status">Cargando cuenta...</small>
+              <small *ngIf="errorCuenta()" role="alert">No se pudieron cargar tus datos.</small>
+            </section>
+            <a mat-stroked-button class="editar-cuenta" routerLink="/cuenta">Editar cuenta</a>
+          </div>
+        </mat-toolbar>
+      </header>
+      <main><router-outlet></router-outlet></main>
+      <footer>PortalSystem · Administración de personas</footer>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
