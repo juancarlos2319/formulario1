@@ -30,6 +30,28 @@ export class SidebarComponent {
       ? segmentos[1].path : null;
   });
 
+  readonly personaContactadaId = computed(() => {
+    const segmentos = this.router.parseUrl(this.urlActual()).root.children[PRIMARY_OUTLET]?.segments ?? [];
+    if (segmentos[0]?.path !== 'contactos' || !/^\d+$/.test(segmentos[1]?.path ?? '')) return null;
+    const rutaLista = segmentos.length === 2;
+    const rutaAgregar = segmentos.length === 3 && segmentos[2].path === 'agregar';
+    const rutaEditar = segmentos.length === 4 && segmentos[2].path === 'editar' && /^\d+$/.test(segmentos[3].path);
+    return rutaLista || rutaAgregar || rutaEditar ? segmentos[1].path : null;
+  });
+
+  readonly contactoEditado = computed(() => {
+    const segmentos = this.router.parseUrl(this.urlActual()).root.children[PRIMARY_OUTLET]?.segments ?? [];
+    if (segmentos.length !== 4 || segmentos[0].path !== 'contactos' || segmentos[2].path !== 'editar' ||
+        !/^\d+$/.test(segmentos[1].path) || !/^\d+$/.test(segmentos[3].path)) return null;
+    return { personaId: segmentos[1].path, contactoId: segmentos[3].path };
+  });
+
+  readonly personaAgregandoContactoId = computed(() => {
+    const segmentos = this.router.parseUrl(this.urlActual()).root.children[PRIMARY_OUTLET]?.segments ?? [];
+    return segmentos.length === 3 && segmentos[0].path === 'contactos' && segmentos[2].path === 'agregar' && /^\d+$/.test(segmentos[1].path)
+      ? segmentos[1].path : null;
+  });
+
   logout(): void {
     this.navegacion.emit();
     this.authService.logout();

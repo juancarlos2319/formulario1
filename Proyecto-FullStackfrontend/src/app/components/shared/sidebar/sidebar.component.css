@@ -16,6 +16,7 @@ mat-nav-list a:hover:not(.active){background:#f0eafb;border-color:#e8dff5}
 .nav-icon{display:grid;place-items:center;width:28px;height:28px;margin-left:12px;margin-right:14px}
 mat-nav-list a.active{background:linear-gradient(110deg,#7659dd,#674bc8);border-color:#7355d0;box-shadow:0 5px 12px #7155d921;--mdc-list-list-item-label-text-color:#fff;--mdc-list-list-item-leading-icon-color:#fff;--mdc-list-list-item-hover-label-text-color:#fff;--mdc-list-list-item-focus-label-text-color:#fff;--mdc-list-list-item-hover-leading-icon-color:#fff;--mdc-list-list-item-focus-leading-icon-color:#fff}
 mat-nav-list a.sub-item{margin-left:18px;width:calc(100% - 18px);border-left:2px solid #b19bdc;border-radius:0 10px 10px 0;--mdc-list-list-item-label-text-size:12px;--mdc-list-list-item-one-line-container-height:44px}
+mat-nav-list a.sub-item.nested-item{margin-left:34px;width:calc(100% - 34px);--mdc-list-list-item-one-line-container-height:40px}
 mat-nav-list a.sub-item.active{background:#eee6fb;box-shadow:none;border-color:transparent;border-left-color:#795bcc;--mdc-list-list-item-label-text-color:#6248ab;--mdc-list-list-item-leading-icon-color:#6248ab;--mdc-list-list-item-hover-label-text-color:#6248ab;--mdc-list-list-item-focus-label-text-color:#6248ab;--mdc-list-list-item-hover-leading-icon-color:#6248ab;--mdc-list-list-item-focus-leading-icon-color:#6248ab}
 .session{margin-top:auto;padding-top:24px}
 .session-label{display:block;margin-bottom:12px}
