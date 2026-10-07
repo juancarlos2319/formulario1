@@ -26,7 +26,7 @@ El puerto predeterminado es 8080. Los SQL no se ejecutan automáticamente con la
 
 ## Autenticación
 
-POST `/api/auth/login` compara usuario y BCrypt, y devuelve `message`, `username`, `token` y `usuarioActual` (solo `nombre` completo y `correo` principal de la persona vinculada a la cuenta). El frontend conserva esos datos en memoria durante la sesión para mostrar el header sin consultar por cada navegación; al recargar recupera una sola vez la cuenta con `GET /api/auth/me`. Al cerrar o cambiar de sesión limpia los datos anteriores. Los **tokens nuevos duran una hora** (3600000 ms). Los tokens ya emitidos conservan su vencimiento original.
+POST `/api/auth/login` compara usuario y BCrypt, y devuelve `message`, `username` y `token`. Los **tokens nuevos duran una hora** (3600000 ms). Los tokens ya emitidos conservan su vencimiento original.
 
 Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, registrado en `SecurityConfig`, verifica el JWT y establece la identidad en `SecurityContextHolder`; Spring Security exige autenticación para las rutas protegidas. Solo `POST /api/auth/login` es público. CORS se gestiona con Spring Security y `@CrossOrigin` en los controladores. El login no comprueba rol ni baja de la cuenta; devuelve 404 si no existe usuario y 401 si la contraseña no coincide.
 
