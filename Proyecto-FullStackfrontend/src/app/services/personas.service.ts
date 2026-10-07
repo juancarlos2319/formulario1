@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, catchError, throwError, finalize, shareReplay } from 'rxjs';
+import { Observable, Subject, catchError, throwError, finalize, shareReplay, tap } from 'rxjs';
 import { Usuario, PersonaResumen, Resultado, Resumen } from '../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergencia.interface';
 
@@ -8,6 +8,8 @@ import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergenci
   providedIn: 'root'
 })
 export class PersonasService {
+  private readonly cambiosPersonales = new Subject<void>();
+  readonly datosPersonalesActualizados$ = this.cambiosPersonales.asObservable();
   private readonly borradorKey = 'registro_borrador';
   // Borrador en memoria: no se persiste hasta completar ambos pasos.
   borrador: Usuario | null = null;
@@ -72,7 +74,8 @@ export class PersonasService {
 
   guardarContactos(id: number, contactos: ContactoEmergencia[]): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('guardar los contactos')));
+      .pipe(tap(resultado => { if (resultado.ok) this.cambiosPersonales.next(); }),
+        catchError(this.manejarError('guardar los contactos')));
   }
 
   crearPersona(datos: Usuario): Observable<Resultado> {
@@ -101,7 +104,8 @@ export class PersonasService {
 
   actualizarPersona(id: number, datos: Usuario): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('actualizar el formulario')));
+      .pipe(tap(resultado => { if (resultado.ok) this.cambiosPersonales.next(); }),
+        catchError(this.manejarError('actualizar el formulario')));
   }
 
   eliminarPersona(id: number): Observable<void> {
