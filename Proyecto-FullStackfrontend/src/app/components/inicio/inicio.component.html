@@ -16,15 +16,15 @@
       <span class="eyebrow">BIENVENIDO DE NUEVO</span>
       <h2 id="login-title">Inicia sesión</h2>
       <p class="description">Ingresa tus credenciales para acceder a tu panel de administración.</p>
-      <form #loginForm="ngForm" (ngSubmit)="onLogin()" [attr.aria-busy]="isLoading">
+      <form #loginForm="ngForm" (ngSubmit)="onLogin()" autocomplete="off" [attr.aria-busy]="isLoading">
         <div class="field">
           <label for="username">Usuario</label>
-          <input id="username" name="username" [(ngModel)]="credentials.username" placeholder="Escribe tu usuario" autocomplete="username" autocapitalize="none" spellcheck="false" required [readOnly]="isLoading">
+          <input id="username" name="username" [(ngModel)]="credentials.username" placeholder="Escribe tu usuario" [attr.autocomplete]="usuarioActivado ? 'username' : 'off'" (focus)="usuarioActivado = true" autocapitalize="none" spellcheck="false" required [readOnly]="isLoading || !usuarioActivado">
         </div>
         <div class="field">
           <label for="password">Contraseña</label>
           <div class="password-field">
-            <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password" placeholder="Escribe tu contraseña" autocomplete="current-password" required [readOnly]="isLoading">
+            <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password" placeholder="Escribe tu contraseña" [attr.autocomplete]="passwordActivado ? 'current-password' : 'off'" (focus)="passwordActivado = true" required [readOnly]="isLoading || !passwordActivado">
             <button class="password-toggle" type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showPassword">{{ showPassword ? 'Ocultar' : 'Mostrar' }}</button>
           </div>
         </div>

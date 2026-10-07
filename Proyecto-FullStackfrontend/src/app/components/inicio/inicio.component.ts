@@ -16,6 +16,8 @@ export class InicioComponent {
   credentials = { username: '', password: '' };
   errorMessage = '';
   showPassword = false;
+  usuarioActivado = false;
+  passwordActivado = false;
   isLoading = false;
 
   constructor(private authService: AuthService, private router: Router) {}

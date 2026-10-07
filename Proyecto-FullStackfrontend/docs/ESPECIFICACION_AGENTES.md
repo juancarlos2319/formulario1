@@ -19,6 +19,8 @@
 
 ## Contratos y comportamiento
 
+- El login inicia vacío con `autocomplete="off"` y campos de solo lectura hasta recibir foco (clic o teclado). Al enfocar cada campo habilita escritura y sugerencias de usuario o contraseña. El navegador o gestor de contraseñas puede ignorar estas indicaciones; no se borran valores elegidos por el usuario.
+
 - Prefijos actuales: `/api/auth/login`, `/api/personas`, `/api/ocupaciones`, `/api/parentescos`.
 - `/contactos/:id` lista los datos de contacto; editar un vínculo abre `/contactos/:id/editar/:contactoId` y agregar uno usa `/contactos/:id/agregar`.
 - Las rutas protegidas requieren `Authorization: Bearer <token>`; el login devuelve un objeto con `token` y `username`.
