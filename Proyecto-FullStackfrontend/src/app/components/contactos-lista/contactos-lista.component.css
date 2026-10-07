@@ -1,13 +1,23 @@
-.table-heading{padding:22px}
-.table-wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;text-align:left;font-size:12px;min-width:900px}
-th{background:#faf9fc;color:#918a9e;font-size:9px;letter-spacing:.6px}
-th,td{padding:14px;border-bottom:1px solid #f0edf5;vertical-align:middle}
-.person{display:flex;align-items:center;gap:10px;min-width:170px;white-space:nowrap}
-.edit-link{display:inline-block;border:1px solid #e9e3f2;background:#faf8fe;color:#7155b8;border-radius:7px;padding:8px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.contacts-panel{overflow:hidden}
+.table-heading{padding:22px 28px 14px}
+.table-heading mat-card-title{color:#302a42;font:700 16px 'Manrope',sans-serif}
+.table-heading mat-card-subtitle{margin-top:8px;color:#928a9d;font:12px 'DM Sans',sans-serif}
+.table-wrap{padding:0!important;overflow-x:auto}
+.contacts-table{width:100%;min-width:900px;background:white}
+.contacts-table th{background:#faf9fc;color:#918a9e;font:700 10px 'DM Sans',sans-serif;letter-spacing:.6px;text-transform:uppercase}
+.contacts-table td{color:#302a42;font:12px 'DM Sans',sans-serif}
+.contacts-table th,.contacts-table td{border-bottom-color:#f0edf5;padding:12px 16px;white-space:nowrap}
+.person{display:flex;align-items:center;gap:10px;min-width:170px}
+.person strong{font-weight:600}
 .welcome-actions{display:flex;align-items:center;gap:10px}
-.secondary,.primary{padding:12px 15px;border-radius:8px;white-space:nowrap;font-weight:600;font-size:12px}
-.secondary{border:1px solid #e9e3f2;background:#fff;color:#7155b8}
-.primary{background:#7155d9;color:white}
-@media(max-width:760px){.welcome-actions{width:100%;flex-direction:column;align-items:stretch}.welcome-actions>a{text-align:center}}
-.remove-contact{margin-left:8px;padding:8px 10px;border:1px solid #f0d9d9;border-radius:7px;background:#fffafa;color:#a83d48;cursor:pointer}.remove-contact:disabled{opacity:.5;cursor:not-allowed}
+.welcome-actions a{min-height:44px;border-radius:8px;font:600 12px 'DM Sans',sans-serif}
+.add-contact{background:#7155d9!important;color:#fff!important}
+.edit-link{border-color:#e9e3f2!important;background:#faf8fe!important;color:#7155b8!important;font:600 11px 'DM Sans',sans-serif}
+.actions-cell{display:flex;align-items:center;gap:8px}
+.remove-contact{border-color:#f0d9d9!important;background:#fffafa!important;color:#a83d48!important;font:600 11px 'DM Sans',sans-serif}
+.empty{padding:30px;text-align:center;color:#82748b}
+.empty h3{margin:0 0 8px;color:#302a42;font:700 15px 'Manrope',sans-serif}
+.empty p{margin:0;font-size:12px}
+mat-progress-bar{margin:0 0 16px;border-radius:8px;overflow:hidden;--mdc-linear-progress-active-indicator-color:#7155d9;--mdc-linear-progress-track-color:#eee9fc}
+.notice button{height:36px;font:600 12px 'DM Sans',sans-serif}
+@media(max-width:760px){.welcome-actions{width:100%;flex-direction:column;align-items:stretch}.welcome-actions a{text-align:center}.table-heading{padding:18px}.contacts-table th,.contacts-table td{padding:10px 12px}}

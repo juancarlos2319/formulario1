@@ -50,6 +50,8 @@ export class PersonasService {
 
   private http = inject(HttpClient);
   private solicitudes = new Map<string, Observable<unknown>>();
+  private parentescosCache?: Observable<Parentesco[]>;
+  private contactosCache = new Map<number, { respuesta: Observable<ContactoEmergencia[]>; expira: number }>();
   private apiUrl = 'http://localhost:8080/api/personas';
 
   // 1. Método auxiliar para adjuntar el token en cada petición
@@ -63,8 +65,18 @@ export class PersonasService {
   // 2. Se inyecta { headers: this.getHeaders() } en todas las rutas protegidas
 
   obtenerContactos(id: number): Observable<ContactoEmergencia[]> {
-    return this.http.get<ContactoEmergencia[]>(`${this.apiUrl}/${id}/contactos`, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener los contactos')));
+    const cache = this.contactosCache.get(id);
+    if (cache && cache.expira > Date.now()) return cache.respuesta;
+
+    const respuesta = this.http.get<ContactoEmergencia[]>(`${this.apiUrl}/${id}/contactos`, { headers: this.getHeaders() }).pipe(
+      catchError(error => {
+        this.contactosCache.delete(id);
+        return this.manejarError('obtener los contactos')(error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+    this.contactosCache.set(id, { respuesta, expira: Date.now() + 30_000 });
+    return respuesta;
   }
 
   buscarContactos(datos: { correos?: string[]; telefonos?: string[]; excluirId?: number }): Observable<ContactoEmergencia[]> {
@@ -74,7 +86,12 @@ export class PersonasService {
 
   guardarContactos(id: number, contactos: ContactoEmergencia[]): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}/contactos`, contactos, { headers: this.getHeaders() })
-      .pipe(tap(resultado => { if (resultado.ok) this.cambiosPersonales.next(); }),
+      .pipe(tap(resultado => {
+        if (resultado.ok) {
+          this.contactosCache.delete(id);
+          this.cambiosPersonales.next();
+        }
+      }),
         catchError(this.manejarError('guardar los contactos')));
   }
 
@@ -118,8 +135,16 @@ export class PersonasService {
   }
 
   obtenerParentescos(): Observable<Parentesco[]> {
-    return this.http.get<Parentesco[]>('http://localhost:8080/api/parentescos', { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener los parentescos')));
+    if (!this.parentescosCache) {
+      this.parentescosCache = this.http.get<Parentesco[]>('http://localhost:8080/api/parentescos', { headers: this.getHeaders() }).pipe(
+        catchError(error => {
+          this.parentescosCache = undefined;
+          return this.manejarError('obtener los parentescos')(error);
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    }
+    return this.parentescosCache;
   }
 
   obtenerResumen(): Observable<Resumen> {

@@ -1,22 +1,100 @@
-<section class="welcome"><div><p class="eyebrow">TU COMUNIDAD</p><h1>Personas registradas</h1><p>Busca, consulta y actualiza los datos de tu comunidad.</p></div><div class="welcome-actions"><a class="secondary" routerLink="/personas/desactivadas">Ver desactivadas</a><a *ngIf="!cargando() && !mensajeError() && usuarios().length < 20" class="primary" routerLink="/registro">＋ Registrar persona</a></div></section>
-      <div *ngIf="mensajeError()" class="notice error" role="alert">{{ mensajeError() }} <button type="button" (click)="cargarUsuarios()" [disabled]="cargando() || eliminando() !== null">Reintentar</button></div>
-      <div *ngIf="cargando()" class="notice" role="status">Cargando personas…</div>
-      <ng-container *ngIf="!cargando() && (!mensajeError() || usuarios().length > 0)">
-        <div *ngIf="usuarios().length >= 20" class="notice" role="status">Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</div>
-        <section class="panel people" id="personas" aria-labelledby="people-title">
-          <div class="table-heading"><div><h2 id="people-title">Personas registradas</h2><p class="muted">{{ usuariosFiltrados.length }} de {{ usuarios().length }} registros</p></div><label class="search"><span class="sr-only">Buscar personas</span><input type="search" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" placeholder="Buscar nombre, email, teléfono…" aria-label="Buscar por nombre, correo, teléfono, ocupación o ciudad"></label></div>
-          <div class="table-wrap" *ngIf="usuariosFiltrados.length">
-            <table><thead><tr><th scope="col">PERSONA</th><th scope="col">TELÉFONO</th><th scope="col">OCUPACIÓN</th><th scope="col">CIUDAD</th><th scope="col">ACCIONES</th></tr></thead>
-              <tbody><ng-container *ngFor="let u of usuariosFiltrados">
-                <tr><td><div class="person"><span class="avatar">{{ obtenerIniciales(u.nombre,u.apellido) }}</span><div><strong>{{ u.nombre }} {{ u.apellido }}</strong><small>{{ u.correos.join(', ') || 'Sin correo' }}</small></div></div></td><td>{{ u.telefonos.join(', ') || 'Sin teléfono' }}</td><td>{{ u.ocupacion || 'Sin ocupación' }}</td><td>{{ u.ciudad || 'Sin ciudad' }}</td>
-                  <td><div class="row-actions"><button type="button" (click)="verDetalle(u)" [attr.aria-expanded]="detalleId() === u.id" [attr.aria-label]="'Ver detalles de ' + u.nombre">Detalles</button><a *ngIf="u.id != null" [routerLink]="['/registro',u.id]">Editar</a><a *ngIf="u.id != null" [routerLink]="['/contactos',u.id]">Contactos</a><button type="button" class="danger" (click)="eliminar(u.id)" [disabled]="u.id == null || u.puedeEliminar !== true || eliminando() !== null" [attr.title]="u.puedeEliminar === false ? 'Las cuentas administradoras no pueden darse de baja' : null" [attr.aria-label]="'Eliminar a ' + u.nombre">{{ eliminando() === u.id ? 'Eliminando…' : 'Eliminar' }}</button></div></td></tr>
-                <tr *ngIf="detalleId() === u.id"><td colspan="5" class="details">
-                  <p *ngIf="cargandoDetalle()" role="status">Cargando detalles...</p>
-                  <dl *ngIf="detalle() as datos"><div><dt>Direcciones</dt><dd><div *ngFor="let direccion of datos.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</div><span *ngIf="!datos.direcciones?.length">{{ datos.direccion || 'No registrada' }}</span></dd></div><div><dt>Género</dt><dd>{{ datos.genero || 'No registrado' }}</dd></div><div><dt>Fecha de nacimiento</dt><dd>{{ datos.fechaNacimiento || 'No registrada' }}</dd></div></dl>
-                </td></tr>
-              </ng-container></tbody>
-            </table>
+<section class="welcome">
+  <div>
+    <p class="eyebrow">TU COMUNIDAD</p>
+    <h1>Personas registradas</h1>
+    <p>Busca, consulta y actualiza los datos de tu comunidad.</p>
+  </div>
+  <div class="welcome-actions">
+    <a mat-stroked-button routerLink="/personas/desactivadas">Ver desactivadas</a>
+    <a *ngIf="!cargando() && !mensajeError() && usuarios().length < 20" mat-flat-button class="add-person" routerLink="/registro">+ Registrar persona</a>
+  </div>
+</section>
+
+<div *ngIf="mensajeError()" class="notice error" role="alert">
+  {{ mensajeError() }}
+  <button mat-button type="button" (click)="cargarUsuarios()" [disabled]="cargando() || eliminando() !== null">Reintentar</button>
+</div>
+<mat-progress-bar *ngIf="cargando()" mode="indeterminate" aria-label="Cargando personas"></mat-progress-bar>
+
+<div *ngIf="!cargando() && usuarios().length >= 20" class="notice" role="status">
+  Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.
+</div>
+
+<mat-card *ngIf="!cargando() && (!mensajeError() || usuarios().length > 0)" class="panel people" id="personas" aria-labelledby="people-title">
+  <mat-card-header class="table-heading">
+    <div class="heading-copy">
+      <mat-card-title id="people-title">Personas registradas</mat-card-title>
+      <mat-card-subtitle>{{ usuariosFiltrados.length }} de {{ usuarios().length }} registros</mat-card-subtitle>
+    </div>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+      <mat-label>Buscar personas</mat-label>
+      <input matInput type="search" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)"
+        placeholder="Nombre, correo, teléfono, ocupación o ciudad" aria-label="Buscar personas">
+    </mat-form-field>
+  </mat-card-header>
+
+  <mat-card-content class="table-wrap" *ngIf="usuariosFiltrados.length">
+    <table mat-table [dataSource]="usuariosFiltrados" multiTemplateDataRows class="people-table">
+      <ng-container matColumnDef="persona">
+        <th mat-header-cell *matHeaderCellDef scope="col">Persona</th>
+        <td mat-cell *matCellDef="let u">
+          <div class="person">
+            <span class="avatar">{{ obtenerIniciales(u.nombre, u.apellido) }}</span>
+            <div><strong>{{ u.nombre }} {{ u.apellido }}</strong><small>{{ u.correos.join(', ') || 'Sin correo' }}</small></div>
           </div>
-          <div *ngIf="!usuariosFiltrados.length" class="empty"><h3>{{ usuarios().length ? 'No encontramos coincidencias' : 'Tu comunidad empieza aquí' }}</h3><p>{{ usuarios().length ? 'Prueba con otro nombre, teléfono o correo.' : 'Registra a tu primera persona para comenzar.' }}</p><button *ngIf="busqueda()" type="button" (click)="busqueda.set('')">Limpiar búsqueda</button></div>
-        </section>
+        </td>
       </ng-container>
+
+      <ng-container matColumnDef="telefono">
+        <th mat-header-cell *matHeaderCellDef scope="col">Teléfono</th>
+        <td mat-cell *matCellDef="let u">{{ u.telefonos.join(', ') || 'Sin teléfono' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ocupacion">
+        <th mat-header-cell *matHeaderCellDef scope="col">Ocupación</th>
+        <td mat-cell *matCellDef="let u">{{ u.ocupacion || 'Sin ocupación' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ciudad">
+        <th mat-header-cell *matHeaderCellDef scope="col">Ciudad</th>
+        <td mat-cell *matCellDef="let u">{{ u.ciudad || 'Sin ciudad' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef scope="col">Acciones</th>
+        <td mat-cell *matCellDef="let u">
+          <div class="row-actions">
+            <button mat-stroked-button type="button" (click)="verDetalle(u)" [attr.aria-expanded]="detalleId() === u.id" [attr.aria-label]="'Ver detalles de ' + u.nombre">Detalles</button>
+            <a *ngIf="u.id != null" mat-stroked-button [routerLink]="['/registro', u.id]">Editar</a>
+            <a *ngIf="u.id != null" mat-stroked-button [routerLink]="['/contactos', u.id]">Contactos</a>
+            <button mat-stroked-button type="button" class="danger" (click)="eliminar(u.id)"
+              [disabled]="u.id == null || u.puedeEliminar !== true || eliminando() !== null"
+              [attr.title]="u.puedeEliminar === false ? 'Las cuentas administradoras no pueden darse de baja' : null"
+              [attr.aria-label]="'Dar de baja a ' + u.nombre">{{ eliminando() === u.id ? 'Procesando…' : 'Dar de baja' }}</button>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="detalle">
+        <td mat-cell *matCellDef="let u" [attr.colspan]="columnas.length" class="details">
+          <mat-progress-bar *ngIf="cargandoDetalle() && detalleId() === u.id" mode="indeterminate" aria-label="Cargando detalles"></mat-progress-bar>
+          <dl *ngIf="detalle() as datos">
+            <div><dt>Direcciones</dt><dd><div *ngFor="let direccion of datos.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</div><span *ngIf="!datos.direcciones?.length">{{ datos.direccion || 'No registrada' }}</span></dd></div>
+            <div><dt>Género</dt><dd>{{ datos.genero || 'No registrado' }}</dd></div>
+            <div><dt>Fecha de nacimiento</dt><dd>{{ datos.fechaNacimiento || 'No registrada' }}</dd></div>
+          </dl>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnaDetalle; when: esFilaDetalle" class="details-row"></tr>
+    </table>
+  </mat-card-content>
+
+  <mat-card-content *ngIf="!usuariosFiltrados.length" class="empty">
+    <h3>{{ usuarios().length ? 'No encontramos coincidencias' : 'Tu comunidad empieza aquí' }}</h3>
+    <p>{{ usuarios().length ? 'Prueba con otro nombre, teléfono o correo.' : 'Registra a tu primera persona para comenzar.' }}</p>
+    <button *ngIf="busqueda()" mat-stroked-button type="button" (click)="busqueda.set('')">Limpiar búsqueda</button>
+  </mat-card-content>
+</mat-card>

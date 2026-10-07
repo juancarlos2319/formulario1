@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, ValidationErrors, FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 @Component({
   selector: 'app-contactos',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
   templateUrl: './contactos.component.html',
   styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
@@ -327,6 +328,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
 
   cargarContactos(): void {
     if (this.cargandoContactos()) return;
+    this.iniciarMedicionRender();
     this.cargandoContactos.set(true);
     this.contactosCargados.set(false);
     this.mensajeError.set('');
@@ -350,6 +352,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
             this.agregarContacto();
           }
           this.contactosCargados.set(true);
+          this.finalizarMedicionRender();
         },
         error: (err) => {
           this.cargandoContactos.set(false);
@@ -357,6 +360,24 @@ export class ContactosComponent implements OnInit, OnDestroy {
           this.mensajeError.set(err instanceof Error ? err.message : 'No se pudieron cargar los contactos.');
         }
       });
+  }
+
+  private iniciarMedicionRender(): void {
+    performance.clearMarks('contactos-carga-inicio');
+    performance.clearMarks('contactos-carga-pintado');
+    performance.clearMeasures('contactos-carga-visible');
+    performance.mark('contactos-carga-inicio');
+  }
+
+  private finalizarMedicionRender(): void {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      performance.mark('contactos-carga-pintado');
+      performance.measure('contactos-carga-visible', 'contactos-carga-inicio', 'contactos-carga-pintado');
+      if (performance.getEntriesByName('contactos-navegacion-inicio', 'mark').length) {
+        performance.mark('contactos-navegacion-visible');
+        performance.measure('contactos-navegacion-total', 'contactos-navegacion-inicio', 'contactos-navegacion-visible');
+      }
+    }));
   }
 
   async guardarContactos(): Promise<void> {

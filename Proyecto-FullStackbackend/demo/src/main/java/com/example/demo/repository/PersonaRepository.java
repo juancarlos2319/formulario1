@@ -11,6 +11,23 @@ import java.util.List;
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
     @Query(value = """
+        SELECT contacto.id, contacto.nombre, contacto.apellido, contacto.fecha_nacimiento, contacto.genero,
+          COALESCE((SELECT string_agg(c.correo, chr(31) ORDER BY c.id)
+                    FROM persona_correo c WHERE c.id_persona = contacto.id), '') AS correos,
+          COALESCE((SELECT string_agg(t.telefono, chr(31) ORDER BY t.id)
+                    FROM persona_telefono t WHERE t.id_persona = contacto.id), '') AS telefonos,
+          relacion.id_parentesco, parentesco.nombre
+        FROM persona titular
+        JOIN perfil_titular perfil ON perfil.id_persona = titular.id AND perfil.fecha_baja IS NULL
+        JOIN persona_contacto_emergencia relacion ON relacion.id_persona = titular.id
+        JOIN persona contacto ON contacto.id = relacion.id_contacto
+        JOIN catalogo_parentesco parentesco ON parentesco.id = relacion.id_parentesco
+        WHERE titular.id = :id
+        ORDER BY relacion.id
+        """, nativeQuery = true)
+    List<Object[]> obtenerContactosDetallados(@Param("id") Long id);
+
+    @Query(value = """
         SELECT count(*),
           count(*) FILTER (WHERE EXISTS (SELECT 1 FROM persona_correo c WHERE c.id_persona = t.id_persona)),
           count(*) FILTER (WHERE EXISTS (SELECT 1 FROM persona_telefono f WHERE f.id_persona = t.id_persona))

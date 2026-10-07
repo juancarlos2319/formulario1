@@ -5,11 +5,15 @@ import { PersonasService } from '../../services/personas.service';
 import { ContactoEmergencia } from '../../interfaces/contacto-emergencia.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 import { firstValueFrom } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-contactos-lista',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatButtonModule, MatCardModule, MatProgressBarModule, MatTableModule],
   templateUrl: './contactos-lista.component.html',
   styleUrls: ['../shared/admin-pages.css', './contactos-lista.component.css']
 })
@@ -23,6 +27,7 @@ export class ContactosListaComponent implements OnInit {
   readonly cargando = signal(true);
   readonly mensajeError = signal('');
   readonly quitando = signal(false);
+  readonly columnas = ['contacto', 'telefono', 'correo', 'fechaNacimiento', 'genero', 'parentesco', 'acciones'];
 
   ngOnInit(): void {
     this.personaId = Number(this.route.snapshot.paramMap.get('id'));
@@ -43,6 +48,13 @@ export class ContactosListaComponent implements OnInit {
         this.cargando.set(false);
       }
     });
+  }
+
+  marcarInicioEdicion(): void {
+    performance.clearMarks('contactos-navegacion-inicio');
+    performance.clearMarks('contactos-navegacion-visible');
+    performance.clearMeasures('contactos-navegacion-total');
+    performance.mark('contactos-navegacion-inicio');
   }
 
   async quitarContacto(contacto: ContactoEmergencia): Promise<void> {

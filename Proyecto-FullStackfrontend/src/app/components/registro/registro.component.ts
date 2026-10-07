@@ -5,11 +5,17 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { CodigoPostalService } from '../../services/codigo-postal.service';
 import { FeedbackService } from '../shared/feedback/feedback.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatSelectModule],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css']
 })

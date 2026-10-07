@@ -5,11 +5,17 @@ import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { Usuario, PersonaResumen } from '../../interfaces/usuario.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-personas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
   templateUrl: './personas.component.html',
   styleUrls: ['../shared/admin-pages.css', './personas.component.css']
 })
@@ -24,6 +30,10 @@ export class PersonasComponent implements OnInit {
   readonly detalle = signal<Usuario | null>(null);
   readonly detalleId = signal<number | null>(null);
   readonly cargandoDetalle = signal(false);
+  readonly columnas = ['persona', 'telefono', 'ocupacion', 'ciudad', 'acciones'];
+  readonly columnaDetalle = ['detalle'];
+
+  esFilaDetalle = (_indice: number, persona: PersonaResumen): boolean => this.detalleId() === persona.id;
 
   get usuariosFiltrados(): PersonaResumen[] {
     const texto = this.normalizar(this.busqueda().trim());

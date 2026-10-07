@@ -5,62 +5,80 @@
     <p>Consulta la información de cada contacto y administra sus vínculos.</p>
   </div>
   <div class="welcome-actions">
-    <a class="secondary" routerLink="/personas">Volver a personas</a>
-    <a class="primary" [routerLink]="['/contactos', personaId, 'agregar']">＋ Agregar contacto</a>
+    <a mat-stroked-button routerLink="/personas">Volver a personas</a>
+    <a mat-flat-button class="add-contact" [routerLink]="['/contactos', personaId, 'agregar']">+ Agregar contacto</a>
   </div>
 </section>
 
 <div *ngIf="mensajeError()" class="notice error" role="alert">
   {{ mensajeError() }}
-  <button type="button" (click)="cargarContactos()" [disabled]="cargando()">Reintentar</button>
+  <button mat-button type="button" (click)="cargarContactos()" [disabled]="cargando()">Reintentar</button>
 </div>
-<div *ngIf="cargando()" class="notice" role="status">Cargando contactos…</div>
 
-<section *ngIf="!cargando() && (!mensajeError() || contactos().length > 0)" class="panel contacts-panel" aria-labelledby="contacts-title">
-  <div class="table-heading">
-    <div>
-      <h2 id="contacts-title">Lista de contactos</h2>
-      <p class="muted">{{ contactos().length }} registros</p>
-    </div>
-  </div>
+<mat-progress-bar *ngIf="cargando()" mode="indeterminate" aria-label="Cargando contactos"></mat-progress-bar>
 
-  <div class="table-wrap" *ngIf="contactos().length">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">CONTACTO</th>
-          <th scope="col">TELÉFONO</th>
-          <th scope="col">CORREO</th>
-          <th scope="col">FECHA DE NACIMIENTO</th>
-          <th scope="col">GÉNERO</th>
-          <th scope="col">PARENTESCO</th>
-          <th scope="col">ACCIÓN</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let contacto of contactos()">
-          <td>
-            <div class="person">
-              <span class="avatar">{{ obtenerIniciales(contacto.nombre, contacto.apellido) }}</span>
-              <strong>{{ contacto.nombre }} {{ contacto.apellido }}</strong>
-            </div>
-          </td>
-          <td>{{ contacto.telefonos?.join(', ') || 'Sin teléfono' }}</td>
-          <td>{{ contacto.correos?.join(', ') || 'Sin correo' }}</td>
-          <td>{{ contacto.fechaNacimiento || 'No registrada' }}</td>
-          <td>{{ contacto.genero || 'No registrado' }}</td>
-          <td>{{ contacto.parentesco || 'Sin parentesco' }}</td>
-          <td>
-            <a *ngIf="contacto.idContacto != null" class="edit-link" [routerLink]="['/contactos', personaId, 'editar', contacto.idContacto]">Editar contacto</a>
-            <button type="button" class="remove-contact" (click)="quitarContacto(contacto)" [disabled]="cargando() || quitando() || !!mensajeError() || contactos().length <= 1" [attr.aria-label]="'Quitar contacto ' + contacto.nombre">Quitar contacto</button>
-          </td>
-        </tr>
-      </tbody>
+<mat-card *ngIf="!cargando() && (!mensajeError() || contactos().length > 0)" class="panel contacts-panel" aria-labelledby="contacts-title">
+  <mat-card-header class="table-heading">
+    <mat-card-title id="contacts-title">Lista de contactos</mat-card-title>
+    <mat-card-subtitle>{{ contactos().length }} registros</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="table-wrap" *ngIf="contactos().length">
+    <table mat-table [dataSource]="contactos()" class="contacts-table">
+      <ng-container matColumnDef="contacto">
+        <th mat-header-cell *matHeaderCellDef scope="col">Contacto</th>
+        <td mat-cell *matCellDef="let contacto">
+          <div class="person">
+            <span class="avatar">{{ obtenerIniciales(contacto.nombre, contacto.apellido) }}</span>
+            <strong>{{ contacto.nombre }} {{ contacto.apellido }}</strong>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="telefono">
+        <th mat-header-cell *matHeaderCellDef scope="col">Teléfono</th>
+        <td mat-cell *matCellDef="let contacto">{{ contacto.telefonos?.join(', ') || 'Sin teléfono' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="correo">
+        <th mat-header-cell *matHeaderCellDef scope="col">Correo</th>
+        <td mat-cell *matCellDef="let contacto">{{ contacto.correos?.join(', ') || 'Sin correo' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaNacimiento">
+        <th mat-header-cell *matHeaderCellDef scope="col">Fecha de nacimiento</th>
+        <td mat-cell *matCellDef="let contacto">{{ contacto.fechaNacimiento || 'No registrada' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="genero">
+        <th mat-header-cell *matHeaderCellDef scope="col">Género</th>
+        <td mat-cell *matCellDef="let contacto">{{ contacto.genero || 'No registrado' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="parentesco">
+        <th mat-header-cell *matHeaderCellDef scope="col">Parentesco</th>
+        <td mat-cell *matCellDef="let contacto">{{ contacto.parentesco || 'Sin parentesco' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef scope="col">Acciones</th>
+        <td mat-cell *matCellDef="let contacto" class="actions-cell">
+          <a *ngIf="contacto.idContacto != null" mat-stroked-button class="edit-link"
+            [routerLink]="['/contactos', personaId, 'editar', contacto.idContacto]"
+            (click)="marcarInicioEdicion()">Editar</a>
+          <button mat-stroked-button type="button" class="remove-contact" (click)="quitarContacto(contacto)"
+            [disabled]="cargando() || quitando() || !!mensajeError() || contactos().length <= 1"
+            [attr.aria-label]="'Quitar contacto ' + contacto.nombre">Quitar</button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas"></tr>
     </table>
-  </div>
+  </mat-card-content>
 
-  <div *ngIf="!contactos().length" class="empty">
+  <mat-card-content *ngIf="!contactos().length" class="empty">
     <h3>{{ mensajeError() ? 'No se pudieron cargar los contactos' : 'Aún no hay contactos' }}</h3>
     <p>{{ mensajeError() ? 'Reintenta la consulta.' : 'Agrega el primer contacto de emergencia.' }}</p>
-  </div>
-</section>
+  </mat-card-content>
+</mat-card>

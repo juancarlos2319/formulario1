@@ -40,7 +40,7 @@
           <h3 [id]="'datos-contacto-title-' + i">Datos personales</h3>
           <div class="contact-field-grid">
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Nombre(s) *</mat-label>
             <input matInput [id]="'nombres_' + i" type="text" formControlName="nombres" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombres')">
             <mat-error *ngIf="campoInvalido(i, 'nombres')">{{ errorCampo(i, 'nombres') }}</mat-error>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Apellido paterno *</mat-label>
             <input matInput [id]="'apellidoPaterno_' + i" type="text" formControlName="apellidoPaterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoPaterno')">
             <mat-error *ngIf="campoInvalido(i, 'apellidoPaterno')">{{ errorCampo(i, 'apellidoPaterno') }}</mat-error>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Apellido materno</mat-label>
             <input matInput [id]="'apellidoMaterno_' + i" type="text" formControlName="apellidoMaterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoMaterno')">
             <mat-error *ngIf="campoInvalido(i, 'apellidoMaterno')">{{ errorCampo(i, 'apellidoMaterno') }}</mat-error>
@@ -64,7 +64,7 @@
         </div>
 
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Fecha de nacimiento *</mat-label>
             <input matInput [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento" [attr.aria-invalid]="campoInvalido(i, 'fechaNacimiento')">
             <mat-error *ngIf="campoInvalido(i, 'fechaNacimiento')">{{ errorCampo(i, 'fechaNacimiento') }}</mat-error>
@@ -72,7 +72,7 @@
         </div>
 
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Género *</mat-label>
             <mat-select [id]="'genero_' + i" formControlName="genero" [attr.aria-invalid]="campoInvalido(i, 'genero')">
               <mat-option value="">Selecciona un género</mat-option>
@@ -94,7 +94,7 @@
         <div formArrayName="correos" class="communication-type">
           <h4>Correos electrónicos</h4>
           <div class="field" *ngFor="let correo of comunicaciones(i, 'correos').controls; let j = index">
-            <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
               <mat-label>Correo {{ j + 1 }} *</mat-label>
               <input matInput [id]="'correo_' + i + '_' + j" type="email" [formControlName]="j" maxlength="150" [attr.aria-invalid]="campoInvalido(i, 'correos.' + j)" />
               <mat-error *ngIf="campoInvalido(i, 'correos.' + j)">{{ errorCampo(i, 'correos.' + j) }}</mat-error>
@@ -107,7 +107,7 @@
         <div formArrayName="telefonos" class="communication-type">
           <h4>Teléfonos</h4>
           <div class="field" *ngFor="let telefono of comunicaciones(i, 'telefonos').controls; let j = index">
-            <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
               <mat-label>Teléfono {{ j + 1 }} *</mat-label>
               <input matInput [id]="'telefono_' + i + '_' + j" type="tel" inputmode="numeric" maxlength="10" [formControlName]="j" />
               <mat-error *ngIf="campoInvalido(i, 'telefonos.' + j)">{{ errorCampo(i, 'telefonos.' + j) }}</mat-error>
@@ -123,7 +123,7 @@
         <section class="contact-group relationship-group" [attr.aria-labelledby]="'parentesco-title-' + i">
           <h3 [id]="'parentesco-title-' + i">Relación con el titular</h3>
         <div class="field">
-          <mat-form-field appearance="outline" class="contact-material-field">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="contact-material-field">
             <mat-label>Parentesco *</mat-label>
             <mat-select [id]="'parentesco_' + i" formControlName="idParentesco" [attr.aria-invalid]="campoInvalido(i, 'idParentesco')">
               <mat-option [value]="null">Selecciona un parentesco</mat-option>

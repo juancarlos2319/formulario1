@@ -21,7 +21,33 @@ public class PersonaService {
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.ContactoDTO> obtenerContactos(Long id) {
-        return titularActivo(id).getContactosEmergencia().stream().map(this::contactoADTO).toList();
+        List<Object[]> filas = personaRepository.obtenerContactosDetallados(id);
+        if (filas.isEmpty()) {
+            titularActivo(id);
+            return List.of();
+        }
+        return filas.stream().map(this::contactoDesdeFila).toList();
+    }
+
+    private com.example.demo.dto.ContactoDTO contactoDesdeFila(Object[] fila) {
+        LocalDate fechaNacimiento = fila[3] instanceof java.sql.Date fechaSql
+                ? fechaSql.toLocalDate()
+                : (LocalDate) fila[3];
+        return new com.example.demo.dto.ContactoDTO(
+                ((Number) fila[0]).longValue(),
+                (String) fila[1],
+                (String) fila[2],
+                fechaNacimiento,
+                (String) fila[4],
+                separarComunicaciones((String) fila[5]),
+                separarComunicaciones((String) fila[6]),
+                ((Number) fila[7]).longValue(),
+                (String) fila[8]);
+    }
+
+    private List<String> separarComunicaciones(String valores) {
+        if (valores == null || valores.isEmpty()) return List.of();
+        return java.util.Arrays.asList(valores.split(java.util.regex.Pattern.quote(String.valueOf((char) 31)), -1));
     }
 
     @org.springframework.transaction.annotation.Transactional
@@ -373,15 +399,6 @@ public class PersonaService {
                     p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
                     p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), null, null))
                 .toList();
-    }
-
-    private com.example.demo.dto.ContactoDTO contactoADTO(ContactoEmergencia relacion) {
-        Persona contacto = relacion.getContacto();
-        return new com.example.demo.dto.ContactoDTO(contacto.getId(), contacto.getNombre(), contacto.getApellido(),
-                contacto.getFechaNacimiento(), contacto.getGenero(),
-                contacto.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
-                contacto.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(),
-                relacion.getParentesco().getId(), relacion.getParentesco().getNombre());
     }
 
     private void validarComunicacion(PersonaDTO dto) {

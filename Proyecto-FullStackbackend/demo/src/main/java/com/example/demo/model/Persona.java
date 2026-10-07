@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@BatchSize(size = 32)
 @Table(name = "persona")
 public class Persona {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
@@ -15,8 +17,8 @@ public class Persona {
     @Column(nullable = false, length = 50) private String genero;
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) private PerfilTitular perfilTitular;
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("id ASC") private List<ContactoEmergencia> contactosEmergencia = new ArrayList<>();
-    @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("id ASC") private List<PersonaCorreo> correos = new ArrayList<>();
-    @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("id ASC") private List<PersonaTelefono> telefonos = new ArrayList<>();
+    @BatchSize(size = 32) @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("id ASC") private List<PersonaCorreo> correos = new ArrayList<>();
+    @BatchSize(size = 32) @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true) @OrderBy("id ASC") private List<PersonaTelefono> telefonos = new ArrayList<>();
     public Long getId() { return id; } public void setId(Long id) { this.id = id; }
     public String getNombre() { return nombre; } public void setNombre(String nombre) { this.nombre = nombre; }
     public String getApellido() { return apellido; } public void setApellido(String apellido) { this.apellido = apellido; }

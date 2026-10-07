@@ -1,171 +1,173 @@
-<div class="page-heading"><p class="eyebrow">ADMINISTRACIÓN DE PERSONAS</p><h1>{{ editando ? 'Actualiza su información' : 'Una nueva persona en tu comunidad' }}</h1><p>{{ editando ? 'Revisa y modifica los datos del registro.' : 'Completa sus datos y continúa con el contacto de emergencia.' }}</p></div>
-      <div class="registration-layout">
-        <aside class="guide" aria-label="Proceso de registro">
-          <h2>{{ editando ? 'Cada detalle cuenta' : 'Empecemos por lo esencial' }}</h2>
-          <p>La información organizada te ayuda a estar más cerca de tu comunidad.</p>
-          <ol><li class="current"><strong>Datos de la persona</strong><small>Información personal, dirección y contacto.</small></li><li *ngIf="!editando"><strong>Contacto de emergencia</strong><small>Completa ambos pasos antes de guardar a la persona.</small></li></ol>
-          <p>Los campos con <strong>*</strong> son obligatorios.</p>
-        </aside>
-        <div class="form-container">
-  <h2>{{ editando ? 'Editar persona' : 'Nuevo Registro de Persona' }}</h2>
-  <p role="status" *ngIf="cargandoPersona() && !mensajeError()">Cargando persona...</p>
-  
-  <div *ngIf="mensajeError()" class="error-alert" role="alert">{{ mensajeError() }}</div>
-
-  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" [attr.aria-busy]="guardando() || cargandoPersona()">
-    <!-- Datos Personales -->
-    <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">01</span> Información personal</legend>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="nombres">Nombre(s) *</label>
-          <input autocomplete="given-name" id="nombres" type="text" formControlName="nombres" class="form-control" [attr.aria-invalid]="campoInvalido('nombres')" [attr.aria-describedby]="campoInvalido('nombres') ? 'nombres-error' : null" />
-          <small class="field-error" id="nombres-error" *ngIf="campoInvalido('nombres')">{{ errorCampo('nombres') }}</small>
-        </div>
-        <div class="form-group">
-          <label for="apellidoPaterno">Apellido paterno *</label>
-          <input autocomplete="family-name" id="apellidoPaterno" type="text" formControlName="apellidoPaterno" class="form-control" [attr.aria-invalid]="campoInvalido('apellidoPaterno')" [attr.aria-describedby]="campoInvalido('apellidoPaterno') ? 'apellidoPaterno-error' : null" />
-          <small class="field-error" id="apellidoPaterno-error" *ngIf="campoInvalido('apellidoPaterno')">{{ errorCampo('apellidoPaterno') }}</small>
-        </div>
-        <div class="form-group">
-          <label for="apellidoMaterno">Apellido materno</label>
-          <input autocomplete="family-name" id="apellidoMaterno" type="text" formControlName="apellidoMaterno" class="form-control" [attr.aria-invalid]="campoInvalido('apellidoMaterno')" [attr.aria-describedby]="campoInvalido('apellidoMaterno') ? 'apellidoMaterno-error' : null" />
-          <small class="field-error" id="apellidoMaterno-error" *ngIf="campoInvalido('apellidoMaterno')">{{ errorCampo('apellidoMaterno') }}</small>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="genero">Género *</label>
-          <select id="genero" formControlName="genero" class="form-control" [attr.aria-invalid]="campoInvalido('genero')" [attr.aria-describedby]="campoInvalido('genero') ? 'genero-error' : null">
-            <option value="">-- Selecciona --</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-          </select>
-          <small class="field-error" id="genero-error" *ngIf="campoInvalido('genero')">{{ errorCampo('genero') }}</small>
-        </div>
-        <div class="form-group">
-          <label for="fechaNacimiento">Fecha de Nacimiento *</label>
-          <input id="fechaNacimiento" type="date" formControlName="fechaNacimiento" class="form-control" [attr.aria-invalid]="campoInvalido('fechaNacimiento')" [attr.aria-describedby]="campoInvalido('fechaNacimiento') ? 'fechaNacimiento-error' : null" />
-          <small class="field-error" id="fechaNacimiento-error" *ngIf="campoInvalido('fechaNacimiento')">{{ errorCampo('fechaNacimiento') }}</small>
-        </div>
-        <div class="form-group">
-          <label for="ocupacion">Ocupación *</label>
-          <select id="ocupacion" formControlName="ocupacion" class="form-control" [attr.aria-invalid]="campoInvalido('ocupacion')" [attr.aria-describedby]="campoInvalido('ocupacion') ? 'ocupacion-error' : null">
-            <option value="">-- Selecciona --</option>
-            <option *ngFor="let o of ocupaciones" [value]="o.nombre || o">{{ o.nombre || o }}</option>
-          </select>
-          <small class="field-error" id="ocupacion-error" *ngIf="campoInvalido('ocupacion')">{{ errorCampo('ocupacion') }}</small>
-        </div>
-      </div>
-    </fieldset>
-
-    <!-- Dirección con CP Autocompletable -->
-    <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">02</span> Ubicación y direcciones</legend><p class="section-help">Consulta la ubicación con el código postal o completa los datos manualmente.</p>
-
-      <div formArrayName="direcciones">
-        <fieldset class="address-section" *ngFor="let direccion of direcciones.controls; let i = index" [formGroupName]="i">
-          <legend>Dirección {{ i + 1 }}</legend>
-          <div class="form-row">
-            <div class="form-group">
-              <label [for]="'cp-' + i">Código Postal *</label>
-              <input [id]="'cp-' + i" type="text" formControlName="cp" class="form-control" (input)="buscarCodigoPostal(i)" inputmode="numeric" autocomplete="postal-code" placeholder="5 dígitos" maxlength="5" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.cp')" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.cp')">{{ errorCampo('direcciones.' + i + '.cp') }}</small>
-              <small *ngIf="direccionesCargando()[i]" class="text-muted" role="status">Buscando CP...</small>
-            </div>
-            <div class="form-group">
-              <label [for]="'pais-' + i">País</label>
-              <input [id]="'pais-' + i" type="text" formControlName="pais" class="form-control" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.pais')">{{ errorCampo('direcciones.' + i + '.pais') }}</small>
-            </div>
-            <div class="form-group">
-              <label [for]="'estado-' + i">Estado</label>
-              <input [id]="'estado-' + i" type="text" formControlName="estado" class="form-control" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.estado')">{{ errorCampo('direcciones.' + i + '.estado') }}</small>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label [for]="'municipio-' + i">Municipio / Ciudad</label>
-              <input [id]="'municipio-' + i" type="text" formControlName="municipio" class="form-control" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.municipio')">{{ errorCampo('direcciones.' + i + '.municipio') }}</small>
-            </div>
-            <div class="form-group">
-              <label [for]="'colonia-' + i">Colonia *</label>
-              <input [id]="'colonia-' + i" formControlName="colonia" class="form-control" [attr.list]="'colonias-' + i" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.colonia')" />
-              <datalist [id]="'colonias-' + i">
-                <option *ngFor="let col of coloniasPorDireccion[i]" [value]="col"></option>
-              </datalist>
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.colonia')">{{ errorCampo('direcciones.' + i + '.colonia') }}</small>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-              <label [for]="'calle-' + i">Calle *</label>
-              <input [id]="'calle-' + i" type="text" formControlName="calle" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.calle')" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.calle')">{{ errorCampo('direcciones.' + i + '.calle') }}</small>
-            </div>
-            <div class="form-group" style="flex: 1;">
-              <label [for]="'numero-' + i">Número Ext/Int *</label>
-              <input [id]="'numero-' + i" type="text" formControlName="numero" class="form-control" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.numero')" />
-              <small class="field-error" *ngIf="campoInvalido('direcciones.' + i + '.numero')">{{ errorCampo('direcciones.' + i + '.numero') }}</small>
-            </div>
-            <button *ngIf="direcciones.length > 1" type="button" class="btn-remove" (click)="quitarDireccion(i)" [attr.aria-label]="'Quitar dirección ' + (i + 1)">Quitar</button>
-          </div>
-        </fieldset>
-      </div>
-      <button type="button" class="btn-add" (click)="agregarDireccion()">＋ Agregar dirección</button>
-    </fieldset>
-
-    <!-- Contactos -->
-    <fieldset [disabled]="edicionBloqueada()">
-      <legend><span class="section-number">03</span> Contacto</legend><p class="section-help">Registra al menos un correo y un teléfono. Puedes agregar más.</p>
-      <div class="form-row">
-        <div formArrayName="correos">
-          <div class="dynamic-row" *ngFor="let correo of correos.controls; let i = index">
-            <div class="form-group">
-              <label [for]="'correo-' + i">Correo {{ i + 1 }} *</label>
-              <input [id]="'correo-' + i" type="email" [formControlName]="i" class="form-control" autocomplete="email" [attr.aria-invalid]="campoInvalido('correos.' + i)" [attr.aria-describedby]="campoInvalido('correos.' + i) ? 'correo-error-' + i : null" />
-              <small class="field-error" [id]="'correo-error-' + i" *ngIf="campoInvalido('correos.' + i)">{{ errorCampo('correos.' + i) }}</small>
-            </div>
-            <button *ngIf="correos.length > 1" type="button" class="btn-remove" (click)="quitarCorreo(i)" [attr.aria-label]="'Quitar correo ' + (i + 1)" title="Quitar correo">Quitar</button>
-          </div>
-          <small class="field-error" *ngIf="registroForm.hasError('correosRepetidos')">Los correos no deben repetirse.</small>
-          <button type="button" class="btn-add" (click)="agregarCorreo()">＋ Agregar correo</button>
-        </div>
-        <div formArrayName="telefonos">
-          <div class="dynamic-row" *ngFor="let telefono of telefonos.controls; let i = index">
-            <div class="form-group">
-              <label [for]="'telefono-' + i">Teléfono {{ i + 1 }} *</label>
-              <input [id]="'telefono-' + i" type="tel" inputmode="numeric" maxlength="10" [formControlName]="i" class="form-control" [attr.aria-invalid]="campoInvalido('telefonos.' + i)" [attr.aria-describedby]="campoInvalido('telefonos.' + i) ? 'telefono-error-' + i : null" />
-              <small class="field-error" [id]="'telefono-error-' + i" *ngIf="campoInvalido('telefonos.' + i)">{{ errorCampo('telefonos.' + i) }}</small>
-            </div>
-            <button *ngIf="telefonos.length > 1" type="button" class="btn-remove" (click)="quitarTelefono(i)" [attr.aria-label]="'Quitar teléfono ' + (i + 1)" title="Quitar teléfono">Quitar</button>
-          </div>
-          <small class="field-error" *ngIf="registroForm.hasError('telefonosRepetidos')">Los teléfonos no deben repetirse.</small>
-          <button type="button" class="btn-add" (click)="agregarTelefono()">＋ Agregar teléfono</button>
-        </div>
-      </div>
-    </fieldset>
-
-
-    <div class="form-group checkbox-group" *ngIf="!editando">
-      <label>
-        <input type="checkbox" formControlName="aceptaTerminos" />
-        Acepto los Términos y Condiciones
-      </label>
-    </div>
-
-    <p *ngIf="registroForm.touched && registroForm.invalid" class="field-error" role="status">Revisa los campos marcados, los contactos adicionales y la aceptación de términos.</p>
-    <div class="form-actions">
-      <a *ngIf="!guardando()" routerLink="/personas" class="btn-secondary">Cancelar</a>
-      <button type="submit" [disabled]="edicionBloqueada() || hayDireccionCargando" class="btn-primary">
-        {{ guardando() ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
-      </button>
-    </div>
-  </form>
+<div class="page-heading">
+  <p class="eyebrow">ADMINISTRACIÓN DE PERSONAS</p>
+  <h1>{{ editando ? 'Actualiza su información' : 'Una nueva persona en tu comunidad' }}</h1>
+  <p>{{ editando ? 'Revisa y modifica los datos del registro.' : 'Completa sus datos y continúa con el contacto de emergencia.' }}</p>
 </div>
+
+<div class="registration-layout">
+  <aside class="guide" aria-label="Proceso de registro">
+    <h2>{{ editando ? 'Cada detalle cuenta' : 'Empecemos por lo esencial' }}</h2>
+    <p>La información organizada te ayuda a estar más cerca de tu comunidad.</p>
+    <ol>
+      <li class="current"><strong>Datos de la persona</strong><small>Información personal, dirección y contacto.</small></li>
+      <li *ngIf="!editando"><strong>Contacto de emergencia</strong><small>Completa ambos pasos antes de guardar a la persona.</small></li>
+    </ol>
+    <p>Los campos con <strong>*</strong> son obligatorios.</p>
+  </aside>
+
+  <section class="form-container">
+    <h2>{{ editando ? 'Editar persona' : 'Nuevo registro de persona' }}</h2>
+    <mat-progress-bar *ngIf="cargandoPersona() && !mensajeError()" mode="indeterminate" aria-label="Cargando persona"></mat-progress-bar>
+    <p role="status" *ngIf="cargandoPersona() && !mensajeError()">Cargando persona…</p>
+    <div *ngIf="mensajeError()" class="error-alert" role="alert">{{ mensajeError() }}</div>
+
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" [attr.aria-busy]="guardando() || cargandoPersona()">
+      <fieldset [disabled]="edicionBloqueada()">
+        <legend><span class="section-number">01</span> Información personal</legend>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Nombre(s) *</mat-label>
+            <input matInput autocomplete="given-name" id="nombres" type="text" formControlName="nombres" [attr.aria-invalid]="campoInvalido('nombres')">
+            <mat-error *ngIf="campoInvalido('nombres')">{{ errorCampo('nombres') }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Apellido paterno *</mat-label>
+            <input matInput autocomplete="family-name" id="apellidoPaterno" type="text" formControlName="apellidoPaterno" [attr.aria-invalid]="campoInvalido('apellidoPaterno')">
+            <mat-error *ngIf="campoInvalido('apellidoPaterno')">{{ errorCampo('apellidoPaterno') }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Apellido materno</mat-label>
+            <input matInput autocomplete="family-name" id="apellidoMaterno" type="text" formControlName="apellidoMaterno">
+            <mat-error *ngIf="campoInvalido('apellidoMaterno')">{{ errorCampo('apellidoMaterno') }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Género *</mat-label>
+            <mat-select id="genero" formControlName="genero" [attr.aria-invalid]="campoInvalido('genero')">
+              <mat-option value="">Selecciona</mat-option>
+              <mat-option value="Masculino">Masculino</mat-option>
+              <mat-option value="Femenino">Femenino</mat-option>
+              <mat-option value="Otro">Otro</mat-option>
+            </mat-select>
+            <mat-error *ngIf="campoInvalido('genero')">{{ errorCampo('genero') }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Fecha de nacimiento *</mat-label>
+            <input matInput id="fechaNacimiento" type="date" formControlName="fechaNacimiento" [attr.aria-invalid]="campoInvalido('fechaNacimiento')">
+            <mat-error *ngIf="campoInvalido('fechaNacimiento')">{{ errorCampo('fechaNacimiento') }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+            <mat-label>Ocupación *</mat-label>
+            <mat-select id="ocupacion" formControlName="ocupacion" [attr.aria-invalid]="campoInvalido('ocupacion')">
+              <mat-option value="">Selecciona</mat-option>
+              <mat-option *ngFor="let o of ocupaciones" [value]="o.nombre || o">{{ o.nombre || o }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="campoInvalido('ocupacion')">{{ errorCampo('ocupacion') }}</mat-error>
+          </mat-form-field>
+        </div>
+      </fieldset>
+
+      <fieldset [disabled]="edicionBloqueada()">
+        <legend><span class="section-number">02</span> Ubicación y direcciones</legend>
+        <p class="section-help">Consulta la ubicación con el código postal o completa los datos manualmente.</p>
+
+        <div formArrayName="direcciones">
+          <fieldset class="address-section" *ngFor="let direccion of direcciones.controls; let i = index" [formGroupName]="i">
+            <legend>Dirección {{ i + 1 }}</legend>
+            <div class="form-row">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Código postal *</mat-label>
+                <input matInput [id]="'cp-' + i" type="text" formControlName="cp" (input)="buscarCodigoPostal(i)" inputmode="numeric" autocomplete="postal-code" placeholder="5 dígitos" maxlength="5" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.cp')">
+                <mat-hint *ngIf="direccionesCargando()[i]">Buscando código postal…</mat-hint>
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.cp')">{{ errorCampo('direcciones.' + i + '.cp') }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>País</mat-label>
+                <input matInput [id]="'pais-' + i" type="text" formControlName="pais">
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.pais')">{{ errorCampo('direcciones.' + i + '.pais') }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Estado</mat-label>
+                <input matInput [id]="'estado-' + i" type="text" formControlName="estado">
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.estado')">{{ errorCampo('direcciones.' + i + '.estado') }}</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Municipio / Ciudad</mat-label>
+                <input matInput [id]="'municipio-' + i" type="text" formControlName="municipio">
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.municipio')">{{ errorCampo('direcciones.' + i + '.municipio') }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Colonia *</mat-label>
+                <input matInput [id]="'colonia-' + i" formControlName="colonia" [attr.list]="'colonias-' + i" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.colonia')">
+                <datalist [id]="'colonias-' + i"><option *ngFor="let col of coloniasPorDireccion[i]" [value]="col"></option></datalist>
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.colonia')">{{ errorCampo('direcciones.' + i + '.colonia') }}</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-row address-street-row">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field street-field">
+                <mat-label>Calle *</mat-label>
+                <input matInput [id]="'calle-' + i" type="text" formControlName="calle" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.calle')">
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.calle')">{{ errorCampo('direcciones.' + i + '.calle') }}</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field number-field">
+                <mat-label>Número ext./int. *</mat-label>
+                <input matInput [id]="'numero-' + i" type="text" formControlName="numero" [attr.aria-invalid]="campoInvalido('direcciones.' + i + '.numero')">
+                <mat-error *ngIf="campoInvalido('direcciones.' + i + '.numero')">{{ errorCampo('direcciones.' + i + '.numero') }}</mat-error>
+              </mat-form-field>
+              <button *ngIf="direcciones.length > 1" mat-stroked-button type="button" class="remove-button" (click)="quitarDireccion(i)" [attr.aria-label]="'Quitar dirección ' + (i + 1)">Quitar</button>
+            </div>
+          </fieldset>
+        </div>
+        <button mat-stroked-button type="button" class="add-button" (click)="agregarDireccion()">+ Agregar dirección</button>
+      </fieldset>
+
+      <fieldset [disabled]="edicionBloqueada()">
+        <legend><span class="section-number">03</span> Contacto</legend>
+        <p class="section-help">Registra al menos un correo y un teléfono. Puedes agregar más.</p>
+        <div class="form-row communication-row">
+          <div formArrayName="correos" class="communication-list">
+            <div class="dynamic-row" *ngFor="let correo of correos.controls; let i = index">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Correo {{ i + 1 }} *</mat-label>
+                <input matInput [id]="'correo-' + i" type="email" [formControlName]="i" autocomplete="email" [attr.aria-invalid]="campoInvalido('correos.' + i)">
+                <mat-error *ngIf="campoInvalido('correos.' + i)">{{ errorCampo('correos.' + i) }}</mat-error>
+              </mat-form-field>
+              <button *ngIf="correos.length > 1" mat-stroked-button type="button" class="remove-button" (click)="quitarCorreo(i)" [attr.aria-label]="'Quitar correo ' + (i + 1)">Quitar</button>
+            </div>
+            <small class="field-error" *ngIf="registroForm.hasError('correosRepetidos')">Los correos no deben repetirse.</small>
+            <button mat-stroked-button type="button" class="add-button" (click)="agregarCorreo()">+ Agregar correo</button>
+          </div>
+          <div formArrayName="telefonos" class="communication-list">
+            <div class="dynamic-row" *ngFor="let telefono of telefonos.controls; let i = index">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="form-field">
+                <mat-label>Teléfono {{ i + 1 }} *</mat-label>
+                <input matInput [id]="'telefono-' + i" type="tel" inputmode="numeric" maxlength="10" [formControlName]="i" [attr.aria-invalid]="campoInvalido('telefonos.' + i)">
+                <mat-error *ngIf="campoInvalido('telefonos.' + i)">{{ errorCampo('telefonos.' + i) }}</mat-error>
+              </mat-form-field>
+              <button *ngIf="telefonos.length > 1" mat-stroked-button type="button" class="remove-button" (click)="quitarTelefono(i)" [attr.aria-label]="'Quitar teléfono ' + (i + 1)">Quitar</button>
+            </div>
+            <small class="field-error" *ngIf="registroForm.hasError('telefonosRepetidos')">Los teléfonos no deben repetirse.</small>
+            <button mat-stroked-button type="button" class="add-button" (click)="agregarTelefono()">+ Agregar teléfono</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="terms-group" *ngIf="!editando">
+        <mat-checkbox formControlName="aceptaTerminos">Acepto los Términos y Condiciones</mat-checkbox>
       </div>
+
+      <p *ngIf="registroForm.touched && registroForm.invalid" class="field-error form-validation-message" role="status">Revisa los campos marcados, los contactos adicionales y la aceptación de términos.</p>
+      <div class="form-actions">
+        <a *ngIf="!guardando()" mat-stroked-button routerLink="/personas" class="cancel-button">Cancelar</a>
+        <button mat-flat-button type="submit" [disabled]="edicionBloqueada() || hayDireccionCargando" class="submit-button">
+          {{ guardando() ? 'Guardando…' : (editando ? 'Guardar cambios' : 'Continuar a contactos →') }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

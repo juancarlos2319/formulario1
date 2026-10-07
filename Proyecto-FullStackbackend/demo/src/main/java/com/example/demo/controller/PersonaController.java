@@ -26,8 +26,13 @@ public class PersonaController {
     }
 
     @GetMapping("/{id}/contactos")
-    public List<com.example.demo.dto.ContactoDTO> obtenerContactos(@PathVariable Long id) {
-        return personaService.obtenerContactos(id);
+    public ResponseEntity<List<com.example.demo.dto.ContactoDTO>> obtenerContactos(@PathVariable Long id) {
+        long inicio = System.nanoTime();
+        List<com.example.demo.dto.ContactoDTO> contactos = personaService.obtenerContactos(id);
+        double milisegundos = (System.nanoTime() - inicio) / 1_000_000.0;
+        return ResponseEntity.ok()
+                .header("Server-Timing", String.format(java.util.Locale.ROOT, "contactos;dur=%.2f", milisegundos))
+                .body(contactos);
     }
 
     @PutMapping("/{id}/contactos")

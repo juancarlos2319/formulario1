@@ -1,8 +1,10 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
+@BatchSize(size = 32)
 @Table(name = "catalogo_parentesco")
 public class CatalogoParentesco {
     @Id
