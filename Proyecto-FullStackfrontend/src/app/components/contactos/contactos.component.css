@@ -19,11 +19,21 @@ input:focus,select:focus{outline:3px solid #e5defa;border-color:#7155d9}
 .field-error{color:#b34d64;font-size:11px}
 .shared-person-note{margin:0 0 12px;padding:10px 12px;border-left:3px solid #39825c;background:#f2fbf6;color:#294c38;font-size:12px;line-height:1.45}
 .contact-summary{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 16px;color:#6c6573;font-size:12px}
-.card-remove,.add-contact-button,.cancel-button,.btn-submit{min-height:40px;padding:0 14px;border:1px solid transparent;border-radius:7px;font:600 12px 'DM Sans',sans-serif;cursor:pointer}
-.card-remove{border-color:#f0d9d9;background:#fffafa;color:#a83d48}
+.card-remove,.add-contact-button,.cancel-button,.btn-submit{min-height:40px;height:40px;min-width:0;padding:0 14px;border-radius:7px;font:600 12px 'DM Sans',sans-serif;cursor:pointer}
+.card-remove{border-color:#f0d9d9!important;background:#fffafa!important;color:#a83d48!important}
 .add-contact-action{margin:0 0 14px}
-.add-contact-button,.cancel-button{border-color:#e9e3f2;background:#fff;color:#7155b8}
+.add-contact-button,.cancel-button{border-color:#e9e3f2!important;background:#fff!important;color:#7155b8!important}
 .form-actions{display:flex;justify-content:flex-end;gap:10px;padding-top:4px}
-.btn-submit{background:#7155d9;color:#fff}
+.btn-submit{background:#7155d9!important;color:#fff!important}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.contact-group{margin:0 0 14px;padding:16px;border:1px solid #efedf3;border-radius:8px;background:#fff}
+.contact-group h3{margin:0 0 14px;color:#50495a;font:600 13px 'Manrope',sans-serif}
+.contact-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}
+.contact-field-grid .field{margin-bottom:4px}
+.communication-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.communication-type{min-width:0}
+.communication-type h4{margin:0 0 10px;color:#6c6573;font:600 12px 'DM Sans',sans-serif}
+.relationship-group .field{max-width:calc(50% - 7px);margin-bottom:0}
+.contact-material-field{width:100%;font-size:13px;--mdc-outlined-text-field-container-shape:6px;--mdc-outlined-text-field-outline-color:#dedbe5;--mdc-outlined-text-field-focus-outline-color:#7155d9;--mdc-outlined-text-field-input-text-color:#302a42;--mdc-outlined-text-field-input-text-size:13px;--mdc-outlined-text-field-label-text-color:#50495a;--mdc-outlined-text-field-focus-label-text-color:#7155d9;--mat-form-field-container-height:40px;--mat-form-field-container-vertical-padding:8px}
 @media(max-width:640px){.form-wrapper{padding:16px}.card-section{padding:14px}.form-actions{flex-direction:column-reverse}.form-actions button{width:100%}}
+@media(max-width:640px){.contact-field-grid,.communication-grid{grid-template-columns:1fr}.relationship-group .field{max-width:none}}

@@ -7,11 +7,15 @@ import { PersonasService } from '../../services/personas.service';
 import { Resultado } from '../../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../../interfaces/contacto-emergencia.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-contactos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
   templateUrl: './contactos.component.html',
   styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
 })

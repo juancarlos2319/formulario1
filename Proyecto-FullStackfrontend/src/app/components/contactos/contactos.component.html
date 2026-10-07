@@ -10,8 +10,8 @@
   <p *ngIf="mensajeError()" class="notice error" role="alert">{{ mensajeError() }}</p>
   <p *ngIf="cargandoContactos()" role="status">Cargando contactos…</p>
   <p *ngIf="verificando" role="status">Verificando correo y teléfono…</p>
-  <p *ngIf="errorVerificacion" class="notice error" role="alert">No se pudo completar la verificación. Revisa los datos y <button type="button" (click)="reintentarVerificacion()">reintenta la consulta</button>.</p>
-  <button *ngIf="personaId > 0 && !contactosCargados() && !cargandoContactos()" type="button" class="cancel-button" (click)="cargarContactos()">Reintentar carga</button>
+  <p *ngIf="errorVerificacion" class="notice error" role="alert">No se pudo completar la verificación. Revisa los datos y <button mat-button type="button" (click)="reintentarVerificacion()">reintenta la consulta</button>.</p>
+  <button mat-stroked-button *ngIf="personaId > 0 && !contactosCargados() && !cargandoContactos()" type="button" class="cancel-button" (click)="cargarContactos()">Reintentar carga</button>
   <form [formGroup]="contactosForm" (ngSubmit)="guardarContactos()">
     <div formArrayName="contactos">
       <fieldset
@@ -22,7 +22,7 @@
       >
         <div class="card-heading">
           <legend>Contacto {{ numeroContacto(i) }}</legend>
-          <button
+          <button mat-stroked-button
             type="button" 
             (click)="eliminarContacto(i)" 
             *ngIf="contactos.length > 1 && (!modoEdicion || i > 0)"
@@ -36,75 +36,108 @@
           Los cambios personales se aplicarán a todos los titulares que comparten este contacto.
         </p>
         <p *ngIf="contacto.get('correos')?.disabled" class="shared-person-note">Se usará la persona registrada. El parentesco corresponde a este vínculo.</p>
+        <section class="contact-group" [attr.aria-labelledby]="'datos-contacto-title-' + i">
+          <h3 [id]="'datos-contacto-title-' + i">Datos personales</h3>
+          <div class="contact-field-grid">
         <div class="field">
-          <label [for]="'nombres_' + i">Nombre(s) *</label>
-          <input [id]="'nombres_' + i" type="text" formControlName="nombres" placeholder="Nombre(s)" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombres')" [attr.aria-describedby]="campoInvalido(i, 'nombres') ? 'nombres-error_' + i : null">
-          <small class="field-error" [id]="'nombres-error_' + i" *ngIf="campoInvalido(i, 'nombres')">{{ errorCampo(i, 'nombres') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Nombre(s) *</mat-label>
+            <input matInput [id]="'nombres_' + i" type="text" formControlName="nombres" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'nombres')">
+            <mat-error *ngIf="campoInvalido(i, 'nombres')">{{ errorCampo(i, 'nombres') }}</mat-error>
+          </mat-form-field>
         </div>
 
         <div class="field">
-          <label [for]="'apellidoPaterno_' + i">Apellido paterno *</label>
-          <input [id]="'apellidoPaterno_' + i" type="text" formControlName="apellidoPaterno" placeholder="Apellido paterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoPaterno')" [attr.aria-describedby]="campoInvalido(i, 'apellidoPaterno') ? 'apellidoPaterno-error_' + i : null">
-          <small class="field-error" [id]="'apellidoPaterno-error_' + i" *ngIf="campoInvalido(i, 'apellidoPaterno')">{{ errorCampo(i, 'apellidoPaterno') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Apellido paterno *</mat-label>
+            <input matInput [id]="'apellidoPaterno_' + i" type="text" formControlName="apellidoPaterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoPaterno')">
+            <mat-error *ngIf="campoInvalido(i, 'apellidoPaterno')">{{ errorCampo(i, 'apellidoPaterno') }}</mat-error>
+          </mat-form-field>
         </div>
 
         <div class="field">
-          <label [for]="'apellidoMaterno_' + i">Apellido materno</label>
-          <input [id]="'apellidoMaterno_' + i" type="text" formControlName="apellidoMaterno" placeholder="Apellido materno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoMaterno')" [attr.aria-describedby]="campoInvalido(i, 'apellidoMaterno') ? 'apellidoMaterno-error_' + i : null">
-          <small class="field-error" [id]="'apellidoMaterno-error_' + i" *ngIf="campoInvalido(i, 'apellidoMaterno')">{{ errorCampo(i, 'apellidoMaterno') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Apellido materno</mat-label>
+            <input matInput [id]="'apellidoMaterno_' + i" type="text" formControlName="apellidoMaterno" maxlength="100" [attr.aria-invalid]="campoInvalido(i, 'apellidoMaterno')">
+            <mat-error *ngIf="campoInvalido(i, 'apellidoMaterno')">{{ errorCampo(i, 'apellidoMaterno') }}</mat-error>
+          </mat-form-field>
         </div>
 
         <div class="field">
-          <label [for]="'fechaNacimiento_' + i">Fecha de nacimiento *</label>
-          <input [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento" [attr.aria-invalid]="campoInvalido(i, 'fechaNacimiento')" [attr.aria-describedby]="campoInvalido(i, 'fechaNacimiento') ? 'fecha-error_' + i : null">
-          <small class="field-error" [id]="'fecha-error_' + i" *ngIf="campoInvalido(i, 'fechaNacimiento')">{{ errorCampo(i, 'fechaNacimiento') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Fecha de nacimiento *</mat-label>
+            <input matInput [id]="'fechaNacimiento_' + i" type="date" formControlName="fechaNacimiento" [attr.aria-invalid]="campoInvalido(i, 'fechaNacimiento')">
+            <mat-error *ngIf="campoInvalido(i, 'fechaNacimiento')">{{ errorCampo(i, 'fechaNacimiento') }}</mat-error>
+          </mat-form-field>
         </div>
 
         <div class="field">
-          <label [for]="'genero_' + i">Genero *</label>
-          <select [id]="'genero_' + i" formControlName="genero" [attr.aria-invalid]="campoInvalido(i, 'genero')" [attr.aria-describedby]="campoInvalido(i, 'genero') ? 'genero-error_' + i : null">
-            <option value="">Selecciona un genero</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-            <option value="No especificado">No especificado</option>
-          </select>
-          <small class="field-error" [id]="'genero-error_' + i" *ngIf="campoInvalido(i, 'genero')">{{ errorCampo(i, 'genero') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Género *</mat-label>
+            <mat-select [id]="'genero_' + i" formControlName="genero" [attr.aria-invalid]="campoInvalido(i, 'genero')">
+              <mat-option value="">Selecciona un género</mat-option>
+              <mat-option value="Masculino">Masculino</mat-option>
+              <mat-option value="Femenino">Femenino</mat-option>
+              <mat-option value="Otro">Otro</mat-option>
+              <mat-option value="No especificado">No especificado</mat-option>
+            </mat-select>
+            <mat-error *ngIf="campoInvalido(i, 'genero')">{{ errorCampo(i, 'genero') }}</mat-error>
+          </mat-form-field>
         </div>
 
-        <div formArrayName="correos">
+          </div>
+        </section>
+
+        <section class="contact-group" [attr.aria-labelledby]="'comunicaciones-title-' + i">
+          <h3 [id]="'comunicaciones-title-' + i">Medios de contacto</h3>
+          <div class="communication-grid">
+        <div formArrayName="correos" class="communication-type">
+          <h4>Correos electrónicos</h4>
           <div class="field" *ngFor="let correo of comunicaciones(i, 'correos').controls; let j = index">
-            <label [for]="'correo_' + i + '_' + j">Correo {{ j + 1 }} *</label>
-            <input [id]="'correo_' + i + '_' + j" type="email" [formControlName]="j" maxlength="150" [attr.aria-invalid]="campoInvalido(i, 'correos.' + j)" />
-            <small class="field-error" *ngIf="campoInvalido(i, 'correos.' + j)">{{ errorCampo(i, 'correos.' + j) }}</small>
-            <button *ngIf="comunicaciones(i, 'correos').length > 1 && !comunicaciones(i, 'correos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'correos', j)" [attr.aria-label]="'Quitar correo ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar correo</button>
+            <mat-form-field appearance="outline" class="contact-material-field">
+              <mat-label>Correo {{ j + 1 }} *</mat-label>
+              <input matInput [id]="'correo_' + i + '_' + j" type="email" [formControlName]="j" maxlength="150" [attr.aria-invalid]="campoInvalido(i, 'correos.' + j)" />
+              <mat-error *ngIf="campoInvalido(i, 'correos.' + j)">{{ errorCampo(i, 'correos.' + j) }}</mat-error>
+            </mat-form-field>
+            <button mat-button *ngIf="comunicaciones(i, 'correos').length > 1 && !comunicaciones(i, 'correos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'correos', j)" [attr.aria-label]="'Quitar correo ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar correo</button>
           </div>
           <small class="field-error" *ngIf="comunicaciones(i, 'correos').hasError('repetidos')">Los correos no deben repetirse.</small>
-          <button *ngIf="!comunicaciones(i, 'correos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'correos')">＋ Agregar correo</button>
+          <button mat-button *ngIf="!comunicaciones(i, 'correos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'correos')">＋ Agregar correo</button>
         </div>
-        <div formArrayName="telefonos">
+        <div formArrayName="telefonos" class="communication-type">
+          <h4>Teléfonos</h4>
           <div class="field" *ngFor="let telefono of comunicaciones(i, 'telefonos').controls; let j = index">
-            <label [for]="'telefono_' + i + '_' + j">Telefono {{ j + 1 }} *</label>
-            <input [id]="'telefono_' + i + '_' + j" type="tel" inputmode="numeric" maxlength="10" [formControlName]="j" />
-            <small class="field-error" *ngIf="campoInvalido(i, 'telefonos.' + j)">{{ errorCampo(i, 'telefonos.' + j) }}</small>
-            <button *ngIf="comunicaciones(i, 'telefonos').length > 1 && !comunicaciones(i, 'telefonos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'telefonos', j)" [attr.aria-label]="'Quitar teléfono ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar teléfono</button>
+            <mat-form-field appearance="outline" class="contact-material-field">
+              <mat-label>Teléfono {{ j + 1 }} *</mat-label>
+              <input matInput [id]="'telefono_' + i + '_' + j" type="tel" inputmode="numeric" maxlength="10" [formControlName]="j" />
+              <mat-error *ngIf="campoInvalido(i, 'telefonos.' + j)">{{ errorCampo(i, 'telefonos.' + j) }}</mat-error>
+            </mat-form-field>
+            <button mat-button *ngIf="comunicaciones(i, 'telefonos').length > 1 && !comunicaciones(i, 'telefonos').disabled" type="button" class="card-remove" (click)="quitarComunicacion(i, 'telefonos', j)" [attr.aria-label]="'Quitar teléfono ' + (j + 1) + ' del contacto ' + numeroContacto(i)">Quitar teléfono</button>
           </div>
           <small class="field-error" *ngIf="comunicaciones(i, 'telefonos').hasError('repetidos')">Los teléfonos no deben repetirse.</small>
-          <button *ngIf="!comunicaciones(i, 'telefonos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'telefonos')">＋ Agregar teléfono</button>
+          <button mat-button *ngIf="!comunicaciones(i, 'telefonos').disabled" type="button" class="add-contact-button" (click)="agregarComunicacion(i, 'telefonos')">＋ Agregar teléfono</button>
         </div>
+          </div>
+        </section>
+
+        <section class="contact-group relationship-group" [attr.aria-labelledby]="'parentesco-title-' + i">
+          <h3 [id]="'parentesco-title-' + i">Relación con el titular</h3>
         <div class="field">
-          <label [for]="'parentesco_' + i">Parentesco *</label>
-          <select [id]="'parentesco_' + i" formControlName="idParentesco" [attr.aria-invalid]="campoInvalido(i, 'idParentesco')" [attr.aria-describedby]="campoInvalido(i, 'idParentesco') ? 'parentesco-error_' + i : null">
-            <option [ngValue]="null">Selecciona un parentesco</option>
-            <option *ngFor="let parentesco of parentescos()" [ngValue]="parentesco.id">{{ parentesco.nombre }}</option>
-          </select>
-          <small class="field-error" [id]="'parentesco-error_' + i" *ngIf="campoInvalido(i, 'idParentesco')">{{ errorCampo(i, 'idParentesco') }}</small>
+          <mat-form-field appearance="outline" class="contact-material-field">
+            <mat-label>Parentesco *</mat-label>
+            <mat-select [id]="'parentesco_' + i" formControlName="idParentesco" [attr.aria-invalid]="campoInvalido(i, 'idParentesco')">
+              <mat-option [value]="null">Selecciona un parentesco</mat-option>
+              <mat-option *ngFor="let parentesco of parentescos()" [value]="parentesco.id">{{ parentesco.nombre }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="campoInvalido(i, 'idParentesco')">{{ errorCampo(i, 'idParentesco') }}</mat-error>
+          </mat-form-field>
         </div>
+        </section>
       </fieldset>
     </div>
 
     <div class="add-contact-action">
-      <button
+      <button mat-stroked-button
         type="button"
         (click)="agregarContacto()"
         [disabled]="guardando() || cargandoContactos() || (personaId > 0 && !contactosCargados())"
@@ -115,8 +148,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="cancel-button" [disabled]="guardando()" (click)="cancelar()">Cancelar</button>
-      <button type="submit" class="btn-submit" [disabled]="guardando() || verificando || errorVerificacion || contactosForm.invalid || contactos.length === 0 || cargandoContactos() || (personaId > 0 && !contactosCargados())">
+      <button mat-stroked-button type="button" class="cancel-button" [disabled]="guardando()" (click)="cancelar()">Cancelar</button>
+      <button mat-flat-button color="primary" type="submit" class="btn-submit" [disabled]="guardando() || verificando || errorVerificacion || contactosForm.invalid || contactos.length === 0 || cargandoContactos() || (personaId > 0 && !contactosCargados())">
       {{ modoEdicion ? 'Guardar cambios' : 'Guardar y finalizar' }}
       </button>
     </div>
