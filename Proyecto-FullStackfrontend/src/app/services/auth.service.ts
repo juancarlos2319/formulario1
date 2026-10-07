@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { PersonasService } from './personas.service';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, shareReplay } from 'rxjs';
 import { UsuarioActual } from '../interfaces/usuario-actual.interface';
 import { Resultado } from '../interfaces/usuario.interface';
 
@@ -9,6 +9,10 @@ import { Resultado } from '../interfaces/usuario.interface';
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly cuentaActual = signal<UsuarioActual | null>(null);
+  readonly usuarioActual = this.cuentaActual.asReadonly();
+  private consultaCuenta?: Observable<UsuarioActual>;
+  private revisionCuenta = 0;
   private registroService = inject(PersonasService);
   private apiUrl = 'http://localhost:8080/api/auth';
   private readonly tokenSubject = new BehaviorSubject<string | null>(this.readToken());
@@ -17,22 +21,46 @@ export class AuthService {
   private readonly tokenMonitor = window.setInterval(() => this.detectExternalTokenChange(), 250);
 
   constructor(private http: HttpClient) {
+    this.registroService.datosPersonalesActualizados$?.subscribe(() => {
+      if (this.tokenSubject.value) {
+        this.actualizarUsuarioActual().subscribe({ error: () => {} });
+      }
+    });
     window.addEventListener('storage', this.onStorageChange);
     this.scheduleExpiration(this.tokenSubject.value);
   }
 
   login(credentials: { username: string; password: string }): Observable<any> {
-  return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials).pipe(
+  return this.http.post<{ token: string; usuarioActual: UsuarioActual }>(`${this.apiUrl}/login`, credentials).pipe(
     tap(res => {
       if (res.token) {
         this.setToken(res.token);
+        this.cuentaActual.set(res.usuarioActual);
       }
     })
   );
 }
 
   obtenerUsuarioActual(): Observable<UsuarioActual> {
-    return this.http.get<UsuarioActual>(`${this.apiUrl}/me`);
+    const usuario = this.cuentaActual();
+    if (usuario) return of(usuario);
+    // Recupera una sesion previa una sola vez al recargar la aplicacion.
+    if (!this.consultaCuenta) {
+      return this.actualizarUsuarioActual();
+    }
+    return this.consultaCuenta;
+  }
+
+  actualizarUsuarioActual(): Observable<UsuarioActual> {
+      const revision = ++this.revisionCuenta;
+      const token = this.tokenSubject.value;
+      this.consultaCuenta = this.http.get<UsuarioActual>(`${this.apiUrl}/me`).pipe(
+        tap(cuenta => {
+          if (revision === this.revisionCuenta && token === this.tokenSubject.value && token) this.cuentaActual.set(cuenta);
+        }),
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+    return this.consultaCuenta;
   }
 
   obtenerDatosLogin(): Observable<{ username: string }> {
@@ -80,6 +108,9 @@ export class AuthService {
   private publishToken(token: string | null): void {
     if (token && !this.hasValidStructure(token)) token = null;
     if (token === this.tokenSubject.value) return;
+    this.cuentaActual.set(null);
+    this.revisionCuenta++;
+    this.consultaCuenta = undefined;
     this.tokenSubject.next(token);
     this.scheduleExpiration(token);
   }
