@@ -4,60 +4,102 @@
     <h1>Personas desactivadas</h1>
     <p>Consulta titulares dados de baja y reactiva los que deban volver al listado.</p>
   </div>
-  <a class="secondary" routerLink="/personas">Volver a personas</a>
+  <a mat-stroked-button routerLink="/personas" class="back-button">Volver a personas</a>
 </section>
 
 <div *ngIf="mensajeError()" class="notice error" role="alert">
   {{ mensajeError() }}
-  <button type="button" (click)="cargarPersonas()" [disabled]="cargando() || reactivando() !== null">Reintentar</button>
+  <button mat-button type="button" (click)="cargarPersonas()" [disabled]="cargando() || reactivando() !== null">Reintentar</button>
 </div>
-<div *ngIf="cargando()" class="notice" role="status">Cargando personas desactivadas…</div>
+<mat-progress-bar *ngIf="cargando() || reactivando() !== null" mode="indeterminate"
+  [attr.aria-label]="cargando() ? 'Cargando personas desactivadas' : 'Reactivando persona'"></mat-progress-bar>
 
-<section *ngIf="!cargando() && (!mensajeError() || personas().length > 0)" class="panel people" aria-labelledby="inactive-title">
-  <div class="table-heading">
-    <div>
-      <h2 id="inactive-title">Titulares dados de baja</h2>
-      <p class="muted">{{ personas().length }} registros</p>
+<mat-card *ngIf="!cargando() && (!mensajeError() || personas().length > 0)" class="panel people" aria-labelledby="inactive-title">
+  <mat-card-header class="table-heading">
+    <div class="heading-copy">
+      <mat-card-title id="inactive-title">Titulares dados de baja</mat-card-title>
+      <mat-card-subtitle>{{ personasFiltradas().length }} de {{ personas().length }} registros</mat-card-subtitle>
     </div>
-  </div>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+      <mat-label>Buscar personas</mat-label>
+      <input matInput type="search" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)"
+        placeholder="Nombre, correo, teléfono, ocupación o ciudad" aria-label="Buscar personas desactivadas">
+    </mat-form-field>
+  </mat-card-header>
 
-  <div class="table-wrap" *ngIf="personas().length">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">PERSONA</th>
-          <th scope="col">FECHA DE BAJA</th>
-          <th scope="col">OCUPACIÓN</th>
-          <th scope="col">CIUDAD</th>
-          <th scope="col">ACCIÓN</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let persona of personas()">
-          <td>
-            <div class="person">
-              <span class="avatar">{{ obtenerIniciales(persona.nombre, persona.apellido) }}</span>
-              <div>
-                <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
-                <small>{{ persona.correos.join(', ') || 'Sin correo' }}</small>
-              </div>
-            </div>
-          </td>
-          <td>{{ persona.fechaBaja || 'Sin fecha' }}</td>
-          <td>{{ persona.ocupacion || 'Sin ocupación' }}</td>
-          <td>{{ persona.direcciones?.[0]?.municipio || 'Sin ciudad' }}</td>
-          <td>
-            <button type="button" class="restore" (click)="reactivar(persona)" [disabled]="reactivando() !== null">
-              {{ reactivando() === persona.id ? 'Reactivando…' : 'Reactivar' }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
+  <mat-card-content class="table-wrap" *ngIf="personasFiltradas().length">
+    <table mat-table [dataSource]="personasFiltradas()" class="inactive-table">
+      <ng-container matColumnDef="persona">
+        <th mat-header-cell *matHeaderCellDef scope="col">Persona</th>
+        <td mat-cell *matCellDef="let persona">
+          <div class="person">
+            <span class="avatar">{{ obtenerIniciales(persona.nombre, persona.apellido) }}</span>
+            <div><strong>{{ persona.nombre }} {{ persona.apellido }}</strong><small>{{ persona.correos.join(', ') || 'Sin correo' }}</small></div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fechaBaja">
+        <th mat-header-cell *matHeaderCellDef scope="col">Fecha de baja</th>
+        <td mat-cell *matCellDef="let persona">{{ persona.fechaBaja || 'Sin fecha' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ocupacion">
+        <th mat-header-cell *matHeaderCellDef scope="col">Ocupación</th>
+        <td mat-cell *matCellDef="let persona">{{ persona.ocupacion || 'Sin ocupación' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="ciudad">
+        <th mat-header-cell *matHeaderCellDef scope="col">Ciudad</th>
+        <td mat-cell *matCellDef="let persona">{{ persona.direcciones?.[0]?.municipio || 'Sin ciudad' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef scope="col">Acciones</th>
+        <td mat-cell *matCellDef="let persona">
+          <button mat-stroked-button type="button" class="restore"
+            (click)="reactivar(persona)" [disabled]="reactivando() !== null || persona.id == null">
+            {{ reactivando() === persona.id ? 'Reactivando…' : 'Reactivar' }}
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas"></tr>
     </table>
-  </div>
+  </mat-card-content>
 
-  <div *ngIf="!personas().length" class="empty">
+  <mat-card-content class="mobile-inactive-list" *ngIf="personasFiltradas().length">
+    <mat-card *ngFor="let persona of personasFiltradas()" class="mobile-inactive-card">
+      <mat-card-header>
+        <span class="avatar">{{ obtenerIniciales(persona.nombre, persona.apellido) }}</span>
+        <div class="mobile-inactive-heading">
+          <mat-card-title>{{ persona.nombre }} {{ persona.apellido }}</mat-card-title>
+          <mat-card-subtitle>{{ persona.correos.join(', ') || 'Sin correo' }}</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="mobile-inactive-data">
+        <div><span>Fecha de baja</span><strong>{{ persona.fechaBaja || 'Sin fecha' }}</strong></div>
+        <div><span>Ocupación</span><strong>{{ persona.ocupacion || 'Sin ocupación' }}</strong></div>
+         <div><span>Ciudad</span><strong>{{ persona.direcciones?.[0]?.municipio || 'Sin ciudad' }}</strong></div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-stroked-button type="button" class="restore" (click)="reactivar(persona)"
+          [disabled]="reactivando() !== null || persona.id == null">
+          {{ reactivando() === persona.id ? 'Reactivando…' : 'Reactivar' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </mat-card-content>
+
+  <mat-card-content *ngIf="!personas().length" class="empty">
     <h3>{{ mensajeError() ? 'No se pudieron cargar los registros' : 'No hay personas desactivadas' }}</h3>
     <p>{{ mensajeError() ? 'Reintenta la consulta.' : 'Las personas dadas de baja aparecerán aquí.' }}</p>
-  </div>
-</section>
+  </mat-card-content>
+
+  <mat-card-content *ngIf="personas().length > 0 && !personasFiltradas().length" class="empty">
+    <h3>No encontramos coincidencias</h3>
+    <p>Prueba con otro nombre, teléfono, correo, ocupación o ciudad.</p>
+    <button mat-stroked-button type="button" (click)="busqueda.set('')">Limpiar búsqueda</button>
+  </mat-card-content>
+</mat-card>

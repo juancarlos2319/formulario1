@@ -1,13 +1,47 @@
 @import '@angular/material/prebuilt-themes/azure-blue.css';
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
-body { margin: 0; }
+:root {
+  --app-primary: #7155d9;
+  --app-primary-hover: #6247c7;
+  --app-primary-soft: #eee9fc;
+  --app-primary-pale: #faf8fe;
+  --app-text-primary: #302a42;
+  --app-text-muted: #928a9d;
+  --app-surface: #fff;
+  --app-surface-subtle: #faf9fc;
+  --app-border: #eae8f0;
+  --app-border-subtle: #f0edf5;
+  --app-focus: #a58ade;
+  --app-success: #26704d;
+  --app-success-soft: #f2fbf6;
+  --app-danger: #a83d48;
+  --app-danger-soft: #fffafa;
+  --app-scroll-track: #f5f1fa;
+  --app-scroll-thumb: #aa92d9;
+  --app-font-body: 'DM Sans', sans-serif;
+  --app-font-heading: 'Manrope', sans-serif;
+  --app-space-xs: 4px;
+  --app-space-sm: 8px;
+  --app-space-md: 12px;
+  --app-space-lg: 16px;
+  --app-space-xl: 24px;
+  --app-radius-sm: 8px;
+  --app-radius-md: 12px;
+  --app-radius-lg: 14px;
+}
+
+body {
+  margin: 0;
+  color: var(--app-text-primary);
+  font-family: var(--app-font-body);
+}
 
 /* Desplazamiento de las vistas y del menu administrativo Material. */
 app-admin-layout .mat-drawer-content,
 app-admin-layout .mat-drawer-inner-container {
   scrollbar-width: thin;
-  scrollbar-color: #aa92d9 #f5f1fa;
+  scrollbar-color: var(--app-scroll-thumb) var(--app-scroll-track);
 }
 
 app-admin-layout .mat-drawer-content::-webkit-scrollbar,
@@ -18,18 +52,18 @@ app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar {
 
 app-admin-layout .mat-drawer-content::-webkit-scrollbar-track,
 app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-track {
-  background: #f5f1fa;
+  background: var(--app-scroll-track);
   border-radius: 12px;
 }
 
 app-admin-layout .mat-drawer-content::-webkit-scrollbar-thumb,
 app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb {
-  background: #aa92d9;
-  border: 2px solid #f5f1fa;
+  background: var(--app-scroll-thumb);
+  border: 2px solid var(--app-scroll-track);
   border-radius: 12px;
 }
 
 app-admin-layout .mat-drawer-content::-webkit-scrollbar-thumb:hover,
 app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb:hover {
-  background: #795ac5;
+  background: var(--app-primary-hover);
 }

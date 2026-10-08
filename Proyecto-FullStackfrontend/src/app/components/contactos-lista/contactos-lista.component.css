@@ -1,4 +1,5 @@
 .contacts-panel{overflow:hidden}
+.mobile-contact-list{display:none}
 .table-heading{padding:22px 28px 14px}
 .table-heading mat-card-title{color:#302a42;font:700 16px 'Manrope',sans-serif}
 .table-heading mat-card-subtitle{margin-top:8px;color:#928a9d;font:12px 'DM Sans',sans-serif}
@@ -20,4 +21,4 @@
 .empty p{margin:0;font-size:12px}
 mat-progress-bar{margin:0 0 16px;border-radius:8px;overflow:hidden;--mdc-linear-progress-active-indicator-color:#7155d9;--mdc-linear-progress-track-color:#eee9fc}
 .notice button{height:36px;font:600 12px 'DM Sans',sans-serif}
-@media(max-width:760px){.welcome-actions{width:100%;flex-direction:column;align-items:stretch}.welcome-actions a{text-align:center}.table-heading{padding:18px}.contacts-table th,.contacts-table td{padding:10px 12px}}
+@media(max-width:760px){.welcome-actions{width:100%;flex-direction:column;align-items:stretch}.welcome-actions a{text-align:center}.table-heading{padding:18px}.table-wrap{display:none!important}.mobile-contact-list{display:grid;gap:12px;padding:0 14px 14px!important}.mobile-contact-card{border:1px solid #eeeaf3;border-radius:12px;box-shadow:none}.mobile-contact-card mat-card-header{align-items:center;gap:12px;padding:14px 14px 8px}.mobile-contact-card mat-card-header .avatar{margin:0}.mobile-contact-card mat-card-title{color:#302a42;font:600 14px 'DM Sans',sans-serif}.mobile-contact-card mat-card-subtitle{margin-top:5px;color:#7155b8;font-size:11px}.mobile-contact-data{display:grid;gap:11px;padding:8px 16px 12px!important}.mobile-contact-data div{display:grid;gap:3px;min-width:0}.mobile-contact-data span{color:#928a9d;font-size:10px}.mobile-contact-data strong{color:#302a42;font-size:12px;font-weight:500;overflow-wrap:anywhere}.mobile-contact-card mat-card-actions{gap:8px;padding:0 14px 14px}.mobile-contact-card mat-card-actions a,.mobile-contact-card mat-card-actions button{min-height:38px;font-size:11px}}

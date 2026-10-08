@@ -30,6 +30,11 @@ export class SidebarComponent {
       ? segmentos[1].path : null;
   });
 
+  readonly vistaPersonasDesactivadas = computed(() => {
+    const segmentos = this.router.parseUrl(this.urlActual()).root.children[PRIMARY_OUTLET]?.segments ?? [];
+    return segmentos.length === 2 && segmentos[0].path === 'personas' && segmentos[1].path === 'desactivadas';
+  });
+
   readonly personaContactadaId = computed(() => {
     const segmentos = this.router.parseUrl(this.urlActual()).root.children[PRIMARY_OUTLET]?.segments ?? [];
     if (segmentos[0]?.path !== 'contactos' || !/^\d+$/.test(segmentos[1]?.path ?? '')) return null;

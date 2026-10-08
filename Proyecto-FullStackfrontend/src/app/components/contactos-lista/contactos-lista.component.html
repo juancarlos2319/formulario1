@@ -77,6 +77,31 @@
     </table>
   </mat-card-content>
 
+  <mat-card-content class="mobile-contact-list" *ngIf="contactos().length">
+    <mat-card *ngFor="let contacto of contactos()" class="mobile-contact-card">
+      <mat-card-header>
+        <span class="avatar">{{ obtenerIniciales(contacto.nombre, contacto.apellido) }}</span>
+        <div>
+          <mat-card-title>{{ contacto.nombre }} {{ contacto.apellido }}</mat-card-title>
+          <mat-card-subtitle>{{ contacto.parentesco || 'Sin parentesco' }}</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="mobile-contact-data">
+        <div><span>Teléfono</span><strong>{{ contacto.telefonos?.join(', ') || 'Sin teléfono' }}</strong></div>
+        <div><span>Correo</span><strong>{{ contacto.correos?.join(', ') || 'Sin correo' }}</strong></div>
+        <div><span>Fecha de nacimiento</span><strong>{{ contacto.fechaNacimiento || 'No registrada' }}</strong></div>
+        <div><span>Género</span><strong>{{ contacto.genero || 'No registrado' }}</strong></div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <a *ngIf="contacto.idContacto != null" mat-stroked-button class="edit-link"
+          [routerLink]="['/contactos', personaId, 'editar', contacto.idContacto]"
+          (click)="marcarInicioEdicion()">Editar</a>
+        <button mat-stroked-button type="button" class="remove-contact" (click)="quitarContacto(contacto)"
+          [disabled]="cargando() || quitando() || !!mensajeError() || contactos().length <= 1">Quitar</button>
+      </mat-card-actions>
+    </mat-card>
+  </mat-card-content>
+
   <mat-card-content *ngIf="!contactos().length" class="empty">
     <h3>{{ mensajeError() ? 'No se pudieron cargar los contactos' : 'Aún no hay contactos' }}</h3>
     <p>{{ mensajeError() ? 'Reintenta la consulta.' : 'Agrega el primer contacto de emergencia.' }}</p>

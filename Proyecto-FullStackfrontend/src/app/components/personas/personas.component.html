@@ -92,6 +92,39 @@
     </table>
   </mat-card-content>
 
+  <mat-card-content class="mobile-people-list" *ngIf="usuariosFiltrados.length">
+    <mat-card *ngFor="let u of usuariosFiltrados" class="mobile-person-card">
+      <mat-card-header>
+        <span class="avatar">{{ obtenerIniciales(u.nombre, u.apellido) }}</span>
+        <div class="mobile-person-heading">
+          <mat-card-title>{{ u.nombre }} {{ u.apellido }}</mat-card-title>
+          <mat-card-subtitle>{{ u.correos.join(', ') || 'Sin correo' }}</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+      <mat-card-content class="mobile-person-data">
+        <div><span>Teléfono</span><strong>{{ u.telefonos.join(', ') || 'Sin teléfono' }}</strong></div>
+        <div><span>Ocupación</span><strong>{{ u.ocupacion || 'Sin ocupación' }}</strong></div>
+        <div><span>Ciudad</span><strong>{{ u.direcciones?.[0]?.municipio || 'Sin ciudad' }}</strong></div>
+        <section *ngIf="detalleId() === u.id" class="mobile-person-details" aria-label="Detalles de la persona">
+          <mat-progress-bar *ngIf="cargandoDetalle()" mode="indeterminate" aria-label="Cargando detalles"></mat-progress-bar>
+          <dl *ngIf="detalle() as datos">
+            <div><dt>Direcciones</dt><dd><div *ngFor="let direccion of datos.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</div><span *ngIf="!datos.direcciones?.length">No registrada</span></dd></div>
+            <div><dt>Género</dt><dd>{{ datos.genero || 'No registrado' }}</dd></div>
+            <div><dt>Fecha de nacimiento</dt><dd>{{ datos.fechaNacimiento || 'No registrada' }}</dd></div>
+          </dl>
+        </section>
+      </mat-card-content>
+      <mat-card-actions class="mobile-person-actions">
+        <button mat-stroked-button type="button" (click)="verDetalle(u)" [attr.aria-expanded]="detalleId() === u.id">{{ detalleId() === u.id ? 'Ocultar' : 'Detalles' }}</button>
+        <a *ngIf="u.id != null" mat-stroked-button [routerLink]="['/registro', u.id]">Editar</a>
+        <a *ngIf="u.id != null" mat-stroked-button [routerLink]="['/contactos', u.id]">Contactos</a>
+        <button mat-stroked-button type="button" class="danger" (click)="eliminar(u.id)"
+          [disabled]="u.id == null || u.puedeEliminar !== true || eliminando() !== null"
+          [attr.aria-label]="'Dar de baja a ' + u.nombre">{{ eliminando() === u.id ? 'Procesando…' : 'Dar de baja' }}</button>
+      </mat-card-actions>
+    </mat-card>
+  </mat-card-content>
+
   <mat-card-content *ngIf="!usuariosFiltrados.length" class="empty">
     <h3>{{ usuarios().length ? 'No encontramos coincidencias' : 'Tu comunidad empieza aquí' }}</h3>
     <p>{{ usuarios().length ? 'Prueba con otro nombre, teléfono o correo.' : 'Registra a tu primera persona para comenzar.' }}</p>
