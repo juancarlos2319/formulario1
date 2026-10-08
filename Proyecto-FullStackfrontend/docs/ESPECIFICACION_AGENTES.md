@@ -55,3 +55,5 @@
 - El formulario usa exclusivamente el arreglo `direcciones`, sin `direccion` ni `ciudad`. Las vistas obtienen el municipio del arreglo.
 
 - Personas consulta `/api/personas` para la tabla y `/{id}/detalles` para los campos adicionales. Listas y detalles se conservan en memoria sin vencimiento; se invalidan al guardar, dar de baja, reactivar o cambiar de sesión.
+
+- El interceptor cierra la sesión y redirige a `/inicio` ante 401, errores de conexión (estado 0), respuestas 5xx o una espera de 15 segundos en peticiones a la API local. Se detectan fallos al hacer peticiones, sin consultas periódicas. No afecta a servicios externos ni a errores de validación; respuestas de sesiones anteriores no cierran la sesión vigente.
