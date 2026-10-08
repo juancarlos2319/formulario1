@@ -1,9 +1,9 @@
-﻿:host{display:block;background:#f8f8fb;color:#302a42;font:14px 'DM Sans',sans-serif}
+﻿:host{display:block;background:#f8f8fb;color:#302a42;font:14px var(--app-font-body)}
 .layout{height:100dvh;background:#f8f8fb}
 .side{width:242px;--mat-sidenav-container-background-color:#fff;--mat-sidenav-container-shape:0;border-right:1px solid #ecebf2}
 .main{display:flex;flex-direction:column;min-height:100%}
 header{position:sticky;top:0;z-index:10}
-.header-toolbar{min-height:76px;height:auto;padding:14px 32px;background:#fff;color:#302a42;border-bottom:1px solid #ecebf2;gap:16px;font:12px 'DM Sans',sans-serif;white-space:normal}
+.header-toolbar{min-height:76px;height:auto;padding:14px 32px;background:#fff;color:#302a42;border-bottom:1px solid #ecebf2;gap:16px;font:12px var(--app-font-body);white-space:normal}
 .page-title{min-width:0;overflow-wrap:anywhere}
 .muted{color:#928a9d}
 main{flex:1;width:100%;padding:30px;max-width:1600px;margin:auto;box-sizing:border-box}
@@ -12,7 +12,7 @@ footer{text-align:center;font-size:11px;color:#a298ad;padding:0 15px 28px}
 .account-data{min-width:0;text-align:right}
 .account-data strong,.account-data small{display:block;overflow-wrap:anywhere}
 .account-data small{color:#928a9d;margin-top:4px;font-size:11px}
-.editar-cuenta{flex-shrink:0;--mdc-outlined-button-label-text-color:#7155b8;--mdc-outlined-button-label-text-font:'DM Sans',sans-serif;--mdc-outlined-button-label-text-size:12px}
+.editar-cuenta{flex-shrink:0;--mdc-outlined-button-label-text-color:#7155b8;--mdc-outlined-button-label-text-font:var(--app-font-body);--mdc-outlined-button-label-text-size:12px}
 .menu-toggle{flex-shrink:0;color:#7155d9}
 button:focus-visible,a:focus-visible{outline:3px solid #a58ade;outline-offset:3px}
 @media(max-width:760px){.header-toolbar{padding:10px 16px;min-height:64px;gap:8px;flex-wrap:wrap}.account{flex:1 1 240px;justify-content:flex-end}main{padding:20px 15px}.side{width:min(280px,85vw)}}

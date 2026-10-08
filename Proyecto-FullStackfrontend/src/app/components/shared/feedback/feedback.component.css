@@ -1,17 +1,17 @@
 :host{position:relative;z-index:1200}
 .notice-stack{position:fixed;z-index:1200;top:18px;right:18px;display:grid;gap:10px;width:min(390px,calc(100vw - 36px));pointer-events:none}
-.notice{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px 16px;border:1px solid #dce9e1;border-left:4px solid #39825c;border-radius:8px;background:#fff;color:#294c38;box-shadow:0 12px 34px #18271920;font:500 13px/1.45 'DM Sans',sans-serif;pointer-events:auto}
+.notice{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px 16px;border:1px solid #dce9e1;border-left:4px solid #39825c;border-radius:8px;background:#fff;color:#294c38;box-shadow:0 12px 34px #18271920;font:500 13px/1.45 var(--app-font-body);pointer-events:auto}
 .notice.error{border-color:#f0d9d9;border-left-color:#b94350;background:#fffafa;color:#772e37}
 .notice.warning{border-color:#f1e4c7;border-left-color:#b77b1f;background:#fffdf7;color:#6c4b18}
 .notice.info{border-color:#dbe3ef;border-left-color:#536f9a;background:#fbfcff;color:#344967}
 .notice button{flex:0 0 auto;border:0;background:transparent;color:inherit;padding:0 2px;font-size:20px;line-height:1;cursor:pointer}
-.confirm-dialog{width:min(440px,calc(100vw - 32px));padding:28px;border:1px solid #e5e8e3;border-radius:10px;background:#fff;color:#242a25;box-shadow:0 24px 80px #131a1640;font-family:'DM Sans',sans-serif}
+.confirm-dialog{width:min(440px,calc(100vw - 32px));padding:28px;border:1px solid #e5e8e3;border-radius:10px;background:#fff;color:#242a25;box-shadow:0 24px 80px #131a1640;font-family:var(--app-font-body)}
 .confirm-dialog::backdrop{background:#14201870}
 .eyebrow{margin:0 0 8px;color:#68816f;font-size:10px;font-weight:700;letter-spacing:1px}
-h2{margin:0;font:700 21px/1.25 'Manrope',sans-serif;color:#202922}
+h2{margin:0;font:700 21px/1.25 var(--app-font-heading);color:#202922}
 .confirm-dialog>p:not(.eyebrow){margin:12px 0 24px;color:#58625a;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
 .dialog-actions{display:flex;justify-content:flex-end;gap:9px}
-.dialog-actions button{min-height:40px;padding:0 16px;border:1px solid #dce2dc;border-radius:6px;background:white;color:#37433a;font:600 13px 'DM Sans',sans-serif;cursor:pointer}
+.dialog-actions button{min-height:40px;padding:0 16px;border:1px solid #dce2dc;border-radius:6px;background:white;color:#37433a;font:600 13px var(--app-font-body);cursor:pointer}
 .dialog-actions .confirm{border-color:#31744e;background:#31744e;color:white}
 .dialog-actions .confirm.danger{border-color:#a83d48;background:#a83d48}
 .dialog-actions button:focus-visible,.notice button:focus-visible{outline:3px solid #83ad91;outline-offset:3px}

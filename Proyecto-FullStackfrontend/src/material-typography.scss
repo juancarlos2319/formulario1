@@ -1,0 +1,33 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Mismos colores Azure/Blue; tipografia propia y solo componentes utilizados.
+$theme: mat.define-theme((
+  color: (theme-type: light, primary: mat.$azure-palette, tertiary: mat.$blue-palette),
+  typography: (
+    plain-family: ('Plus Jakarta Sans', 'Segoe UI', sans-serif),
+    brand-family: ('Sora', 'Segoe UI', sans-serif),
+    regular-weight: 400,
+    medium-weight: 500,
+    bold-weight: 700,
+  ),
+));
+
+html {
+  @include mat.core-theme($theme);
+  @include mat.button-theme($theme);
+  @include mat.icon-button-theme($theme);
+  @include mat.fab-theme($theme);
+  @include mat.card-theme($theme);
+  @include mat.checkbox-theme($theme);
+  @include mat.form-field-theme($theme);
+  @include mat.input-theme($theme);
+  @include mat.list-theme($theme);
+  @include mat.progress-bar-theme($theme);
+  @include mat.progress-spinner-theme($theme);
+  @include mat.select-theme($theme);
+  @include mat.sidenav-theme($theme);
+  @include mat.table-theme($theme);
+  @include mat.toolbar-theme($theme);
+}

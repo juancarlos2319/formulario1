@@ -57,3 +57,5 @@
 - Personas consulta `/api/personas` para la tabla y `/{id}/detalles` para los campos adicionales. Listas y detalles se conservan en memoria sin vencimiento; se invalidan al guardar, dar de baja, reactivar o cambiar de sesión.
 
 - El interceptor cierra la sesión y redirige a `/inicio` ante 401, errores de conexión (estado 0), respuestas 5xx o una espera de 15 segundos en peticiones a la API local. Se detectan fallos al hacer peticiones, sin consultas periódicas. No afecta a servicios externos ni a errores de validación; respuestas de sesiones anteriores no cierran la sesión vigente.
+
+- Tipografía: Sora para títulos, Plus Jakarta Sans para lectura y controles, IBM Plex Mono para cifras del dashboard y campos numéricos. Las familias se centralizan en `styles.scss` y el tema tipográfico Material en `material-typography.scss`. Google Fonts se carga desde `index.html` con `display=swap` y familias de respaldo.

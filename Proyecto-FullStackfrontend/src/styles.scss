@@ -1,5 +1,4 @@
-@import '@angular/material/prebuilt-themes/azure-blue.css';
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+@use './material-typography';
 
 :root {
   --app-primary: #7155d9;
@@ -19,8 +18,9 @@
   --app-danger-soft: #fffafa;
   --app-scroll-track: #f5f1fa;
   --app-scroll-thumb: #aa92d9;
-  --app-font-body: 'DM Sans', sans-serif;
-  --app-font-heading: 'Manrope', sans-serif;
+  --app-font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  --app-font-numeric: 'IBM Plex Mono', ui-monospace, monospace;
+  --app-font-heading: 'Sora', 'Segoe UI', sans-serif;
   --app-space-xs: 4px;
   --app-space-sm: 8px;
   --app-space-md: 12px;
@@ -35,6 +35,7 @@ body {
   margin: 0;
   color: var(--app-text-primary);
   font-family: var(--app-font-body);
+  line-height: 1.55;
 }
 
 /* Desplazamiento de las vistas y del menu administrativo Material. */
@@ -66,4 +67,19 @@ app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb {
 app-admin-layout .mat-drawer-content::-webkit-scrollbar-thumb:hover,
 app-admin-layout .mat-drawer-inner-container::-webkit-scrollbar-thumb:hover {
   background: var(--app-primary-hover);
+}
+
+/* Jerarquia tipografica compartida por las pantallas. */
+h1, h2, h3, .mat-mdc-card-title {
+  font-family: var(--app-font-heading);
+  text-wrap: balance;
+}
+
+h1 { line-height: 1.2; }
+h2, h3 { line-height: 1.35; }
+
+.app-numeric, body input[inputmode="numeric"], body input[type="tel"], body input[type="number"] {
+  font-family: var(--app-font-numeric);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }

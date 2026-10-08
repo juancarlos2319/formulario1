@@ -1,4 +1,4 @@
-﻿:host{display:block;container-type:inline-size;--mdc-filled-button-container-color:#7155d9;--mdc-filled-button-label-text-color:#fff;--mdc-linear-progress-active-indicator-color:#8b70df;--mdc-linear-progress-track-color:#f2eff8;--mdc-list-list-item-label-text-font:'DM Sans',sans-serif;--mdc-list-list-item-supporting-text-font:'DM Sans',sans-serif;--mdc-outlined-card-container-color:#fff}
+﻿:host{display:block;container-type:inline-size;--mdc-filled-button-container-color:#7155d9;--mdc-filled-button-label-text-color:#fff;--mdc-linear-progress-active-indicator-color:#8b70df;--mdc-linear-progress-track-color:#f2eff8;--mdc-list-list-item-label-text-font:var(--app-font-body);--mdc-list-list-item-supporting-text-font:var(--app-font-body);--mdc-outlined-card-container-color:#fff}
 .welcome{gap:14px;margin-bottom:14px}
 h1{font-size:clamp(20px,2.5dvh,26px);margin:6px 0}
 .welcome .eyebrow{margin:0}
@@ -9,7 +9,7 @@ h1{font-size:clamp(20px,2.5dvh,26px);margin:6px 0}
 .stats .tile{float:right;width:30px;height:30px;border-radius:9px}
 .stats p{font-size:11px;color:#898191;margin:6px 0}
 .stats small{font-size:10px}
-.stat-value{font:800 28px 'Manrope',sans-serif}
+.stat-value{font:500 28px var(--app-font-numeric);font-variant-numeric:tabular-nums;letter-spacing:-1px}
 .green{background:#e4f7ef;color:#348666}.orange{background:#fff0df;color:#b47836}.blue{background:#e6f1fc;color:#498bd1}
 .overview{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
 .distribution mat-card-content,.quick mat-card-content{padding:16px}

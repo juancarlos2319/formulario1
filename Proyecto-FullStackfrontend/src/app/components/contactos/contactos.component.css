@@ -7,19 +7,19 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 .form-wrapper{max-width:880px;margin:0 auto 24px;padding:24px;background:#fff;border:1px solid #eae8f0;border-radius:8px;box-shadow:none}
-.form-title{margin:0 0 18px;color:#302a42;font:700 16px 'Manrope',sans-serif}
+.form-title{margin:0 0 18px;color:#302a42;font:700 16px var(--app-font-heading)}
 .card-section{margin:0 0 16px;padding:18px;border:1px solid #eae8f0;border-radius:8px;background:#faf9fc}
 .card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .card-heading legend{padding:0;color:#302a42;font-weight:700}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 label{color:#50495a;font-size:12px;font-weight:600}
-input,select{width:100%;min-height:40px;padding:9px 11px;border:1px solid #dedbe5;border-radius:6px;background:white;color:#302a42;font:13px 'DM Sans',sans-serif}
+input,select{width:100%;min-height:40px;padding:9px 11px;border:1px solid #dedbe5;border-radius:6px;background:white;color:#302a42;font:13px var(--app-font-body)}
 input:focus,select:focus{outline:3px solid #e5defa;border-color:#7155d9}
 .field :disabled{background:#f0eff2;color:#77717f;cursor:not-allowed}
 .field-error{color:#b34d64;font-size:11px}
 .shared-person-note{margin:0 0 12px;padding:10px 12px;border-left:3px solid #39825c;background:#f2fbf6;color:#294c38;font-size:12px;line-height:1.45}
 .contact-summary{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 16px;color:#6c6573;font-size:12px}
-.card-remove,.add-contact-button,.cancel-button,.btn-submit{min-height:40px;height:40px;min-width:0;padding:0 14px;border-radius:7px;font:600 12px 'DM Sans',sans-serif;cursor:pointer}
+.card-remove,.add-contact-button,.cancel-button,.btn-submit{min-height:40px;height:40px;min-width:0;padding:0 14px;border-radius:7px;font:600 12px var(--app-font-body);cursor:pointer}
 .card-remove{border-color:#f0d9d9!important;background:#fffafa!important;color:#a83d48!important}
 .add-contact-action{margin:0 0 14px}
 .add-contact-button,.cancel-button{border-color:#e9e3f2!important;background:#fff!important;color:#7155b8!important}
@@ -27,12 +27,12 @@ input:focus,select:focus{outline:3px solid #e5defa;border-color:#7155d9}
 .btn-submit{background:#7155d9!important;color:#fff!important}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed}
 .contact-group{margin:0 0 14px;padding:16px;border:1px solid #efedf3;border-radius:8px;background:#fff}
-.contact-group h3{margin:0 0 14px;color:#50495a;font:600 13px 'Manrope',sans-serif}
+.contact-group h3{margin:0 0 14px;color:#50495a;font:600 13px var(--app-font-heading)}
 .contact-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}
 .contact-field-grid .field{margin-bottom:4px}
 .communication-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .communication-type{min-width:0}
-.communication-type h4{margin:0 0 10px;color:#6c6573;font:600 12px 'DM Sans',sans-serif}
+.communication-type h4{margin:0 0 10px;color:#6c6573;font:600 12px var(--app-font-body)}
 .relationship-group .field{max-width:calc(50% - 7px);margin-bottom:0}
 .contact-material-field{width:100%;font-size:13px;--mdc-outlined-text-field-container-shape:6px;--mdc-outlined-text-field-outline-color:#dedbe5;--mdc-outlined-text-field-focus-outline-color:#7155d9;--mdc-outlined-text-field-input-text-color:#302a42;--mdc-outlined-text-field-input-text-size:13px;--mdc-outlined-text-field-label-text-color:#50495a;--mdc-outlined-text-field-focus-label-text-color:#7155d9;--mat-form-field-container-height:40px;--mat-form-field-container-vertical-padding:8px}
 @media(max-width:640px){.form-wrapper{padding:16px}.card-section{padding:14px}.form-actions{flex-direction:column-reverse}.form-actions button{width:100%}}
