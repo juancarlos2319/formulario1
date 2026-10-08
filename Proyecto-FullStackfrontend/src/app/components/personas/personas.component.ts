@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
-import { Usuario, PersonaResumen } from '../../interfaces/usuario.interface';
+import { PersonaDetalle, PersonaResumen } from '../../interfaces/usuario.interface';
 import { FeedbackService } from '../shared/feedback/feedback.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -27,7 +27,7 @@ export class PersonasComponent implements OnInit {
   readonly mensajeError = signal('');
   readonly busqueda = signal('');
   readonly eliminando = signal<number | null>(null);
-  readonly detalle = signal<Usuario | null>(null);
+  readonly detalle = signal<PersonaDetalle | null>(null);
   readonly detalleId = signal<number | null>(null);
   readonly cargandoDetalle = signal(false);
   readonly columnas = ['persona', 'telefono', 'ocupacion', 'ciudad', 'acciones'];
@@ -38,7 +38,7 @@ export class PersonasComponent implements OnInit {
   get usuariosFiltrados(): PersonaResumen[] {
     const texto = this.normalizar(this.busqueda().trim());
     return this.usuarios().filter(u => this.normalizar(
-      [u.nombre, u.apellido, ...u.correos, ...u.telefonos, u.ocupacion, u.ciudad].join(' ')
+      [u.nombre, u.apellido, ...u.correos, ...u.telefonos, u.ocupacion, ...(u.direcciones ?? []).map(d => d.municipio)].join(' ')
     ).includes(texto));
   }
 
@@ -65,7 +65,7 @@ export class PersonasComponent implements OnInit {
     this.detalleId.set(id);
     this.detalle.set(null);
     this.cargandoDetalle.set(true);
-    this.registroService.obtenerPersonaPorId(id).subscribe({
+    this.registroService.obtenerDetallePersona(id).subscribe({
       next: datos => { if (this.detalleId() === id) { this.detalle.set(datos); this.cargandoDetalle.set(false); } },
       error: () => { if (this.detalleId() === id) { this.cargandoDetalle.set(false); this.mensajeError.set('No se pudieron cargar los detalles.'); } }
     });
@@ -87,7 +87,7 @@ export class PersonasComponent implements OnInit {
     this.registroService.eliminarPersona(id).subscribe({
       next: () => {
         this.usuarios.set(this.usuarios().filter(u => u.id !== id));
-        if (this.detalle()?.id === id) this.detalle.set(null);
+        if (this.detalleId() === id) { this.detalle.set(null); this.detalleId.set(null); }
         this.eliminando.set(null);
         this.feedbackService.notify('La persona fue dada de baja.', 'success');
       },

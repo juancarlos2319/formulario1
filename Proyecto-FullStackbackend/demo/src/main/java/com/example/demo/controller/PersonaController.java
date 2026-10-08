@@ -55,6 +55,11 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.obtenerInactivos());
     }
 
+    @GetMapping("/{id}/detalles")
+    public com.example.demo.dto.PersonaDetalleDTO obtenerDetalle(@PathVariable Long id) {
+        return personaService.obtenerDetalle(id);
+    }
+
     @GetMapping("/{id}")
     public PersonaDTO obtenerPorId(@PathVariable Long id) {
         return personaService.obtenerPorId(id);

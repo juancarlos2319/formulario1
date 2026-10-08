@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject, catchError, throwError, finalize, shareReplay, tap } from 'rxjs';
-import { Usuario, PersonaResumen, Resultado, Resumen } from '../interfaces/usuario.interface';
+import { Usuario, PersonaDetalle, PersonaResumen, Resultado, Resumen } from '../interfaces/usuario.interface';
 import { ContactoEmergencia, Parentesco } from '../interfaces/contacto-emergencia.interface';
 
 @Injectable({
@@ -22,6 +22,7 @@ export class PersonasService {
   }
 
   limpiarCacheSesion(): void {
+    this.personasCache.clear();
     this.contactosCache.clear();
     this.parentescosCache = undefined;
     this.solicitudes.clear();
@@ -51,10 +52,11 @@ export class PersonasService {
       return throwError(() => new Error('Primero completa los datos de la persona registrada.'));
     }
     return this.http.post<Resultado>(this.apiUrl, { ...borrador, contactosEmergencia: contactos }, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('guardar el registro y sus contactos')));
+      .pipe(tap(r => { if (r.ok) this.invalidarPersonas(); }), catchError(this.manejarError('guardar el registro y sus contactos')));
   }
 
   private http = inject(HttpClient);
+  private personasCache = new Map<string, Observable<unknown>>();
   private solicitudes = new Map<string, Observable<unknown>>();
   private parentescosCache?: Observable<Parentesco[]>;
   private contactosCache = new Map<number, { respuesta: Observable<ContactoEmergencia[]>; expira: number }>();
@@ -95,6 +97,7 @@ export class PersonasService {
       .pipe(tap(resultado => {
         if (resultado.ok) {
           // La persona editada puede estar compartida por otros titulares.
+          this.invalidarPersonas();
           this.contactosCache.clear();
           this.cambiosPersonales.next();
         }
@@ -104,22 +107,42 @@ export class PersonasService {
 
   crearPersona(datos: Usuario): Observable<Resultado> {
     return this.http.post<Resultado>(this.apiUrl, datos, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('guardar el formulario')));
+      .pipe(tap(r => { if (r.ok) this.invalidarPersonas(); }), catchError(this.manejarError('guardar el formulario')));
   }
 
   obtenerPersonas(): Observable<PersonaResumen[]> {
-    return this.http.get<PersonaResumen[]>(this.apiUrl, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener los formularios')));
+    return this.consultarPersonasCache<PersonaResumen[]>(this.apiUrl, 'obtener los formularios');
   }
 
   obtenerPersonasInactivas(): Observable<PersonaResumen[]> {
-    return this.http.get<PersonaResumen[]>(`${this.apiUrl}/inactivos`, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('obtener las personas desactivadas')));
+    return this.consultarPersonasCache<PersonaResumen[]>(`${this.apiUrl}/inactivos`, 'obtener las personas desactivadas');
   }
 
   reactivarPersona(id: number): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}/reactivar`, null, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('reactivar la persona')));
+      .pipe(tap(r => { if (r.ok) this.invalidarPersonas(); }), catchError(this.manejarError('reactivar la persona')));
+  }
+
+  obtenerDetallePersona(id: number): Observable<PersonaDetalle> {
+    return this.consultarPersonasCache<PersonaDetalle>(`${this.apiUrl}/${id}/detalles`, 'obtener los detalles');
+  }
+
+  private invalidarPersonas(): void {
+    this.personasCache.clear();
+  }
+
+  private consultarPersonasCache<T>(url: string, operacion: string): Observable<T> {
+    const existente = this.personasCache.get(url);
+    if (existente) return existente as Observable<T>;
+    const respuesta = this.http.get<T>(url, { headers: this.getHeaders() }).pipe(
+      catchError(error => {
+        if (this.personasCache.get(url) === respuesta) this.personasCache.delete(url);
+        return this.manejarError(operacion)(error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+    this.personasCache.set(url, respuesta);
+    return respuesta;
   }
 
   obtenerPersonaPorId(id: number): Observable<Usuario> {
@@ -130,6 +153,7 @@ export class PersonasService {
     return this.http.put<Resultado>(`${this.apiUrl}/${id}`, datos, { headers: this.getHeaders() })
       .pipe(tap(resultado => {
         if (resultado.ok) {
+          this.invalidarPersonas();
           this.contactosCache.clear();
           this.cambiosPersonales.next();
         }
@@ -139,7 +163,7 @@ export class PersonasService {
 
   eliminarPersona(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() })
-      .pipe(catchError(this.manejarError('eliminar el formulario')));
+      .pipe(tap(() => this.invalidarPersonas()), catchError(this.manejarError('eliminar el formulario')));
   }
 
   obtenerOcupaciones(): Observable<string[]> {

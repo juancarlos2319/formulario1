@@ -23,8 +23,6 @@ public class PersonaDTO {
     private String apellido;
     private LocalDate fechaNacimiento;
     private String genero;
-    private String direccion;
-    private String ciudad;
     private String ocupacion;
     private LocalDate fechaBaja;
 
@@ -43,10 +41,6 @@ public class PersonaDTO {
     public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     public String getGenero() { return genero; }
     public void setGenero(String genero) { this.genero = genero; }
-    public String getDireccion() { return direccion; }
-    public void setDireccion(String direccion) { this.direccion = direccion; }
-    public String getCiudad() { return ciudad; }
-    public void setCiudad(String ciudad) { this.ciudad = ciudad; }
     public String getOcupacion() { return ocupacion; }
     public void setOcupacion(String ocupacion) { this.ocupacion = ocupacion; }
     public LocalDate getFechaBaja() { return fechaBaja; }

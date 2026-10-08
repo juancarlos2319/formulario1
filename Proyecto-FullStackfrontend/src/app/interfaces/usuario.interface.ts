@@ -6,10 +6,9 @@ export interface PersonaResumen {
   apellido: string;
   correos: string[];
   telefonos: string[];
-  ciudad: string;
   ocupacion: string;
   fechaBaja?: string | null;
-  direcciones?: Direccion[];
+  direcciones?: Pick<Direccion, 'municipio'>[];
   puedeEliminar?: boolean;
 }
 
@@ -23,10 +22,16 @@ export interface Direccion {
   numero: string;
 }
 
+export interface PersonaDetalle {
+  genero: string;
+  fechaNacimiento: string;
+  direcciones: Direccion[];
+}
+
 export interface Usuario extends PersonaResumen {
+  direcciones?: Direccion[];
   fechaNacimiento: string;
   genero: string;
-  direccion: string;
   contactosEmergencia?: ContactoEmergencia[];
 }
 

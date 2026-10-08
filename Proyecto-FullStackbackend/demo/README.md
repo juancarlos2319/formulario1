@@ -35,7 +35,7 @@ Enviar `Authorization: Bearer <token>` en las rutas protegidas. `JwtFilter`, reg
 | Método y ruta | Función |
 | --- | --- |
 | POST `/api/auth/login` | Obtener token de una hora |
-| GET `/api/personas` | Listar titulares activos con lista completa de contactos |
+| GET `/api/personas` | Listar titulares activos: nombre, apellido, correos, teléfonos, ocupación, municipio principal y permiso de baja |
 | GET `/api/personas/{id}` | Consultar únicamente el titular activo indicado; devuelve 404 si no existe, es solo contacto o está dado de baja |
 | POST `/api/personas` | Registrar titular y al menos un contacto |
 | PUT `/api/personas/{id}` | Actualizar datos y comunicaciones de titular activo |
@@ -110,9 +110,9 @@ Para una base existente, ejecutar manualmente `src/main/resources/migrations/202
 
 ## SQL inicial
 
-Ejecuta primero [schema.sql](src/main/resources/schema.sql) y después [data.sql](src/main/resources/data.sql) sobre una base vacía. Estos scripts incluyen `perfil_titular`, `direccion_titular`, los catálogos, las comunicaciones y los contactos de emergencia. No necesitas ejecutar la migración de direcciones al crear la base: la tabla se define en `schema.sql` y sus datos iniciales se insertan en `data.sql`.
+Ejecuta primero [schema.sql](src/main/resources/schema.sql) y después [data.sql](src/main/resources/data.sql) sobre una base vacía. Estos scripts incluyen `perfil_titular`, `direccion_titular`, los catálogos, las comunicaciones y los contactos de emergencia. La tabla de direcciones se define en `schema.sql` y sus datos iniciales se insertan en `data.sql`.
 
-La semilla crea perfiles de titular para Carlos y Laura, con una dirección principal por persona (orden 0), y las personas de soporte como contactos. Las direcciones conservan calle, número y municipio; estado, colonia y código postal quedan pendientes de completar desde el formulario. Los scripts están pensados para una base nueva; ejecuta `data.sql` una sola vez. El archivo de migración de direcciones se conserva para bases anteriores que todavía no tengan esta estructura y sus datos.
+La semilla crea perfiles de titular para Carlos y Laura, con una dirección principal por persona (orden 0), y las personas de soporte como contactos. Las direcciones conservan calle, número y municipio; estado, colonia y código postal quedan pendientes de completar desde el formulario. Los scripts están pensados para una base nueva; ejecuta `data.sql` una sola vez.
 
 ## Generar un hash
 
@@ -637,3 +637,11 @@ Este archivo reúne la explicación operativa y esta guía. Las referencias de s
 - `docs/Guia_backend_archivos_y_lineas.pdf`: documento final con índice y código numerado.
 
 Las carpetas `.git`, `.idea` y `target` contienen metadatos o resultados generados y no forman parte de los archivos fuente explicados.
+
+## Contrato de direcciones
+
+Las altas, ediciones y consultas de titulares usan `direcciones`, un arreglo de objetos con `pais`, `estado`, `municipio`, `colonia`, `codigoPostal`, `calle` y `numero`. Se requiere entre una y veinte direcciones. `direccion` y `ciudad` ya no forman parte del JSON. Los listados obtienen el municipio del arreglo `direcciones`.
+
+Las direcciones se guardan exclusivamente en `direccion_titular`. `perfil_titular` ya no tiene las columnas `direccion` ni `ciudad`. Para recrear la base, ejecuta `schema.sql` sobre una base vacía y luego `data.sql`, una sola vez. No se requiere una migración. `CREATE TABLE IF NOT EXISTS` no elimina columnas de tablas ya existentes.
+
+`GET /api/personas/{id}/detalles` devuelve solo `genero`, `fechaNacimiento` y `direcciones` completas. Los listados incluyen en `direcciones` solo el municipio de la primera dirección. `GET /api/personas/{id}` conserva el formulario completo para editar. El frontend conserva listados y detalles en memoria hasta recargar, cambiar de sesión o guardar cambios; las respuestas fallidas no se conservan.

@@ -76,6 +76,13 @@ public class PersonaService {
     private UsuarioRepository usuarioRepository;
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public com.example.demo.dto.PersonaDetalleDTO obtenerDetalle(Long id) {
+        Persona persona = titularActivo(id);
+        return new com.example.demo.dto.PersonaDetalleDTO(persona.getGenero(), persona.getFechaNacimiento(),
+                convertirDirecciones(persona.getPerfilTitular()));
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PersonaDTO obtenerPorId(Long id) {
         return convertirADTO(titularActivo(id));
     }
@@ -173,14 +180,7 @@ public class PersonaService {
         dto.setFechaNacimiento(p.getFechaNacimiento());
         dto.setGenero(p.getGenero());
         PerfilTitular perfil = p.getPerfilTitular();
-        List<PersonaDTO.DireccionDTO> direcciones = perfil.getDirecciones().stream()
-            .map(d -> new PersonaDTO.DireccionDTO(d.getPais(), d.getEstado(), d.getMunicipio(),
-                d.getColonia(), d.getCodigoPostal(), d.getCalle(), d.getNumero()))
-            .toList();
-        if (direcciones.isEmpty()) direcciones = direccionesAntiguas(perfil);
-        dto.setDirecciones(direcciones);
-        dto.setDireccion(perfil.getDireccion());
-        dto.setCiudad(perfil.getCiudad());
+        dto.setDirecciones(convertirDirecciones(perfil));
         dto.setFechaBaja(p.getPerfilTitular().getFechaBaja());
         dto.setOcupacion(p.getPerfilTitular().getOcupacion().getNombre());
 
@@ -227,25 +227,15 @@ public class PersonaService {
 
     private List<PersonaDTO.DireccionDTO> direccionesDe(PersonaDTO dto) {
         if (dto.getDirecciones() != null && !dto.getDirecciones().isEmpty()) return dto.getDirecciones();
-        if (dto.getDireccion() != null || dto.getCiudad() != null) {
-            return List.of(new PersonaDTO.DireccionDTO("México", "", dto.getCiudad(), "", "",
-                    dto.getDireccion(), ""));
-        }
         throw invalido("Se requiere al menos una dirección");
     }
 
-    private List<PersonaDTO.DireccionDTO> direccionesAntiguas(PerfilTitular perfil) {
-        return List.of(new PersonaDTO.DireccionDTO("México", "", perfil.getCiudad(), "", "",
-                perfil.getDireccion(), ""));
-    }
-
-        private List<PersonaDTO.DireccionDTO> convertirDirecciones(PerfilTitular perfil) {
-        List<PersonaDTO.DireccionDTO> direcciones = perfil.getDirecciones().stream()
+    private List<PersonaDTO.DireccionDTO> convertirDirecciones(PerfilTitular perfil) {
+        return perfil.getDirecciones().stream()
             .map(d -> new PersonaDTO.DireccionDTO(d.getPais(), d.getEstado(), d.getMunicipio(),
                 d.getColonia(), d.getCodigoPostal(), d.getCalle(), d.getNumero()))
             .toList();
-        return direcciones.isEmpty() ? direccionesAntiguas(perfil) : direcciones;
-        }
+    }
 
     private void reemplazarDirecciones(PerfilTitular perfil, PersonaDTO dto) {
         List<PersonaDTO.DireccionDTO> direcciones = direccionesDe(dto);
@@ -272,23 +262,12 @@ public class PersonaService {
             direccion.setNumero(valor(datos.numero(), ""));
             perfil.getDirecciones().add(direccion);
         }
-        PersonaDTO.DireccionDTO principal = direcciones.getFirst();
-        perfil.setDireccion(formatoLegacy(principal));
-        perfil.setCiudad(principal.municipio().trim());
     }
 
     private int length(String value) { return value == null ? 0 : value.length(); }
 
     private String valor(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value.trim();
-    }
-
-    private String formatoLegacy(PersonaDTO.DireccionDTO direccion) {
-        if (direccion.numero() == null || direccion.numero().isBlank()) return direccion.calle().trim();
-        return direccion.calle().trim() + " #" + direccion.numero().trim() +
-                (direccion.colonia() == null || direccion.colonia().isBlank() ? "" : ", Col. " + direccion.colonia().trim()) +
-                (direccion.codigoPostal() == null || direccion.codigoPostal().isBlank() ? "" : ", C.P. " + direccion.codigoPostal().trim()) +
-                (direccion.estado() == null || direccion.estado().isBlank() ? "" : ", " + direccion.estado().trim());
     }
 
     private Persona titularActivo(Long id) {
@@ -461,10 +440,12 @@ public class PersonaService {
 
     private com.example.demo.dto.PersonaResumenDTO convertirAResumen(Persona p, boolean puedeEliminar) {
         return new com.example.demo.dto.PersonaResumenDTO(p.getId(), p.getNombre(), p.getApellido(),
-                p.getPerfilTitular().getCiudad(), p.getPerfilTitular().getOcupacion().getNombre(),
+                p.getPerfilTitular().getOcupacion().getNombre(),
                 p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
                 p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), p.getFechaBaja(),
-                convertirDirecciones(p.getPerfilTitular()), puedeEliminar);
+                p.getPerfilTitular().getDirecciones().stream().limit(1)
+                    .map(d -> new com.example.demo.dto.PersonaResumenDTO.DireccionResumenDTO(d.getMunicipio())).toList(),
+                puedeEliminar);
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)

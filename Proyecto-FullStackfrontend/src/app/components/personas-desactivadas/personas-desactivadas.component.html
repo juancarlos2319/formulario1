@@ -45,7 +45,7 @@
           </td>
           <td>{{ persona.fechaBaja || 'Sin fecha' }}</td>
           <td>{{ persona.ocupacion || 'Sin ocupación' }}</td>
-          <td>{{ persona.ciudad || 'Sin ciudad' }}</td>
+          <td>{{ persona.direcciones?.[0]?.municipio || 'Sin ciudad' }}</td>
           <td>
             <button type="button" class="restore" (click)="reactivar(persona)" [disabled]="reactivando() !== null">
               {{ reactivando() === persona.id ? 'Reactivando…' : 'Reactivar' }}

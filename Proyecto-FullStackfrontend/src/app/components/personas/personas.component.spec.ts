@@ -11,8 +11,8 @@ describe('PersonasComponent: proteccion de administradores', () => {
     const personas = jasmine.createSpyObj('PersonasService', ['obtenerPersonas', 'eliminarPersona']);
     const feedback = jasmine.createSpyObj('FeedbackService', ['confirm', 'notify']);
     personas.obtenerPersonas.and.returnValue(of([
-      { id: 1, nombre: 'Administrador prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', ciudad: '', puedeEliminar: false },
-      { id: 2, nombre: 'Persona prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', ciudad: '', puedeEliminar: true }
+      { id: 1, nombre: 'Administrador prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', puedeEliminar: false },
+      { id: 2, nombre: 'Persona prueba', apellido: '', correos: [], telefonos: [], ocupacion: '', puedeEliminar: true }
     ]));
     await TestBed.configureTestingModule({ imports: [PersonasComponent], providers: [provideRouter([]), provideNoopAnimations(),
       { provide: PersonasService, useValue: personas }, { provide: FeedbackService, useValue: feedback }

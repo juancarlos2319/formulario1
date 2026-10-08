@@ -37,7 +37,7 @@ class DemoApplicationTests {
     private PersonaDTO formulario(int cantidad) {
         PersonaDTO d = new PersonaDTO();
         d.setNombre("Titular"); d.setApellido("Prueba");
-        d.setGenero("No especificado"); d.setDireccion("Calle de prueba"); d.setCiudad("Ciudad de prueba");
+        d.setGenero("No especificado"); d.setDirecciones(List.of(new PersonaDTO.DireccionDTO("Mexico", "", "Ciudad de prueba", "", "", "Calle de prueba", "1")));
         d.setFechaNacimiento(LocalDate.of(1990,1,1)); d.setOcupacion("Docente");
         d.setCorreos(List.of("uno@example.com", "dos@example.com"));
         d.setTelefonos(List.of("5511111111", "5522222222"));

@@ -57,7 +57,7 @@
 
       <ng-container matColumnDef="ciudad">
         <th mat-header-cell *matHeaderCellDef scope="col">Ciudad</th>
-        <td mat-cell *matCellDef="let u">{{ u.ciudad || 'Sin ciudad' }}</td>
+        <td mat-cell *matCellDef="let u">{{ u.direcciones?.[0]?.municipio || 'Sin ciudad' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="acciones">
@@ -79,7 +79,7 @@
         <td mat-cell *matCellDef="let u" [attr.colspan]="columnas.length" class="details">
           <mat-progress-bar *ngIf="cargandoDetalle() && detalleId() === u.id" mode="indeterminate" aria-label="Cargando detalles"></mat-progress-bar>
           <dl *ngIf="detalle() as datos">
-            <div><dt>Direcciones</dt><dd><div *ngFor="let direccion of datos.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</div><span *ngIf="!datos.direcciones?.length">{{ datos.direccion || 'No registrada' }}</span></dd></div>
+            <div><dt>Direcciones</dt><dd><div *ngFor="let direccion of datos.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</div><span *ngIf="!datos.direcciones?.length">No registrada</span></dd></div>
             <div><dt>Género</dt><dd>{{ datos.genero || 'No registrado' }}</dd></div>
             <div><dt>Fecha de nacimiento</dt><dd>{{ datos.fechaNacimiento || 'No registrada' }}</dd></div>
           </dl>

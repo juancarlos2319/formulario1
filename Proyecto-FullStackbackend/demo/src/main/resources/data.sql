@@ -16,8 +16,8 @@ INSERT INTO persona (id, nombre, apellido, fecha_nacimiento, genero) VALUES
 (5, 'Sofia', 'Ramirez', '1975-02-27', 'Femenino'),
 (6, 'Daniel', 'Ortega', '1970-09-12', 'Masculino')
 ON CONFLICT (id) DO NOTHING;
-INSERT INTO perfil_titular (id_persona, direccion, ciudad, id_ocupacion, fecha_baja) VALUES
-(1, 'Av. Revolucion 101', 'Pachuca', 2, NULL), (2, 'Calle Allende 202', 'Pachuca', 2, NULL)
+INSERT INTO perfil_titular (id_persona, id_ocupacion, fecha_baja) VALUES
+(1, 2, NULL), (2, 2, NULL)
 ON CONFLICT (id_persona) DO NOTHING;
 -- Direcciones iniciales definidas directamente, sin ejecutar una migracion.
 -- Completar estado, colonia y codigo postal desde el formulario al editar.

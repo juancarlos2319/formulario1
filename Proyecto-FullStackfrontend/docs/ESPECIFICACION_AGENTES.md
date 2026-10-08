@@ -51,3 +51,7 @@
 - No expongas JWT ni datos personales en logs, errores o ejemplos. No registres secretos en el repositorio.
 - Actualiza pruebas y documentación visible cuando cambie navegación, formulario o contrato.
 - Buscar coincidencias por correo/teléfono en tiempo real y pedir confirmación antes de reutilizar `idContacto`. Rechazar vacía el campo; aceptar envía solo ID y parentesco. Después de editar/agregar a un titular existente, volver a `/contactos/:id`. Quitar la última referencia elimina el contacto sin perfil/cuenta en backend.
+
+- El formulario usa exclusivamente el arreglo `direcciones`, sin `direccion` ni `ciudad`. Las vistas obtienen el municipio del arreglo.
+
+- Personas consulta `/api/personas` para la tabla y `/{id}/detalles` para los campos adicionales. Listas y detalles se conservan en memoria sin vencimiento; se invalidan al guardar, dar de baja, reactivar o cambiar de sesión.

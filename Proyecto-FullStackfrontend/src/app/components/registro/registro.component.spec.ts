@@ -35,7 +35,7 @@ describe('RegistroComponent: carga por ID', () => {
     expect(servicio.obtenerPersonaPorId).toHaveBeenCalledOnceWith(7);
     expect(component.cargandoPersona()).toBeTrue();
     expect(component.edicionBloqueada()).toBeTrue();
-    respuesta.next({ id: 7, nombre: 'Titular', direccion: '', ciudad: '' } as Usuario);
+    respuesta.next({ id: 7, nombre: 'Titular', apellido: 'Prueba', genero: 'Otro', fechaNacimiento: '1990-01-01', ocupacion: 'Docente', correos: [], telefonos: [], direcciones: [] });
     expect(component.registroForm.get('nombre')!.value).toBe('Titular');
     expect(component.cargandoPersona()).toBeFalse();
     expect(component.personaCargada()).toBeTrue();
@@ -150,8 +150,6 @@ describe('RegistroComponent: carga por ID', () => {
       genero: 'Otro',
       fechaNacimiento: '1990-01-01',
       ocupacion: 'Docente',
-      direccion: '',
-      ciudad: '',
       direcciones: [{ pais: 'México', estado: 'Hidalgo', municipio: 'Pachuca', colonia: 'Centro', codigoPostal: '', calle: 'Calle Uno', numero: '1' }]
     } as Usuario);
     component.registroForm.patchValue({ nombre: 'Titular', apellido: 'Prueba', genero: 'Otro', fechaNacimiento: '1990-01-01', ocupacion: 'Docente' });
@@ -167,6 +165,8 @@ describe('RegistroComponent: carga por ID', () => {
     expect(direccion?.calle).toBe('Calle Editada');
     expect(direccion?.numero).toBe('25');
     expect(Object.keys(direccion ?? {})).not.toContain('cp');
+    expect(Object.keys(payload)).not.toContain('direccion');
+    expect(Object.keys(payload)).not.toContain('ciudad');
   });
 
   it('conserva la dirección guardada sin consultar CP y muestra el error real al guardar', () => {
@@ -174,7 +174,7 @@ describe('RegistroComponent: carga por ID', () => {
     component.ngOnInit();
     respuesta.next({ id: 7, nombre: 'Titular', apellido: 'Prueba', genero: 'Otro',
       fechaNacimiento: '1990-01-01', ocupacion: 'Docente', correos: ['titular@example.com'],
-      telefonos: ['5512345678'], ciudad: 'Pachuca',
+      telefonos: ['5512345678'],
       direcciones: [{ pais: 'México', estado: 'Hidalgo', municipio: 'Pachuca', colonia: 'Centro',
         codigoPostal: '42000', calle: 'Calle Uno', numero: '1' }] } as Usuario);
     expect(servicioCP.consultar).not.toHaveBeenCalled();
@@ -191,7 +191,7 @@ describe('RegistroComponent: carga por ID', () => {
     component.ngOnInit();
     respuesta.next({ id: 7, nombre: 'Titular', apellido: 'Prueba', genero: 'Otro',
       fechaNacimiento: '1990-01-01', ocupacion: 'Docente', correos: ['titular@example.com'],
-      telefonos: ['5512345678'], ciudad: 'Pachuca', direcciones: [{ pais: 'México',
+      telefonos: ['5512345678'], direcciones: [{ pais: 'México',
         estado: '', municipio: 'Pachuca', colonia: '', codigoPostal: '', calle: 'Av. Revolucion 101', numero: '' }] } as Usuario);
     expect(component.direcciones.at(0).get('numero')?.value).toBe('101');
     component.direcciones.at(0).patchValue({ cp: '123' });

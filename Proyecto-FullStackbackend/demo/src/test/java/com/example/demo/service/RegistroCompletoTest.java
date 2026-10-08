@@ -96,7 +96,7 @@ class RegistroCompletoTest {
         PersonaDTO dto = new PersonaDTO();
         dto.setNombre("Titular"); dto.setApellido("Prueba");
         dto.setFechaNacimiento(LocalDate.of(1990, 1, 1));
-        dto.setDireccion("Calle de prueba 1"); dto.setCiudad("Ciudad de prueba");
+        dto.setDirecciones(List.of(new PersonaDTO.DireccionDTO("México", "", "Ciudad de prueba", "", "", "Calle de prueba", "1")));
         dto.setCorreos(List.of("principal@example.com")); dto.setTelefonos(List.of("5512345678"));
         dto.setCorreos(List.of("principal@example.com", "secundario@example.com"));
         dto.setTelefonos(List.of("5512345678", "5587654321"));
@@ -151,8 +151,6 @@ class RegistroCompletoTest {
     @Test void requiereUnaDireccionYValidaElCodigoPostalCuandoSeProporciona() {
         PersonaDTO sinDirecciones = datos(1);
         sinDirecciones.setDirecciones(List.of());
-        sinDirecciones.setDireccion(null);
-        sinDirecciones.setCiudad(null);
         PersonaDTO cpInvalido = datos(1);
         cpInvalido.setDirecciones(List.of(new PersonaDTO.DireccionDTO(
                 "México", "Hidalgo", "Pachuca", "Centro", "4200", "Calle Uno", "10")));

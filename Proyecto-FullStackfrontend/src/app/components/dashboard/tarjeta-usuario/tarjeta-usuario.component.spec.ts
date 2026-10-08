@@ -14,7 +14,7 @@ describe('TarjetaUsuarioComponent', () => {
 
     fixture = TestBed.createComponent(TarjetaUsuarioComponent);
     component = fixture.componentInstance;
-    component.usuario = { id: 1, nombre: 'Persona de prueba', apellido: 'Prueba', ciudad: '', ocupacion: '', correos: [], telefonos: [], fechaNacimiento: '1990-01-01', genero: 'Otro', direccion: '' };
+    component.usuario = { id: 1, nombre: 'Persona de prueba', apellido: 'Prueba', ocupacion: '', correos: [], telefonos: [], fechaNacimiento: '1990-01-01', genero: 'Otro', direcciones: [] };
     fixture.detectChanges();
   });
 

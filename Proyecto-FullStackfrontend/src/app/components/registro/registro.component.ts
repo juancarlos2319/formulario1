@@ -135,7 +135,7 @@ export class RegistroComponent implements OnInit {
     this.direccionesCargando.update(estados => estados.filter((_, i) => i !== index));
   }
 
-  private cargarDirecciones(persona: { direcciones?: DireccionPersistida[]; direccion?: string; ciudad?: string }): void {
+  private cargarDirecciones(persona: { direcciones?: DireccionPersistida[] }): void {
     this.direcciones.clear();
     this.coloniasPorDireccion = [];
     this.direccionesCargando.set([]);
@@ -147,7 +147,7 @@ export class RegistroComponent implements OnInit {
         this.agregarDireccion(datos);
       });
     } else {
-      this.agregarDireccion(this.convertirDireccionAntigua(persona.direccion ?? '', persona.ciudad ?? ''));
+      this.agregarDireccion();
     }
     // Conserva la ubicacion guardada sin depender de una consulta externa al abrir.
   }
@@ -334,17 +334,13 @@ export class RegistroComponent implements OnInit {
     calle: direccion.calle,
     numero: direccion.numero
   }));
-  const direccionPrincipal = direcciones[0];
-  const direccionFormateada = `${direccionPrincipal.calle} #${direccionPrincipal.numero}, Col. ${direccionPrincipal.colonia}, C.P. ${direccionPrincipal.codigoPostal}, ${direccionPrincipal.estado}`;
 
   const apellidoCompleto = `${rawVal.apellidoPaterno ?? ''} ${rawVal.apellidoMaterno ?? ''}`.trim();
   const payload = {
     nombre: rawVal.nombres ?? rawVal.nombre, apellido: apellidoCompleto || rawVal.apellido || '', genero: rawVal.genero,
     fechaNacimiento: rawVal.fechaNacimiento, ocupacion: rawVal.ocupacion,
     correos: rawVal.correos, telefonos: rawVal.telefonos,
-    direcciones,
-    ciudad: direccionPrincipal.municipio,
-    direccion: direccionFormateada
+    direcciones
   };
 
   if (!this.editando) {

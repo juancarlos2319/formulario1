@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS persona (
 -- Solo existe para personas registradas como titulares.
 CREATE TABLE IF NOT EXISTS perfil_titular (
     id_persona BIGINT PRIMARY KEY REFERENCES persona(id) ON DELETE CASCADE,
-    direccion VARCHAR(255) NOT NULL,
-    ciudad VARCHAR(100) NOT NULL,
     id_ocupacion BIGINT NOT NULL REFERENCES catalogo_ocupacion(id),
     fecha_baja DATE
 );

@@ -12,8 +12,10 @@
   <div class="card-body">
     <p><strong>Email:</strong> {{ usuario.correos.join(', ') }}</p>
     <p><strong>Teléfono:</strong> {{ usuario.telefonos.join(', ') }}</p>
-    <p><strong>Ciudad:</strong> {{ usuario.ciudad }}</p>
-    <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
+    <p><strong>Ciudad:</strong> {{ usuario.direcciones?.[0]?.municipio }}</p>
+    <p><strong>Direcciones:</strong></p>
+    <p *ngFor="let direccion of usuario.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</p>
+    <p *ngIf="!usuario.direcciones?.length">No registrada</p>
     <p><strong>Género:</strong> {{ usuario.genero }}</p>
     <p><strong>Fecha Nacimiento:</strong> {{ usuario.fechaNacimiento }}</p>
 

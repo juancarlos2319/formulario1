@@ -12,6 +12,44 @@ describe('PersonasService: consulta individual', () => {
     http = TestBed.inject(HttpTestingController);
   });
   afterEach(() => http.verify());
+  it('conserva listas y detalles y comparte solicitudes simultaneas', () => {
+    const url = 'http://localhost:8080/api/personas';
+    service.obtenerPersonas().subscribe();
+    http.expectOne(url).flush([]);
+    service.obtenerPersonas().subscribe(datos => expect(datos).toEqual([]));
+    http.expectNone(url);
+    service.obtenerDetallePersona(7).subscribe();
+    service.obtenerDetallePersona(7).subscribe();
+    http.expectOne(`${url}/7/detalles`).flush({ genero: 'Otro', fechaNacimiento: '1990-01-01', direcciones: [] });
+    service.obtenerDetallePersona(7).subscribe(datos => expect(datos.genero).toBe('Otro'));
+    http.expectNone(`${url}/7/detalles`);
+    http.expectNone(`${url}/7`);
+  });
+
+  it('invalida listas y detalles al actualizar y al cambiar de sesion', () => {
+    const url = 'http://localhost:8080/api/personas';
+    service.obtenerPersonas().subscribe(); http.expectOne(url).flush([]);
+    service.obtenerDetallePersona(8).subscribe(); http.expectOne(`${url}/8/detalles`).flush({ direcciones: [] });
+    service.guardarContactos(7, []).subscribe(); http.expectOne(`${url}/7/contactos`).flush({ ok: true });
+    service.obtenerPersonas().subscribe(); http.expectOne(url).flush([]);
+    service.obtenerDetallePersona(8).subscribe(); http.expectOne(`${url}/8/detalles`).flush({ direcciones: [] });
+    service.limpiarCacheSesion();
+    service.obtenerDetallePersona(8).subscribe(); http.expectOne(`${url}/8/detalles`).flush({ direcciones: [] });
+    expect(service).toBeDefined();
+  });
+
+  it('permite reintentar un detalle fallido y conserva cache tras guardado fallido', () => {
+    spyOn(console, 'error');
+    const url = 'http://localhost:8080/api/personas/7/detalles';
+    service.obtenerDetallePersona(7).subscribe({ error: error => expect(error).toBeInstanceOf(Error) });
+    http.expectOne(url).flush({}, { status: 500, statusText: 'Error' });
+    service.obtenerDetallePersona(7).subscribe(); http.expectOne(url).flush({ genero: 'Otro', direcciones: [] });
+    service.guardarContactos(7, []).subscribe({ error: error => expect(error).toBeInstanceOf(Error) });
+    http.expectOne('http://localhost:8080/api/personas/7/contactos').flush({}, { status: 400, statusText: 'Error' });
+    service.obtenerDetallePersona(7).subscribe(datos => expect(datos.genero).toBe('Otro'));
+    http.expectNone(url);
+  });
+
   it('reutiliza contactos durante la navegación y limpia las cachés al cambiar de sesión', () => {
     service.obtenerContactos(7).subscribe();
     http.expectOne('http://localhost:8080/api/personas/7/contactos').flush([{ idContacto: 3 }]);
