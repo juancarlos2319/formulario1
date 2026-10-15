@@ -28,6 +28,7 @@ export class PersonasDesactivadasComponent implements OnInit {
   readonly mensajeError = signal('');
   readonly busqueda = signal('');
   readonly columnas = ['persona', 'fechaBaja', 'ocupacion', 'ciudad', 'acciones'];
+  /** Deriva las bajas visibles a partir del texto buscado y los datos descargados. */
   readonly personasFiltradas = computed(() => {
     const texto = this.normalizar(this.busqueda().trim());
     if (!texto) return this.personas();
@@ -37,14 +38,17 @@ export class PersonasDesactivadasComponent implements OnInit {
     ].join(' ')).includes(texto));
   });
 
+  /** Elimina acentos y diferencias de mayúsculas para comparar búsquedas. */
   private normalizar(valor: string | undefined): string {
     return (valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
+  /** Prepara la pantalla y solicita los datos iniciales necesarios. */
   ngOnInit(): void {
     this.cargarPersonas();
   }
 
+  /** Carga el listado de bajas y permite mostrar o reintentar sus errores. */
   cargarPersonas(): void {
     this.cargando.set(true);
     this.mensajeError.set('');
@@ -60,6 +64,7 @@ export class PersonasDesactivadasComponent implements OnInit {
     });
   }
 
+  /** Confirma y solicita la reactivación antes de retirar la fila del listado. */
   async reactivar(persona: PersonaResumen): Promise<void> {
     if (persona.id == null || this.reactivando() !== null) return;
     const confirmada = await this.feedbackService.confirm({
@@ -86,6 +91,7 @@ export class PersonasDesactivadasComponent implements OnInit {
     });
   }
 
+  /** Forma las iniciales del nombre y apellido para mostrarlas en el avatar. */
   obtenerIniciales(nombre: string = '', apellido: string = ''): string {
     return ((nombre || '').charAt(0) + (apellido || '').charAt(0)).toUpperCase();
   }

@@ -27,16 +27,19 @@ export class ContactosComponent implements OnInit, OnDestroy {
   private confirmaciones = Promise.resolve();
   private verificaciones = new Map<FormGroup, { revision: number; pendiente: boolean; fallo: boolean; reutilizado: boolean; subscription: Subscription }>();
 
+  /** Detecta contactos pendientes de consulta o confirmación de coincidencias. */
   get verificando(): boolean {
     this.revisionVerificaciones();
     return this.contactos.controls.some(control => this.verificaciones.get(control as FormGroup)?.pendiente);
   }
 
+  /** Detecta verificaciones fallidas que deben resolverse antes de guardar. */
   get errorVerificacion(): boolean {
     this.revisionVerificaciones();
     return this.contactos.controls.some(control => this.verificaciones.get(control as FormGroup)?.fallo);
   }
 
+  /** Cancela observadores e impide aplicar respuestas al componente destruido. */
   ngOnDestroy(): void {
     this.destruido = true;
     this.verificaciones.forEach(estado => estado.subscription.unsubscribe());
@@ -59,6 +62,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
+  /** Prepara formularios y catálogos según el modo de alta, edición o incorporación. */
   ngOnInit(): void {
     // Formulario dinámico inicializado
     this.contactosForm = this.fb.group({
@@ -85,10 +89,12 @@ export class ContactosComponent implements OnInit, OnDestroy {
   }
 
   // Getter conveniente para iterar con ngFor en la plantilla HTML
+  /** Expone los grupos de contacto del formulario. */
   get contactos(): FormArray {
     return this.contactosForm.get('contactos') as FormArray;
   }
 
+  /** Calcula la numeración visible respetando la posición original en edición. */
   numeroContacto(index: number): number {
     if (this.modoEdicion && index === 0) {
       const indiceOriginal = this.contactosOriginales.findIndex(contacto => contacto.idContacto === this.contactoId);
@@ -100,6 +106,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   }
 
   // Crea la estructura de un contacto
+  /** Crea los controles personales, comunicaciones y parentesco con validación. */
   crearContactoGroup(datos?: ContactoEmergencia): FormGroup {
     const nombre = datos?.nombre ?? '';
     const apellidos = this.descomponerApellidos(datos?.apellido ?? '');
@@ -120,38 +127,45 @@ export class ContactosComponent implements OnInit, OnDestroy {
     return grupo;
   }
 
+  /** Obtiene los controles de correo o teléfono de un contacto. */
   comunicaciones(index: number, tipo: 'correos' | 'telefonos'): FormArray {
     return this.contactos.at(index).get(tipo) as FormArray;
   }
 
+  /** Crea un correo o teléfono con el formato exigido por el formulario. */
   private crearComunicacion(tipo: 'correos' | 'telefonos', valor = '') {
     return this.fb.control(valor, tipo === 'correos'
       ? [Validators.required, Validators.email, Validators.maxLength(150)]
       : [Validators.required, Validators.pattern('^[0-9]{10}$')]);
   }
 
+  /** Rechaza comunicaciones repetidas tras normalizar espacios y mayúsculas. */
   private comunicacionesDistintas(control: AbstractControl): ValidationErrors | null {
     const valores: string[] = (control.value ?? []).map((valor: string) => valor.trim().toLowerCase()).filter(Boolean);
     return new Set(valores).size === valores.length ? null : { repetidos: true };
   }
 
+  /** Añade una comunicación si está editable y no se está guardando. */
   agregarComunicacion(index: number, tipo: 'correos' | 'telefonos'): void {
     const array = this.comunicaciones(index, tipo);
     if (this.guardando() || array.disabled) return;
     array.push(this.crearComunicacion(tipo));
   }
 
+  /** Retira una comunicación editable sin quitar la última de su tipo. */
   quitarComunicacion(index: number, tipo: 'correos' | 'telefonos', posicion: number): void {
     const array = this.comunicaciones(index, tipo);
     if (this.guardando() || array.disabled || array.length <= 1) return;
     array.removeAt(posicion);
   }
 
+  /** Indica si debe mostrarse el error de un campo ya tocado o modificado. */
   campoInvalido(index: number, nombre: string): boolean {
     const campo = this.contactos.at(index).get(nombre);
     return !!campo && campo.invalid && (campo.touched || campo.dirty);
   }
 
+  /** Traduce la validación fallida del control a un mensaje de captura. */
   errorCampo(index: number, nombre: string): string {
     const errores = this.contactos.at(index).get(nombre)?.errors;
     if (errores?.['required']) return 'Este campo es obligatorio.';
@@ -161,6 +175,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     return 'Revisa este campo.';
   }
 
+  /** Separa el apellido guardado para poblar los controles de captura. */
   private descomponerApellidos(apellido?: string): { paterno: string; materno: string } {
     const apellidos = (apellido ?? '').trim();
     const partes = apellidos.split(/\s+/).filter(Boolean);
@@ -170,11 +185,14 @@ export class ContactosComponent implements OnInit, OnDestroy {
     };
   }
 
+  /** Une los apellidos capturados eliminando espacios exteriores. */
   private combinarApellidos(apellidoPaterno: string, apellidoMaterno: string): string {
     return `${apellidoPaterno} ${apellidoMaterno}`.trim();
   }
 
+  /** Sincroniza nombres separados con los campos esperados por la API. */
   private sincronizarAliasNombreContacto(grupo: FormGroup): void {
+    /** Combina los nombres separados sin volver a disparar sus observadores. */
     const actualizarDesdeNuevos = () => {
       const nombres = (grupo.get('nombres')?.value ?? '').trim();
       const paterno = (grupo.get('apellidoPaterno')?.value ?? '').trim();
@@ -183,6 +201,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       if ((grupo.get('nombre')?.value ?? '') !== nombres) grupo.get('nombre')?.setValue(nombres, { emitEvent: false });
       if ((grupo.get('apellido')?.value ?? '') !== apellido) grupo.get('apellido')?.setValue(apellido, { emitEvent: false });
     };
+    /** Distribuye los campos del contrato en los controles separados sin generar un ciclo. */
     const actualizarDesdeLegacy = () => {
       const nombre = (grupo.get('nombre')?.value ?? '').trim();
       const apellido = (grupo.get('apellido')?.value ?? '').trim();
@@ -205,6 +224,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     actualizarDesdeNuevos();
   }
 
+  /** Prepara el payload del contacto excluyendo los alias visuales de nombres. */
   private convertirContactoLegacy(raw: any): ContactoEmergencia {
     const nombre = (raw?.nombres ?? raw?.nombre ?? '').trim();
     const apellido = this.combinarApellidos(raw?.apellidoPaterno ?? raw?.apellido ?? '', raw?.apellidoMaterno ?? '');
@@ -218,12 +238,14 @@ export class ContactosComponent implements OnInit, OnDestroy {
   }
 
   // Botón para agregar N contactos sin límite
+  /** Añade un grupo y empieza a observar sus posibles coincidencias. */
   agregarContacto(datos?: ContactoEmergencia): void {
     const grupo = this.crearContactoGroup(datos);
     this.contactos.push(grupo);
     this.observarCoincidencias(grupo);
   }
 
+  /** Consulta coincidencias con espera breve, confirma reutilización y descarta respuestas antiguas. */
   private observarCoincidencias(grupo: FormGroup): void {
     const estado = { revision: 0, pendiente: false, fallo: false, reutilizado: false, subscription: new Subscription() };
     this.verificaciones.set(grupo, estado);
@@ -250,6 +272,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       })
     ).subscribe(resultado => {
       this.confirmaciones = this.confirmaciones.then(async () => {
+        /** Comprueba que el grupo y la revisión aún son válidos antes de aplicar resultados. */
         const vigente = () => !this.destruido && this.contactos.controls.includes(grupo) && estado.revision === resultado.revision;
         if (!vigente()) return;
         try {
@@ -307,6 +330,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Relanza las búsquedas de los contactos cuya verificación falló. */
   reintentarVerificacion(): void {
     this.contactos.controls.forEach(grupo => {
       if (this.verificaciones.get(grupo as FormGroup)?.fallo) grupo.get('correos')!.updateValueAndValidity();
@@ -314,6 +338,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
   }
 
   // Permite borrar dinámicamente si hay más de 1 contacto en pantalla
+  /** Retira grupo y observador sin eliminar el contacto editado ni el último permitido. */
   eliminarContacto(index: number): void {
     if (this.modoEdicion && index === 0) return;
     if (this.contactos.length > 1) {
@@ -326,6 +351,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Carga los vínculos previos y prepara el formulario según el modo seleccionado. */
   cargarContactos(): void {
     if (this.cargandoContactos()) return;
     this.iniciarMedicionRender();
@@ -362,6 +388,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Marca el inicio para medir la carga visible del formulario. */
   private iniciarMedicionRender(): void {
     performance.clearMarks('contactos-carga-inicio');
     performance.clearMarks('contactos-carga-pintado');
@@ -369,6 +396,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     performance.mark('contactos-carga-inicio');
   }
 
+  /** Mide la carga visible después de dos ciclos de pintado. */
   private finalizarMedicionRender(): void {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       performance.mark('contactos-carga-pintado');
@@ -380,6 +408,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     }));
   }
 
+  /** Valida, confirma cambios compartidos y envía la lista completa de vínculos. */
   async guardarContactos(): Promise<void> {
     if (this.guardando() || this.verificando || this.errorVerificacion) return;
     if (this.cargandoContactos() || (this.personaId > 0 && !this.contactosCargados()) || this.contactos.length === 0) return;
@@ -450,6 +479,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Vuelve a la lista de contactos o al primer paso del alta según el contexto. */
   cancelar(): void {
     if (this.personaId > 0) {
       this.router.navigate(['/contactos', this.personaId]);
@@ -458,6 +488,7 @@ export class ContactosComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Carga las opciones de parentesco para crear o editar vínculos. */
   private cargarParentescos(): void {
     this.registroService.obtenerParentescos().subscribe({
       next: (parentescos) => this.parentescos.set(parentescos),

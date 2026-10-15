@@ -20,6 +20,7 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
+    /** Configura rutas públicas, autenticación stateless, CORS y el filtro JWT. */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -39,7 +40,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Desactiva la generación de contraseña aleatoria por defecto
+    /** Evita el usuario automático de Spring; el login lo gestiona AuthController. */
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
@@ -47,6 +48,7 @@ public class SecurityConfig {
         };
     }
 
+    /** Proporciona BCrypt para comparar y codificar las contraseñas de las cuentas. */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

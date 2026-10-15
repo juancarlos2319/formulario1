@@ -29,11 +29,13 @@ export class ContactosListaComponent implements OnInit {
   readonly quitando = signal(false);
   readonly columnas = ['contacto', 'telefono', 'correo', 'fechaNacimiento', 'genero', 'parentesco', 'acciones'];
 
+  /** Obtiene el ID del titular desde la ruta y carga sus contactos. */
   ngOnInit(): void {
     this.personaId = Number(this.route.snapshot.paramMap.get('id'));
     this.cargarContactos();
   }
 
+  /** Consulta los vínculos del titular y actualiza datos, carga y errores. */
   cargarContactos(): void {
     if (this.quitando()) return;
     this.cargando.set(true);
@@ -50,6 +52,7 @@ export class ContactosListaComponent implements OnInit {
     });
   }
 
+  /** Marca el inicio de navegación para medir la apertura del formulario. */
   marcarInicioEdicion(): void {
     performance.clearMarks('contactos-navegacion-inicio');
     performance.clearMarks('contactos-navegacion-visible');
@@ -57,6 +60,7 @@ export class ContactosListaComponent implements OnInit {
     performance.mark('contactos-navegacion-inicio');
   }
 
+  /** Confirma la desvinculación y envía la lista restante conservando al menos uno. */
   async quitarContacto(contacto: ContactoEmergencia): Promise<void> {
     if (this.cargando() || this.quitando() || this.mensajeError() || this.contactos().length <= 1 ||
         contacto.idContacto == null || !this.contactos().some(item => item.idContacto === contacto.idContacto)) return;
@@ -82,6 +86,7 @@ export class ContactosListaComponent implements OnInit {
     }
   }
 
+  /** Forma las iniciales del nombre y apellido para mostrarlas en el avatar. */
   obtenerIniciales(nombre = '', apellido = ''): string {
     return `${nombre.charAt(0)}${apellido.charAt(0)}`.toUpperCase();
   }

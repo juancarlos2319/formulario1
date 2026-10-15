@@ -20,6 +20,7 @@ export class AuthService {
   private expirationTimer?: ReturnType<typeof setTimeout>;
   private readonly tokenMonitor = window.setInterval(() => this.detectExternalTokenChange(), 250);
 
+  /** Vigila cambios de sesión y refresca el perfil tras actualizar datos personales. */
   constructor(private http: HttpClient) {
     this.registroService.datosPersonalesActualizados$?.subscribe(() => {
       if (this.tokenSubject.value) {
@@ -30,6 +31,7 @@ export class AuthService {
     this.scheduleExpiration(this.tokenSubject.value);
   }
 
+  /** Envía las credenciales y conserva el token y el perfil devueltos por el backend. */
   login(credentials: { username: string; password: string }): Observable<any> {
   return this.http.post<{ token: string; usuarioActual: UsuarioActual }>(`${this.apiUrl}/login`, credentials).pipe(
     tap(res => {
@@ -41,6 +43,7 @@ export class AuthService {
   );
 }
 
+  /** Reutiliza el perfil en memoria o comparte su consulta al recuperar una sesión. */
   obtenerUsuarioActual(): Observable<UsuarioActual> {
     const usuario = this.cuentaActual();
     if (usuario) return of(usuario);
@@ -51,6 +54,7 @@ export class AuthService {
     return this.consultaCuenta;
   }
 
+  /** Consulta el perfil e ignora respuestas de una sesión o revisión anterior. */
   actualizarUsuarioActual(): Observable<UsuarioActual> {
       const revision = ++this.revisionCuenta;
       const token = this.tokenSubject.value;
@@ -63,19 +67,23 @@ export class AuthService {
     return this.consultaCuenta;
   }
 
+  /** Obtiene el nombre de usuario de la cuenta autenticada para editarlo. */
   obtenerDatosLogin(): Observable<{ username: string }> {
     return this.http.get<{ username: string }>(`${this.apiUrl}/me/login`);
   }
 
+  /** Envía los cambios de acceso junto con la contraseña actual. */
   actualizarLogin(datos: { username: string; passwordActual: string; passwordNueva: string }): Observable<Resultado> {
     return this.http.put<Resultado>(`${this.apiUrl}/me/login`, datos);
   }
 
+  /** Elimina el borrador y publica el cierre de sesión para limpiar perfil y cachés. */
   logout(): void {
     this.registroService.limpiarBorrador();
     this.setToken(null);
   }
 
+  /** Comprueba estructura y expiración local del JWT; el backend valida la firma. */
   isLoggedIn(): boolean {
     this.synchronizeToken();
     const token = this.tokenSubject.value;
@@ -87,10 +95,12 @@ export class AuthService {
     return false;
   }
 
+  /** Lee el JWT guardado en el navegador. */
   private readToken(): string | null {
     return localStorage.getItem('jwt_token');
   }
 
+  /** Actualiza el token almacenado y notifica el cambio a la aplicación. */
   private setToken(token: string | null): void {
     if (token) {
       localStorage.setItem('jwt_token', token);
@@ -100,11 +110,13 @@ export class AuthService {
     this.publishToken(token);
   }
 
+  /** Sincroniza el estado interno si cambió el token del navegador. */
   private synchronizeToken(): void {
     const token = this.readToken();
     if (token !== this.tokenSubject.value) this.publishToken(token);
   }
 
+  /** Limpia perfil y cachés al cambiar de sesión y programa su vencimiento. */
   private publishToken(token: string | null): void {
     if (token && !this.hasValidStructure(token)) token = null;
     if (token === this.tokenSubject.value) return;
@@ -116,6 +128,7 @@ export class AuthService {
     this.scheduleExpiration(token);
   }
 
+  /** Comprueba las tres partes del token y su fecha de expiración futura. */
   private hasValidStructure(token: string): boolean {
     try {
       const parts = token.split('.');
@@ -127,6 +140,7 @@ export class AuthService {
     }
   }
 
+  /** Programa la pérdida de sesión al vencer el JWT y descarta tokens inválidos. */
   private scheduleExpiration(token: string | null): void {
     if (this.expirationTimer) clearTimeout(this.expirationTimer);
     if (!token) return;
@@ -144,18 +158,21 @@ export class AuthService {
     }
   }
 
+  /** Invalida la sesión si otra pestaña modifica el token almacenado. */
   private onStorageChange = (event: StorageEvent): void => {
     if (event.key === 'jwt_token' && event.newValue !== this.tokenSubject.value) {
       this.invalidateSession();
     }
   };
 
+  /** Detecta cambios externos del token sin consultar periódicamente al backend. */
   private detectExternalTokenChange(): void {
     if (this.readToken() !== this.tokenSubject.value) {
       this.invalidateSession();
     }
   }
 
+  /** Borra token y borrador al detectar un cambio externo de sesión. */
   private invalidateSession(): void {
     if (!this.tokenSubject.value && !this.readToken()) return;
     this.registroService.limpiarBorrador();

@@ -38,28 +38,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly mensajeError = signal('');
   readonly fecha = new Intl.DateTimeFormat('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
+  /** Expone la cantidad de titulares con correo del resumen. */
   get conEmail(): number { return this.resumen().conCorreo; }
+  /** Expone la cantidad de titulares con teléfono del resumen. */
   get conTelefono(): number { return this.resumen().conTelefono; }
+  /** Calcula la capacidad restante sin devolver números negativos. */
   get lugaresDisponibles(): number { return Math.max(0, 20 - this.resumen().total); }
+  /** Calcula el porcentaje de cada ocupación respecto al total. */
   get ocupaciones(): { nombre: string; cantidad: number; porcentaje: number }[] {
     const resumen = this.resumen();
     return resumen.ocupaciones.map(grupo => ({ ...grupo, porcentaje: resumen.total ? grupo.cantidad / resumen.total * 100 : 0 }));
   }
 
+  /** Programa la entrada de la cabecera y solicita los agregados del dashboard. */
   ngOnInit(): void {
     this.temporizadorCabecera = setTimeout(() => this.cabeceraVisible.set(true), 100);
     this.cargarUsuarios();
   }
 
+  /** Cancela temporizadores u observadores pendientes al abandonar la pantalla. */
   ngOnDestroy(): void {
     clearTimeout(this.temporizadorCabecera);
     clearTimeout(this.temporizadorContenido);
   }
 
+  /** Activa la entrada del contenido después de actualizar los datos. */
   private mostrarContenido(): void {
     this.temporizadorContenido = setTimeout(() => this.contenidoVisible.set(true), 100);
   }
 
+  /** Solicita el resumen y actualiza carga, errores y visibilidad del contenido. */
   cargarUsuarios(): void {
     clearTimeout(this.temporizadorContenido);
     this.contenidoVisible.set(false);

@@ -7,5 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface CatalogoOcupacionRepository extends JpaRepository<CatalogoOcupacion, Long> {
+    /** Busca una ocupación por su nombre exacto. */
     Optional<CatalogoOcupacion> findByNombre(String nombre);
 }

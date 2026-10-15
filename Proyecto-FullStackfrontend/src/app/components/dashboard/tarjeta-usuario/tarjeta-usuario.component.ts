@@ -16,12 +16,14 @@ export class TarjetaUsuarioComponent {
   @Output() eliminar = new EventEmitter<number>();
   @Output() editar = new EventEmitter<Usuario>();
 
+  /** Notifica al componente padre qué persona se quiere eliminar. */
   onEliminar(): void {
     if (this.usuario && this.usuario.id) {
       this.eliminar.emit(this.usuario.id);
     }
   }
 
+  /** Entrega la persona seleccionada al componente padre para editarla. */
   onEditar(): void {
     this.editar.emit(this.usuario);
   }

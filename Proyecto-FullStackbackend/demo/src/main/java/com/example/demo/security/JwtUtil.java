@@ -18,10 +18,12 @@ public class JwtUtil {
     private String secretKey;
     private final long EXPIRATION_TIME = 3600000; // 1 hora en milisegundos
 
+    /** Construye la clave HMAC a partir del secreto configurado. */
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
+    /** Genera un JWT firmado con el username y una vigencia de una hora. */
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -31,6 +33,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    /** Verifica firma y vigencia del JWT antes de recuperar su identidad. */
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

@@ -19,12 +19,14 @@ import java.util.List;
         methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
 )
 public class PersonaController {
+    /** Consulta coincidencias por comunicaciones antes de reutilizar una persona. */
     @PostMapping("/contactos/coincidencias")
     public List<com.example.demo.dto.ContactoDTO> buscarContactos(
             @RequestBody com.example.demo.dto.BusquedaContactoDTO busqueda) {
         return personaService.buscarContactos(busqueda);
     }
 
+    /** Devuelve los contactos del titular y añade la duración de la consulta al header. */
     @GetMapping("/{id}/contactos")
     public ResponseEntity<List<com.example.demo.dto.ContactoDTO>> obtenerContactos(@PathVariable Long id) {
         long inicio = System.nanoTime();
@@ -35,6 +37,7 @@ public class PersonaController {
                 .body(contactos);
     }
 
+    /** Sustituye la lista de vínculos del titular y devuelve confirmación. */
     @PutMapping("/{id}/contactos")
     public ResultadoDTO guardarContactos(
             @PathVariable Long id, @RequestBody List<com.example.demo.dto.ContactoDTO> contactos) {
@@ -45,26 +48,31 @@ public class PersonaController {
     @Autowired
     private PersonaService personaService;
 
+    /** Devuelve los agregados de titulares activos para el dashboard. */
     @GetMapping("/resumen")
     public com.example.demo.dto.ResumenDTO obtenerResumen() {
         return personaService.obtenerResumen();
     }
 
+    /** Devuelve el listado resumido de titulares dados de baja. */
     @GetMapping("/inactivos")
     public ResponseEntity<List<PersonaResumenDTO>> obtenerInactivos() {
         return ResponseEntity.ok(personaService.obtenerInactivos());
     }
 
+    /** Devuelve solo los datos adicionales usados al desplegar detalles. */
     @GetMapping("/{id}/detalles")
     public com.example.demo.dto.PersonaDetalleDTO obtenerDetalle(@PathVariable Long id) {
         return personaService.obtenerDetalle(id);
     }
 
+    /** Devuelve los datos completos del titular activo para editar su formulario. */
     @GetMapping("/{id}")
     public PersonaDTO obtenerPorId(@PathVariable Long id) {
         return personaService.obtenerPorId(id);
     }
 
+    /** Solicita la reactivación y conserva los errores de negocio en la respuesta HTTP. */
     @PutMapping("/{id}/reactivar")
     public ResponseEntity<?> reactivar(@PathVariable Long id) {
         try {
@@ -75,6 +83,7 @@ public class PersonaController {
         }
     }
 
+    /** Devuelve el listado resumido de activos y traduce los errores a HTTP. */
     @GetMapping
     public ResponseEntity<?> obtenerPersonas() {
         try {
@@ -89,6 +98,7 @@ public class PersonaController {
         }
     }
 
+    /** Registra titular y contactos juntos; devuelve 201 si la operación se completa. */
     @PostMapping
     public ResponseEntity<?> guardarPersona(@RequestBody PersonaDTO dto) {
         try {
@@ -103,6 +113,7 @@ public class PersonaController {
         }
     }
 
+    /** Actualiza el titular indicado y traduce los errores según el contrato HTTP. */
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarPersona(@PathVariable Long id, @RequestBody PersonaDTO dto) {
         try {
@@ -117,6 +128,7 @@ public class PersonaController {
         }
     }
 
+    /** Aplica la baja lógica y devuelve 204 sin cuerpo cuando se completa. */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarPersona(@PathVariable Long id) {
         try {

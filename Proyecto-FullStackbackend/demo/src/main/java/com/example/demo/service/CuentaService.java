@@ -19,12 +19,14 @@ public class CuentaService {
     private final PersonaRepository personaRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /** Recibe los repositorios y el encoder necesarios para gestionar la cuenta. */
     public CuentaService(UsuarioRepository usuarioRepository, PersonaRepository personaRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.personaRepository = personaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /** Recupera el username de la cuenta o rechaza una identidad inexistente. */
     @Transactional(readOnly = true)
     public java.util.Map<String, String> obtenerDatosLogin(String username) {
         Usuario usuario = usuarioRepository.findByUsername(username)
@@ -32,6 +34,7 @@ public class CuentaService {
         return java.util.Map.of("username", usuario.getUsername());
     }
 
+    /** Valida credenciales y disponibilidad del username antes de guardar los cambios. */
     @Transactional
     public void actualizarLogin(String autenticado, EditarCuentaDTO datos) {
         Usuario usuario = usuarioRepository.findByUsername(autenticado)
@@ -59,6 +62,7 @@ public class CuentaService {
         }
     }
 
+    /** Forma el perfil del header con el nombre completo y el primer correo. */
     @Transactional(readOnly = true)
     public UsuarioActualDTO obtenerUsuarioActual(String username) {
         Usuario usuario = usuarioRepository.findByUsername(username)

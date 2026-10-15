@@ -30,16 +30,19 @@ public class AuthController {
     @Autowired
     private CuentaService cuentaService;
 
+    /** Devuelve nombre y correo de la cuenta identificada por el JWT. */
     @GetMapping("/me")
     public UsuarioActualDTO obtenerUsuarioActual(Authentication authentication) {
         return cuentaService.obtenerUsuarioActual(authentication.getName());
     }
 
+    /** Devuelve el username de la cuenta autenticada para su edición. */
     @GetMapping("/me/login")
     public Map<String, String> obtenerDatosLogin(Authentication authentication) {
         return cuentaService.obtenerDatosLogin(authentication.getName());
     }
 
+    /** Delega el cambio de credenciales y devuelve una confirmación de guardado. */
     @PutMapping("/me/login")
     public com.example.demo.dto.ResultadoDTO actualizarLogin(Authentication authentication,
             @RequestBody com.example.demo.dto.EditarCuentaDTO datos) {
@@ -47,6 +50,7 @@ public class AuthController {
         return new com.example.demo.dto.ResultadoDTO(true);
     }
 
+    /** Busca la cuenta, compara BCrypt y devuelve el JWT y los datos del perfil. */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");

@@ -12,6 +12,7 @@ import { FeedbackComponent } from './components/shared/feedback/feedback.compone
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  /** Observa la sesión y devuelve al login cuando se pierde el token. */
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router

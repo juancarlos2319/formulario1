@@ -34,6 +34,7 @@ export class InicioComponent implements OnInit, OnDestroy {
   entradas = [0, 120, 240, 360, 480, 600, 720, 0, 120, 240, 360, 480, 600, 720, 840, 960]
     .map(retraso => this.configurarEntrada(retraso));
 
+  /** Ajusta las animaciones según las preferencias de movimiento reducido. */
   private configurarEntrada(retraso: number) {
     return { value: 'oculto', params: {
       duracion: this.movimientoReducido ? 250 : 450,
@@ -48,8 +49,10 @@ export class InicioComponent implements OnInit, OnDestroy {
   passwordActivado = false;
   isLoading = false;
 
+  /** function Object() { [native code] } */
   constructor(private authService: AuthService, private router: Router) {}
 
+  /** Activa las animaciones después del primer render. */
   ngOnInit(): void {
     // Inicia despues del primer render, tanto al recargar como al entrar por el router.
     this.temporizadorEntrada = setTimeout(() => {
@@ -57,10 +60,12 @@ export class InicioComponent implements OnInit, OnDestroy {
     }, 150);
   }
 
+  /** Cancela la entrada pendiente al salir de la pantalla. */
   ngOnDestroy(): void {
     clearTimeout(this.temporizadorEntrada);
   }
 
+  /** Valida las credenciales básicas, inicia sesión y navega al dashboard. */
   onLogin(): void {
     if (this.isLoading || !this.credentials.username.trim() || !this.credentials.password) return;
     this.errorMessage = '';

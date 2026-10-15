@@ -14,8 +14,12 @@ public class CatalogoParentesco {
     @Column(nullable = false, unique = true, length = 50)
     private String nombre;
 
+    /** Devuelve el identificador. */
     public Long getId() { return id; }
+    /** Asigna el identificador. */
     public void setId(Long id) { this.id = id; }
+    /** Devuelve el nombre. */
     public String getNombre() { return nombre; }
+    /** Asigna el nombre. */
     public void setNombre(String nombre) { this.nombre = nombre; }
 }

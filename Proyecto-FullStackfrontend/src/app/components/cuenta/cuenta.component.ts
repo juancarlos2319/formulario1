@@ -33,6 +33,7 @@ export class CuentaComponent implements OnInit {
     return nueva === grupo.get('confirmarPassword')?.value ? null : { passwordsDistintas: true };
   }});
 
+  /** Carga el nombre de usuario actual para preparar el formulario de cuenta. */
   ngOnInit(): void {
     this.auth.obtenerDatosLogin().pipe(finalize(() => this.cargando.set(false))).subscribe({
       next: datos => this.formulario.controls.username.setValue(datos.username),
@@ -40,6 +41,7 @@ export class CuentaComponent implements OnInit {
     });
   }
 
+  /** Valida y guarda credenciales; si se confirman obliga a iniciar sesión de nuevo. */
   guardar(): void {
     if (this.cargando() || this.guardando()) return;
     if (this.formulario.invalid) { this.formulario.markAllAsTouched(); return; }

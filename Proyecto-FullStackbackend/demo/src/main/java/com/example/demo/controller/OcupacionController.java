@@ -13,6 +13,7 @@ public class OcupacionController {
     @Autowired
     private CatalogoOcupacionRepository catalogoOcupacionRepository;
 
+    /** Devuelve las ocupaciones del catálogo para poblar el formulario. */
     @GetMapping
     public ResponseEntity<?> obtenerOcupaciones() {
         return ResponseEntity.ok(catalogoOcupacionRepository.findAll());

@@ -1,1381 +1,2157 @@
-[
-  {
-    "archivo": "src/main/java/com/example/demo/DemoApplication.java",
-    "lineas": 13,
-    "sha256": "93ed6cd1967aa82c8c31d57371b8d45d879593fd1359ba4c859c82691792d1c5",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@SpringBootApplication",
-        "explicacion": "Activa configuración automática y descubrimiento de componentes."
-      },
-      {
-        "linea": 10,
-        "ancla": "SpringApplication.run",
-        "explicacion": "Inicia el contexto de aplicación y el servidor."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/controller/AuthController.java",
-    "lineas": 61,
-    "sha256": "1d12c1bec983b913d3420ce43bf4b14a19f6fbd827548ff63491eb790951203b",
-    "referencias": [
-      {
-        "linea": 14,
-        "ancla": "@RequestMapping",
-        "explicacion": "Agrupa las rutas bajo /api/auth."
-      },
-      {
-        "linea": 27,
-        "ancla": "@PostMapping",
-        "explicacion": "Define POST /api/auth/login."
-      },
-      {
-        "linea": 29,
-        "ancla": "String username =",
-        "explicacion": "Lee username del cuerpo JSON; la línea siguiente lee password."
-      },
-      {
-        "linea": 34,
-        "ancla": "findByUsername",
-        "explicacion": "Busca la cuenta. El bloque siguiente responde 404 si no existe."
-      },
-      {
-        "linea": 43,
-        "ancla": "passwordEncoder.matches",
-        "explicacion": "Compara la contraseña recibida con BCrypt. Si falla se devuelve 401."
-      },
-      {
-        "linea": 53,
-        "ancla": "jwtUtil.generateToken",
-        "explicacion": "Emite un JWT con el nombre de usuario."
-      },
-      {
-        "linea": 55,
-        "ancla": "return ResponseEntity.ok",
-        "explicacion": "Devuelve message, username y token. No hay comprobación de rol ni de baja en el método."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/controller/PersonaController.java",
-    "lineas": 104,
-    "sha256": "183e5d7da1a1d22d8617e5f38a4e9f3a7dc9ca4e770b1af8fbb354a3ae3cb9c3",
-    "referencias": [
-      {
-        "linea": 13,
-        "ancla": "@RequestMapping",
-        "explicacion": "Prefijo /api/personas."
-      },
-      {
-        "linea": 14,
-        "ancla": "@CrossOrigin",
-        "explicacion": "Permite el origen localhost:4200 y los métodos/encabezados declarados."
-      },
-      {
-        "linea": 21,
-        "ancla": "@GetMapping(\"/{id}/contactos\")",
-        "explicacion": "Consulta contactos de una persona identificada por la URL."
-      },
-      {
-        "linea": 26,
-        "ancla": "@PutMapping(\"/{id}/contactos\")",
-        "explicacion": "Recibe una lista de ContactoDTO para guardarla."
-      },
-      {
-        "linea": 50,
-        "ancla": "obtenerPersonas()",
-        "explicacion": "Lista activos; captura RuntimeException como 500 con texto."
-      },
-      {
-        "linea": 64,
-        "ancla": "guardarPersona(",
-        "explicacion": "Recibe PersonaDTO, devuelve 201 y convierte RuntimeException en 400."
-      },
-      {
-        "linea": 78,
-        "ancla": "actualizarPersona(",
-        "explicacion": "Actualiza por ID; devuelve 200 o 404 ante RuntimeException, incluso cuando es un error de validación."
-      },
-      {
-        "linea": 92,
-        "ancla": "eliminarPersona(",
-        "explicacion": "Baja lógica: 204 sin cuerpo, o 404 si se captura una excepción."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/controller/OcupacionController.java",
-    "lineas": 20,
-    "sha256": "6ea9621739b41ff0bb4d700d1a036d3b903c0b918c6e418ce42213dccc8b6201",
-    "referencias": [
-      {
-        "linea": 9,
-        "ancla": "@RequestMapping",
-        "explicacion": "Ruta /api/ocupaciones."
-      },
-      {
-        "linea": 16,
-        "ancla": "@GetMapping",
-        "explicacion": "Define la consulta GET."
-      },
-      {
-        "linea": 18,
-        "ancla": "findAll()",
-        "explicacion": "Lee y devuelve todas las ocupaciones con 200."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/service/PersonaService.java",
-    "lineas": 343,
-    "sha256": "76fd8b067e9eaa8ec94b5d3631821a5b9264524c74ca5eaa2614a34982412e66",
-    "referencias": [
-      {
-        "linea": 22,
-        "ancla": "public List<com.example.demo.dto.ContactoDTO> obtenerContactos",
-        "explicacion": "Devuelve todas las relaciones del titular activo."
-      },
-      {
-        "linea": 27,
-        "ancla": "public List<com.example.demo.dto.ContactoDTO> guardarContactos",
-        "explicacion": "Sustituye la lista completa; exige al menos uno y no impone máximo."
-      },
-      {
-        "linea": 51,
-        "ancla": "findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull",
-        "explicacion": "Lista titulares activos, no personas creadas solo como contacto."
-      },
-      {
-        "linea": 80,
-        "ancla": "public PersonaDTO guardar",
-        "explicacion": "Valida titular, contactos y comunicaciones antes del alta transaccional."
-      },
-      {
-        "linea": 86,
-        "ancla": "personasActivas >= 20",
-        "explicacion": "El límite de 20 cuenta solo titulares; no hay bloqueo concurrente."
-      },
-      {
-        "linea": 91,
-        "ancla": "Persona guardada = personaRepository.saveAndFlush(persona)",
-        "explicacion": "Identifica y persiste el registro principal como titular."
-      },
-      {
-        "linea": 92,
-        "ancla": "reemplazarContactos(guardada, dto.getContactosEmergencia())",
-        "explicacion": "Persiste las relaciones dentro de la misma transacción."
-      },
-      {
-        "linea": 98,
-        "ancla": "public PersonaDTO actualizar",
-        "explicacion": "Actualiza datos/comunicaciones de titular activo; los contactos se gestionan en su propia ruta."
-      },
-      {
-        "linea": 131,
-        "ancla": "setFechaBaja(LocalDate.now())",
-        "explicacion": "Baja lógica del titular, sin borrar personas ni relaciones compartidas."
-      },
-      {
-        "linea": 149,
-        "ancla": "dto.setContactosEmergencia(contactos)",
-        "explicacion": "Incluye la lista completa en la respuesta, además de los campos singulares del primero."
-      },
-      {
-        "linea": 164,
-        "ancla": "dto.setCorreosAdicionales",
-        "explicacion": "Devuelve comunicaciones secundarias; la siguiente línea hace lo mismo con teléfonos."
-      },
-      {
-        "linea": 198,
-        "ancla": "private void validarTitular",
-        "explicacion": "Exige nombre y apellido de hasta 100 caracteres y fecha de nacimiento a los titulares."
-      },
-      {
-        "linea": 206,
-        "ancla": "private Persona titularActivo",
-        "explicacion": "Rechaza personas dadas de baja o que solo sean contactos con 404."
-      },
-      {
-        "linea": 218,
-        "ancla": "private void validarContactos",
-        "explicacion": "Valida mínimo uno, IDs y datos personales requeridos para contactos nuevos."
-      },
-      {
-        "linea": 247,
-        "ancla": "private CatalogoParentesco resolverParentesco",
-        "explicacion": "Busca parentesco existente por ID o nombre exacto; no crea catálogo desde el formulario."
-      },
-      {
-        "linea": 261,
-        "ancla": "contacto = personaRepository.findById(dto.idContacto())",
-        "explicacion": "Reutiliza solo personas activas; no modifica datos compartidos."
-      },
-      {
-        "linea": 265,
-        "ancla": "contacto = new Persona()",
-        "explicacion": "La persona nueva creada como contacto no cuenta como titular."
-      },
-      {
-        "linea": 294,
-        "ancla": "titular.getContactosEmergencia().removeIf",
-        "explicacion": "Quita relaciones omitidas; orphanRemoval elimina solo los vínculos, nunca personas compartidas."
-      },
-      {
-        "linea": 297,
-        "ancla": "private com.example.demo.dto.ContactoDTO contactoADTO",
-        "explicacion": "Devuelve ID de persona, nombre, apellido, teléfono y parentesco de la relación."
-      },
-      {
-        "linea": 306,
-        "ancla": "private void validarComunicacion",
-        "explicacion": "Mantiene dos correos y dos teléfonos completos para titulares."
-      },
-      {
-        "linea": 323,
-        "ancla": "private void actualizarComunicacion",
-        "explicacion": "Crea posiciones faltantes y actualiza comunicaciones principales/secundarias."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/config/SecurityConfig.java",
-    "lineas": 54,
-    "sha256": "5a808997dbc454563b227c1153b5b892437866116449df717c1a701454df7ae8",
-    "referencias": [
-      {
-        "linea": 18,
-        "ancla": "@EnableWebSecurity",
-        "explicacion": "Habilita esta configuración de seguridad."
-      },
-      {
-        "linea": 26,
-        "ancla": ".csrf(",
-        "explicacion": "Desactiva protección CSRF."
-      },
-      {
-        "linea": 27,
-        "ancla": ".cors(",
-        "explicacion": "Habilita integración CORS."
-      },
-      {
-        "linea": 28,
-        "ancla": "SessionCreationPolicy.STATELESS",
-        "explicacion": "No mantiene la autenticación en una sesión HTTP de Spring Security."
-      },
-      {
-        "linea": 31,
-        "ancla": ".requestMatchers(org.springframework.http.HttpMethod.OPTIONS",
-        "explicacion": "Permite OPTIONS."
-      },
-      {
-        "linea": 32,
-        "ancla": ".requestMatchers(\"/api/auth/login\")",
-        "explicacion": "Permite únicamente el endpoint público de login."
-      },
-      {
-        "linea": 35,
-        "ancla": ".anyRequest().authenticated()",
-        "explicacion": "El resto exige identidad autenticada, sin una condición de rol."
-      },
-      {
-        "linea": 37,
-        "ancla": ".addFilterBefore",
-        "explicacion": "Registra JwtFilter en la cadena de Spring Security para establecer la identidad autenticada."
-      },
-      {
-        "linea": 44,
-        "ancla": "public UserDetailsService",
-        "explicacion": "Devuelve un servicio que rechaza consultas; el login se resuelve en el controlador."
-      },
-      {
-        "linea": 52,
-        "ancla": "return new BCryptPasswordEncoder",
-        "explicacion": "Proporciona el comparador/codificador BCrypt."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/security/JwtUtil.java",
-    "lineas": 42,
-    "sha256": "c196b452076e4841cdf2873a0cc253d030f88fde13d9946cbbef6d69b6c348b9",
-    "referencias": [
-      {
-        "linea": 17,
-        "ancla": "@Value",
-        "explicacion": "Lee jwt.secret desde configuración."
-      },
-      {
-        "linea": 19,
-        "ancla": "EXPIRATION_TIME =",
-        "explicacion": "Vigencia fija de 3600000 milisegundos: una hora."
-      },
-      {
-        "linea": 22,
-        "ancla": "Keys.hmacShaKeyFor",
-        "explicacion": "Crea la clave a partir de los bytes UTF-8 del secreto."
-      },
-      {
-        "linea": 27,
-        "ancla": ".setSubject",
-        "explicacion": "Coloca el username como sujeto."
-      },
-      {
-        "linea": 29,
-        "ancla": ".setExpiration",
-        "explicacion": "Calcula el vencimiento desde la hora actual."
-      },
-      {
-        "linea": 30,
-        "ancla": ".signWith",
-        "explicacion": "Firma con HS256."
-      },
-      {
-        "linea": 38,
-        "ancla": ".parseClaimsJws",
-        "explicacion": "Analiza y verifica firma y vencimiento; después obtiene el sujeto. Un token incorrecto produce excepción."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/security/JwtFilter.java",
-    "lineas": 50,
-    "sha256": "5895680a6e9e649a68b00d58de5907d78dedd5a98741a78e8837e57cc5f7867f",
-    "referencias": [
-      {
-        "linea": 17,
-        "ancla": "@Component",
-        "explicacion": "Registra el filtro como componente administrado por Spring."
-      },
-      {
-        "linea": 27,
-        "ancla": "String authHeader",
-        "explicacion": "Lee Authorization."
-      },
-      {
-        "linea": 32,
-        "ancla": "token = authHeader.substring(7)",
-        "explicacion": "Retira el prefijo Bearer y conserva el JWT."
-      },
-      {
-        "linea": 34,
-        "ancla": "username = jwtUtil.extractUsername",
-        "explicacion": "Verifica el token y obtiene el usuario. Los errores se capturan y registran en consola."
-      },
-      {
-        "linea": 40,
-        "ancla": "if (username != null",
-        "explicacion": "Crea autenticación solo si hay sujeto y el contexto aún no tiene una."
-      },
-      {
-        "linea": 43,
-        "ancla": "Collections.emptyList()",
-        "explicacion": "Construye autenticación sin autoridades/roles."
-      },
-      {
-        "linea": 45,
-        "ancla": "SecurityContextHolder.getContext().setAuthentication",
-        "explicacion": "Guarda la identidad en el contexto para las siguientes reglas de seguridad."
-      },
-      {
-        "linea": 48,
-        "ancla": "filterChain.doFilter",
-        "explicacion": "Continúa la cadena; las reglas posteriores decidirán el acceso cuando no hubo autenticación."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/dto/PersonaDTO.java",
-    "lineas": 65,
-    "sha256": "8b607daa694ac4c19cd212d29a970bc3b5bbc714dd2b442e33185f2495a05535",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "private java.util.List<String> correosAdicionales",
-        "explicacion": "Exactamente un correo secundario exigido por el servicio."
-      },
-      {
-        "linea": 7,
-        "ancla": "private java.util.List<String> telefonosAdicionales",
-        "explicacion": "Exactamente un teléfono secundario."
-      },
-      {
-        "linea": 8,
-        "ancla": "private java.util.List<ContactoDTO> contactosEmergencia",
-        "explicacion": "Lista de mínimo un contacto, sin máximo; se recibe al crear y se rellena en respuestas."
-      },
-      {
-        "linea": 17,
-        "ancla": "private Long id",
-        "explicacion": "ID del titular."
-      },
-      {
-        "linea": 27,
-        "ancla": "aceptaTerminos = true",
-        "explicacion": "Valor no validado ni persistido actualmente."
-      },
-      {
-        "linea": 28,
-        "ancla": "private String contactoEmergenciaNombre",
-        "explicacion": "Campos singulares del primer contacto conservados por compatibilidad."
-      },
-      {
-        "linea": 35,
-        "ancla": "public Long getId()",
-        "explicacion": "Accesores para serialización y uso del servicio."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/dto/ContactoDTO.java",
-    "lineas": 11,
-    "sha256": "d850e945cc3e45f7e2a54cc2eecfc9d33ffe2d790cb360224f53dae3260206b8",
-    "referencias": [
-      {
-        "linea": 5,
-        "ancla": "public record",
-        "explicacion": "Sin ID se exigen los datos personales requeridos; con ID solo se cambia el vínculo. idParentesco o parentesco identifican el catálogo."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/Persona.java",
-    "lineas": 35,
-    "sha256": "3e962c5906d3b6f244554a4dd3ea0e20540d4d2b2bed5e371cf7c390ace771a9",
-    "referencias": [
-      {
-        "linea": 9,
-        "ancla": "@Table",
-        "explicacion": "Mapea la tabla persona."
-      },
-      {
-        "linea": 14,
-        "ancla": "@Column(name = \"fecha_nacimiento\", nullable = false)",
-        "explicacion": "Fecha obligatoria por esquema."
-      },
-      {
-        "linea": 28,
-        "ancla": "public boolean isTitular",
-        "explicacion": "Indica si existe PerfilTitular; no es una columna propia de Persona."
-      },
-      {
-        "linea": 25,
-        "ancla": "public PerfilTitular getPerfilTitular",
-        "explicacion": "Accede a los datos exclusivos del registro titular."
-      },
-      {
-        "linea": 17,
-        "ancla": "@OneToMany(mappedBy = \"persona\"",
-        "explicacion": "Lista relaciones de emergencia sin borrar contactos compartidos."
-      },
-      {
-        "linea": 17,
-        "ancla": "private List<ContactoEmergencia>",
-        "explicacion": "Colección de vínculos salientes; cascada y eliminación de huérfanos solo sobre relaciones."
-      },
-      {
-        "linea": 18,
-        "ancla": "private List<PersonaCorreo>",
-        "explicacion": "Correos ordenados por ID: primero principal y restantes adicionales."
-      },
-      {
-        "linea": 19,
-        "ancla": "private List<PersonaTelefono>",
-        "explicacion": "Teléfonos ordenados del mismo modo."
-      },
-      {
-        "linea": 29,
-        "ancla": "public void setTitular",
-        "explicacion": "Compatibilidad: titular se deriva de la existencia de PerfilTitular."
-      },
-      {
-        "linea": 32,
-        "ancla": "public List<ContactoEmergencia> getContactosEmergencia",
-        "explicacion": "Devuelve relaciones salientes ordenadas."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/PerfilTitular.java",
-    "lineas": 20,
-    "sha256": "a43ebb58c106f74470c4b53cad8d0949e1240de8a9c87a2fc93033e1ccf43188",
-    "referencias": [
-      {
-        "linea": 10,
-        "ancla": "@MapsId",
-        "explicacion": "Comparte la clave primaria con Persona."
-      },
-      {
-        "linea": 13,
-        "ancla": "@ManyToOne",
-        "explicacion": "Requiere una ocupación del catálogo."
-      },
-      {
-        "linea": 14,
-        "ancla": "@Column(name = \"fecha_baja\")",
-        "explicacion": "null indica perfil activo; una fecha registra la baja lógica."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/CatalogoOcupacion.java",
-    "lineas": 21,
-    "sha256": "81a6d1ff108a1d5f828f6ffbc6a2e8f9ab79060c3d457764dfe50d00a6ef0816",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@Table",
-        "explicacion": "Identifica la tabla SQL."
-      },
-      {
-        "linea": 9,
-        "ancla": "@GeneratedValue",
-        "explicacion": "IDENTITY delega la generación de ID en la base."
-      },
-      {
-        "linea": 13,
-        "ancla": "private String nombre",
-        "explicacion": "Campo persistido; las anotaciones Column cercanas describen restricciones del mapeo."
-      },
-      {
-        "linea": 17,
-        "ancla": "public Long getId()",
-        "explicacion": "Inicio de accesores para leer/escribir campos; no contienen validación de negocio."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/PersonaCorreo.java",
-    "lineas": 27,
-    "sha256": "130ff10cee64f187194cd08e50ee3179b6e01829da64f0ee5fd3434f0e016fe2",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@Table",
-        "explicacion": "Mapea persona_correo."
-      },
-      {
-        "linea": 9,
-        "ancla": "@GeneratedValue",
-        "explicacion": "Identificador generado por base."
-      },
-      {
-        "linea": 13,
-        "ancla": "@JoinColumn",
-        "explicacion": "Vincula al padre por id_persona."
-      },
-      {
-        "linea": 16,
-        "ancla": "@Column(nullable = false, length = 150)",
-        "explicacion": "Longitud y obligatoriedad del correo."
-      },
-      {
-        "linea": 25,
-        "ancla": "public String getCorreo",
-        "explicacion": "Acceso al valor para construir el DTO."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/PersonaTelefono.java",
-    "lineas": 27,
-    "sha256": "351ff611dad1df483ab1e32ccdca7ab8853377d8567b26b44b3f0d9c0efc2325",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@Table",
-        "explicacion": "Mapea persona_telefono."
-      },
-      {
-        "linea": 9,
-        "ancla": "@GeneratedValue",
-        "explicacion": "Identificador generado por base."
-      },
-      {
-        "linea": 13,
-        "ancla": "@JoinColumn",
-        "explicacion": "Relación ManyToOne a persona."
-      },
-      {
-        "linea": 16,
-        "ancla": "@Column(nullable = false, length = 30)",
-        "explicacion": "Longitud alineada con schema.sql."
-      },
-      {
-        "linea": 25,
-        "ancla": "public String getTelefono",
-        "explicacion": "Devuelve el número."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/ContactoEmergencia.java",
-    "lineas": 36,
-    "sha256": "fcd82530e62f2f185574f00969d38f6c44cf0c0a26538ac383f36383a6c7a004",
-    "referencias": [
-      {
-        "linea": 8,
-        "ancla": "@Table",
-        "explicacion": "Mapea persona_contacto_emergencia; UNIQUE evita repetir el par titular/contacto."
-      },
-      {
-        "linea": 7,
-        "ancla": "@org.hibernate.annotations.Check",
-        "explicacion": "Impide autorreferencia también al generar el esquema JPA."
-      },
-      {
-        "linea": 16,
-        "ancla": "@JoinColumn(name = \"id_persona\"",
-        "explicacion": "Referencia al titular."
-      },
-      {
-        "linea": 21,
-        "ancla": "@JoinColumn(name = \"id_contacto\"",
-        "explicacion": "Referencia a la persona compartida, sin cascada de borrado."
-      },
-      {
-        "linea": 25,
-        "ancla": "@JoinColumn(name = \"id_parentesco\"",
-        "explicacion": "Referencia al catálogo de parentescos."
-      },
-      {
-        "linea": 32,
-        "ancla": "public Persona getContacto",
-        "explicacion": "Acceso a los datos de la persona de contacto."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/Usuario.java",
-    "lineas": 33,
-    "sha256": "d491ac5da4b51d12b2956afd3d6e365fc0cbe8ade953c4eb907dc50cd9d379c8",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@Table",
-        "explicacion": "Identifica la tabla SQL."
-      },
-      {
-        "linea": 10,
-        "ancla": "@GeneratedValue",
-        "explicacion": "IDENTITY delega la generación de ID en la base."
-      },
-      {
-        "linea": 17,
-        "ancla": "private String password",
-        "explicacion": "Campo persistido; las anotaciones Column cercanas describen restricciones del mapeo."
-      },
-      {
-        "linea": 19,
-        "ancla": "private String rol",
-        "explicacion": "Guarda el rol pero el login/filtros actuales no lo verifican."
-      },
-      {
-        "linea": 22,
-        "ancla": "public Long getId()",
-        "explicacion": "Inicio de accesores para leer/escribir campos; no contienen validación de negocio."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/repository/PersonaRepository.java",
-    "lineas": 13,
-    "sha256": "3a8f22149ce618516c158482d60e019d6b1e9bd0cf3ab398b58c6187e9edf692",
-    "referencias": [
-      {
-        "linea": 9,
-        "ancla": "extends JpaRepository",
-        "explicacion": "Hereda persistencia y búsqueda por ID para titulares y contactos."
-      },
-      {
-        "linea": 10,
-        "ancla": "findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull",
-        "explicacion": "Lista solo titulares activos."
-      },
-      {
-        "linea": 11,
-        "ancla": "findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull",
-        "explicacion": "Lista titulares dados de baja."
-      },
-      {
-        "linea": 12,
-        "ancla": "countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull",
-        "explicacion": "Cuenta solo titulares activos, excluyendo contactos del límite de 20."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/repository/CatalogoOcupacionRepository.java",
-    "lineas": 11,
-    "sha256": "fbf52acec4231c8b2da4cf6b18b0a232c7d7c5b0a81a1fc58ddcf764550558f1",
-    "referencias": [
-      {
-        "linea": 9,
-        "ancla": "extends JpaRepository",
-        "explicacion": "Hereda save, saveAndFlush, findById, findAll y otras operaciones; el ID es Long."
-      },
-      {
-        "linea": 10,
-        "ancla": "findByNombre",
-        "explicacion": "Spring Data deriva la consulta del nombre del método."
-      },
-      {
-        "linea": 10,
-        "ancla": "Optional<",
-        "explicacion": "Expresa que la búsqueda puede no encontrar coincidencia."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/repository/UsuarioRepository.java",
-    "lineas": 9,
-    "sha256": "7b2f46fe169254d451a8922ea5a3d72f7750ee3981ce27680be4b4e8476c1a13",
-    "referencias": [
-      {
-        "linea": 7,
-        "ancla": "extends JpaRepository",
-        "explicacion": "Hereda save, saveAndFlush, findById, findAll y otras operaciones; el ID es Long."
-      },
-      {
-        "linea": 8,
-        "ancla": "findByUsername",
-        "explicacion": "Spring Data deriva la consulta del nombre del método."
-      },
-      {
-        "linea": 8,
-        "ancla": "Optional<",
-        "explicacion": "Expresa que la búsqueda puede no encontrar coincidencia."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/resources/application.properties",
-    "lineas": 11,
-    "sha256": "e554a6d068c355f0845cd3f8dddaf01e6e0947fb0b8b9bce34866554f61665c2",
-    "referencias": [
-      {
-        "linea": 1,
-        "ancla": "spring.application.name",
-        "explicacion": "Nombre de aplicación."
-      },
-      {
-        "linea": 2,
-        "ancla": "spring.datasource.url",
-        "explicacion": "Conexión PostgreSQL a nomina_db."
-      },
-      {
-        "linea": 3,
-        "ancla": "spring.datasource.username",
-        "explicacion": "Usuario de la conexión."
-      },
-      {
-        "linea": 4,
-        "ancla": "spring.datasource.password",
-        "explicacion": "Contraseña configurada directamente; valor omitido en esta copia."
-      },
-      {
-        "linea": 6,
-        "ancla": "jwt.secret",
-        "explicacion": "Clave de firma configurada directamente; valor omitido."
-      },
-      {
-        "linea": 9,
-        "ancla": "ddl-auto",
-        "explicacion": "update solicita ajustar el esquema JPA; no equivale a ejecutar data.sql."
-      },
-      {
-        "linea": 10,
-        "ancla": "show-sql",
-        "explicacion": "Muestra consultas SQL."
-      },
-      {
-        "linea": 11,
-        "ancla": "hibernate.dialect",
-        "explicacion": "Dialecto PostgreSQL. No aparece habilitación de inicialización SQL automática."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/resources/schema.sql",
-    "lineas": 49,
-    "sha256": "a89f84dbc620f573d6f7d358717120933bc76460f9574f87e3ff91b14f17f7cf",
-    "referencias": [
-      {
-        "linea": 2,
-        "ancla": "CREATE TABLE IF NOT EXISTS catalogo_parentesco",
-        "explicacion": "Catálogo de parentescos."
-      },
-      {
-        "linea": 5,
-        "ancla": "CREATE TABLE IF NOT EXISTS persona (",
-        "explicacion": "Datos personales comunes y obligatorios de titulares y contactos."
-      },
-      {
-        "linea": 14,
-        "ancla": "CREATE TABLE IF NOT EXISTS perfil_titular",
-        "explicacion": "Datos complementarios y fecha de baja lógica de titulares."
-      },
-      {
-        "linea": 34,
-        "ancla": "CREATE TABLE IF NOT EXISTS persona_contacto_emergencia",
-        "explicacion": "Unión entre titular y contacto con parentesco."
-      },
-      {
-        "linea": 39,
-        "ancla": "uq_pce_par",
-        "explicacion": "Restricción que evita repetir el par."
-      },
-      {
-        "linea": 40,
-        "ancla": "ck_pce_distintos",
-        "explicacion": "Prohíbe una persona como contacto de sí misma."
-      },
-      {
-        "linea": 42,
-        "ancla": "CREATE INDEX IF NOT EXISTS idx_pce_persona",
-        "explicacion": "Facilita búsqueda de relaciones salientes."
-      },
-      {
-        "linea": 22,
-        "ancla": "CREATE TABLE IF NOT EXISTS persona_correo",
-        "explicacion": "Correos de hasta 150 caracteres."
-      },
-      {
-        "linea": 28,
-        "ancla": "CREATE TABLE IF NOT EXISTS persona_telefono",
-        "explicacion": "Teléfonos de exactamente diez dígitos."
-      },
-      {
-        "linea": 43,
-        "ancla": "CREATE TABLE IF NOT EXISTS usuario",
-        "explicacion": "Cuenta con id_persona obligatorio, todavía no mapeado en la entidad Usuario."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/resources/data.sql",
-    "lineas": 39,
-    "sha256": "1e4c1d36b2bc1618ce1ad12a5b6f943574afc658ab35eb5d18af36398165582c",
-    "referencias": [
-      {
-        "linea": 1,
-        "ancla": "INSERT INTO catalogo_ocupacion",
-        "explicacion": "Siete ocupaciones iniciales."
-      },
-      {
-        "linea": 5,
-        "ancla": "INSERT INTO catalogo_parentesco",
-        "explicacion": "Once parentescos iniciales."
-      },
-      {
-        "linea": 11,
-        "ancla": "INSERT INTO persona (",
-        "explicacion": "Crea titulares y contactos con datos personales completos."
-      },
-      {
-        "linea": 19,
-        "ancla": "INSERT INTO perfil_titular",
-        "explicacion": "Distingue los dos titulares iniciales y sus datos complementarios."
-      },
-      {
-        "linea": 22,
-        "ancla": "INSERT INTO persona_correo",
-        "explicacion": "Correos iniciales; repetir la semilla puede duplicarlos."
-      },
-      {
-        "linea": 28,
-        "ancla": "INSERT INTO persona_telefono",
-        "explicacion": "Teléfonos de titulares y contactos."
-      },
-      {
-        "linea": 32,
-        "ancla": "INSERT INTO persona_contacto_emergencia",
-        "explicacion": "Vínculos titular/contacto/parentesco; evita duplicar el mismo par."
-      },
-      {
-        "linea": 35,
-        "ancla": "INSERT INTO usuario",
-        "explicacion": "Cuentas con hashes BCrypt; no se verificaron contraseñas."
-      },
-      {
-        "linea": 39,
-        "ancla": "SELECT setval('persona_id_seq'",
-        "explicacion": "Ajusta la secuencia de personas después de IDs explícitos."
-      }
-    ]
-  },
-  {
-    "archivo": "pom.xml",
-    "lineas": 137,
-    "sha256": "08d655df6a9f0862c150f8b0007b89281bdd1e619e5a3e9954d937313f7b35fb",
-    "referencias": [
-      {
-        "linea": 7,
-        "ancla": "<artifactId>spring-boot-starter-parent",
-        "explicacion": "Hereda configuración de Spring Boot; la siguiente línea fija la versión 4.1.1."
-      },
-      {
-        "linea": 30,
-        "ancla": "<java.version>",
-        "explicacion": "Java 21."
-      },
-      {
-        "linea": 43,
-        "ancla": "<artifactId>spring-boot-starter-webmvc",
-        "explicacion": "Soporte de controladores HTTP."
-      },
-      {
-        "linea": 73,
-        "ancla": "<artifactId>postgresql",
-        "explicacion": "Driver de base de datos en ejecución."
-      },
-      {
-        "linea": 78,
-        "ancla": "<artifactId>spring-boot-starter-data-jpa",
-        "explicacion": "Persistencia JPA y repositorios."
-      },
-      {
-        "linea": 82,
-        "ancla": "<artifactId>jjwt-api",
-        "explicacion": "API JWT; después aparecen implementación y Jackson."
-      },
-      {
-        "linea": 99,
-        "ancla": "<artifactId>spring-boot-starter-security",
-        "explicacion": "Dependencia de seguridad."
-      },
-      {
-        "linea": 107,
-        "ancla": "<artifactId>asciidoctor-maven-plugin",
-        "explicacion": "Procesa documentación en prepare-package."
-      },
-      {
-        "linea": 132,
-        "ancla": "<artifactId>spring-boot-maven-plugin",
-        "explicacion": "Empaquetado y ejecución de la aplicación Spring Boot."
-      }
-    ]
-  },
-  {
-    "archivo": "scripts/HashPassword.java",
-    "lineas": 30,
-    "sha256": "d0f81902d234fd2b4e542774b6b8356a02373c85e1abefb546eb36f5c942c08b",
-    "referencias": [
-      {
-        "linea": 10,
-        "ancla": "System.console()",
-        "explicacion": "Exige una consola interactiva."
-      },
-      {
-        "linea": 14,
-        "ancla": "console.readPassword(\"Nueva",
-        "explicacion": "Lee contraseña sin mostrarla; después solicita confirmación."
-      },
-      {
-        "linea": 17,
-        "ancla": "!Arrays.equals",
-        "explicacion": "Rechaza valores ausentes o diferentes."
-      },
-      {
-        "linea": 21,
-        "ancla": "value.isBlank()",
-        "explicacion": "Exige mínimo 12 caracteres y máximo 72 bytes UTF-8."
-      },
-      {
-        "linea": 24,
-        "ancla": "BCryptPasswordEncoder(12)",
-        "explicacion": "Genera e imprime BCrypt con coste 12."
-      },
-      {
-        "linea": 26,
-        "ancla": "Arrays.fill(password",
-        "explicacion": "Limpia arrays en finally; no borra el String creado previamente."
-      }
-    ]
-  },
-  {
-    "archivo": "src/test/java/com/example/demo/service/RegistroCompletoTest.java",
-    "lineas": 194,
-    "sha256": "a505133c3561ccda8c49aea0aefd791f1495ac620e15bdcc9134818182eba2b2",
-    "referencias": [
-      {
-        "linea": 23,
-        "ancla": "@BeforeEach",
-        "explicacion": "Inyecta mocks y configura respuestas de catálogo/guardado."
-      },
-      {
-        "linea": 78,
-        "ancla": "void permiteUnContactoYDevuelveIdentidadCompleta",
-        "explicacion": "Comprueba mínimo uno y respuesta con IDs/apellido."
-      },
-      {
-        "linea": 85,
-        "ancla": "void permiteMasDeDosContactosSinContarlosComoTitulares",
-        "explicacion": "Comprueba cuatro contactos excluidos de la categoría titular."
-      },
-      {
-        "linea": 93,
-        "ancla": "void compartePersonaSinModificarSusDatosPersonales",
-        "explicacion": "Reutiliza una persona y conserva sus datos compartidos."
-      },
-      {
-        "linea": 110,
-        "ancla": "void reemplazarQuitaSoloRelacionYSostieneLasConservadas",
-        "explicacion": "Quita vínculos sin borrar personas."
-      },
-      {
-        "linea": 117,
-        "ancla": "void rechazaAutorreferencia",
-        "explicacion": "Rechaza contacto igual al titular."
-      },
-      {
-        "linea": 122,
-        "ancla": "void rechazaIDsDuplicados",
-        "explicacion": "Rechaza repetición de IDs en una lista."
-      },
-      {
-        "linea": 142,
-        "ancla": "void contactoNoSePuedeEditarComoTitular",
-        "explicacion": "Evita operar sobre contactos a través de las rutas de titular."
-      },
-      {
-        "linea": 156,
-        "ancla": "void limiteVeinteTitulares",
-        "explicacion": "Comprueba el límite de altas."
-      }
-    ]
-  },
-  {
-    "archivo": "src/test/java/com/example/demo/DemoApplicationTests.java",
-    "lineas": 103,
-    "sha256": "8890892656d068e80facac02f352a894d189e3706dfaa370c220d41a6389d411",
-    "referencias": [
-      {
-        "linea": 18,
-        "ancla": "@EnabledIfEnvironmentVariable",
-        "explicacion": "Solo habilita una base local desechable nomina_backend_test con puerto explícito."
-      },
-      {
-        "linea": 24,
-        "ancla": "spring.jpa.hibernate.ddl-auto=none",
-        "explicacion": "Prueba contra el esquema SQL real, no contra uno inventado por Hibernate."
-      },
-      {
-        "linea": 32,
-        "ancla": "@BeforeEach",
-        "explicacion": "Crea tablas si faltan y vacía datos de la base de prueba."
-      },
-      {
-        "linea": 51,
-        "ancla": "void persisteCuatroContactosComoPersonasYListaSoloTitular",
-        "explicacion": "Comprueba la persistencia de cuatro personas de contacto y un titular."
-      },
-      {
-        "linea": 60,
-        "ancla": "void contactoCompartidoSobreviveARetirarUnaRelacion",
-        "explicacion": "Verifica que borrar un vínculo no borra al contacto compartido."
-      },
-      {
-        "linea": 71,
-        "ancla": "void repetirPutConIDsNoDuplicaPersonasNiRelaciones",
-        "explicacion": "Comprueba repetición segura cuando se conservan los IDs."
-      },
-      {
-        "linea": 77,
-        "ancla": "void falloPosteriorRevierteNuevasPersonasYOcupacion",
-        "explicacion": "Comprueba rollback del alta completa."
-      },
-      {
-        "linea": 84,
-        "ancla": "void falloPutRevierteCambioDeRelaciones",
-        "explicacion": "Comprueba rollback durante sustitución de contactos."
-      },
-      {
-        "linea": 91,
-        "ancla": "void restriccionesSqlRechazanAutorreferenciaYDuplicado",
-        "explicacion": "Verifica CHECK y UNIQUE en PostgreSQL."
-      },
-      {
-        "linea": 98,
-        "ancla": "void bajaTitularNoEliminaContactoCompartido",
-        "explicacion": "Baja lógica sin borrado de personas."
-      }
-    ]
-  },
-  {
-    "archivo": ".mvn/wrapper/maven-wrapper.properties",
-    "lineas": 3,
-    "sha256": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706",
-    "referencias": [
-      {
-        "linea": 1,
-        "ancla": "wrapperVersion",
-        "explicacion": "Versión del wrapper."
-      },
-      {
-        "linea": 2,
-        "ancla": "distributionType",
-        "explicacion": "Modo only-script."
-      },
-      {
-        "linea": 3,
-        "ancla": "distributionUrl",
-        "explicacion": "URL de la distribución Maven."
-      }
-    ]
-  },
-  {
-    "archivo": "mvnw.cmd",
-    "lineas": 189,
-    "sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
-    "referencias": [
-      {
-        "linea": 35,
-        "ancla": "@FOR /F",
-        "explicacion": "Ejecuta la sección PowerShell del archivo."
-      },
-      {
-        "linea": 54,
-        "ancla": "$distributionUrl =",
-        "explicacion": "Lee la URL de propiedades del wrapper."
-      },
-      {
-        "linea": 102,
-        "ancla": "if (Test-Path -Path \"$MAVEN_HOME\"",
-        "explicacion": "Reutiliza distribución existente en caché."
-      },
-      {
-        "linea": 135,
-        "ancla": "$webclient.DownloadFile",
-        "explicacion": "Descarga Maven si falta."
-      },
-      {
-        "linea": 138,
-        "ancla": "$distributionSha256Sum =",
-        "explicacion": "Lee checksum opcional y lo verifica si está configurado."
-      },
-      {
-        "linea": 150,
-        "ancla": "Expand-Archive",
-        "explicacion": "Extrae la distribución descargada."
-      },
-      {
-        "linea": 104,
-        "ancla": "Write-Output \"MVN_CMD=",
-        "explicacion": "Comunica la ruta de ejecución a batch."
-      }
-    ]
-  },
-  {
-    "archivo": "mvnw",
-    "lineas": 295,
-    "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
-    "referencias": [
-      {
-        "linea": 45,
-        "ancla": "set_java_home()",
-        "explicacion": "Localiza Java."
-      },
-      {
-        "linea": 117,
-        "ancla": "done <\"$scriptDir/.mvn/wrapper",
-        "explicacion": "Lee configuración del wrapper."
-      },
-      {
-        "linea": 148,
-        "ancla": "exec_maven()",
-        "explicacion": "Función que invoca Maven."
-      },
-      {
-        "linea": 153,
-        "ancla": "if [ -d \"$MAVEN_HOME\" ]",
-        "explicacion": "Detecta distribución ya instalada."
-      },
-      {
-        "linea": 194,
-        "ancla": "command -v wget",
-        "explicacion": "Selecciona descarga por wget; después considera curl y Java."
-      },
-      {
-        "linea": 226,
-        "ancla": "if [ -n \"${distributionSha256Sum-}\" ]",
-        "explicacion": "Verifica checksum solo si está configurado."
-      },
-      {
-        "linea": 155,
-        "ancla": "exec_maven \"$@\"",
-        "explicacion": "Invoca Maven; la primera coincidencia pertenece a la rama de caché."
-      }
-    ]
-  },
-  {
-    "archivo": ".gitignore",
-    "lineas": 33,
-    "sha256": "089382e4d7944ab6cb6900a1269678ebff93c00d441ada788cd05a8da182b22b",
-    "referencias": [
-      {
-        "linea": 2,
-        "ancla": "target/",
-        "explicacion": "Excluye resultados de compilación."
-      },
-      {
-        "linea": 3,
-        "ancla": ".mvn/wrapper/maven-wrapper.jar",
-        "explicacion": "Excluye el binario del wrapper."
-      },
-      {
-        "linea": 17,
-        "ancla": ".idea",
-        "explicacion": "Excluye configuración IntelliJ."
-      },
-      {
-        "linea": 33,
-        "ancla": ".vscode/",
-        "explicacion": "Excluye configuración VS Code."
-      }
-    ]
-  },
-  {
-    "archivo": ".gitattributes",
-    "lineas": 3,
-    "sha256": "1c8cc8fb65937e0ee87a7ed50745c6f87fb78ded993fb796aa800c877cc6d517",
-    "referencias": [
-      {
-        "linea": 1,
-        "ancla": "/mvnw",
-        "explicacion": "Fuerza LF en el lanzador Unix."
-      },
-      {
-        "linea": 2,
-        "ancla": "*.cmd",
-        "explicacion": "Fuerza CRLF en comandos Windows."
-      }
-    ]
-  },
-  {
-    "archivo": "README.md",
-    "lineas": 625,
-    "sha256": "f443207ad643896c08827651752e8a0b2c4905309e1dbf9953faaac5392eb2d0",
-    "referencias": [
-      {
-        "linea": 7,
-        "ancla": "## Funcionamiento",
-        "explicacion": "Modelo de titulares, contactos y relaciones."
-      },
-      {
-        "linea": 17,
-        "ancla": "## Configuración",
-        "explicacion": "Arranque y conexión."
-      },
-      {
-        "linea": 27,
-        "ancla": "## Autenticación",
-        "explicacion": "Token nuevo de una hora y alcance del login."
-      },
-      {
-        "linea": 33,
-        "ancla": "## Rutas",
-        "explicacion": "Endpoints incluyendo catálogo de parentescos."
-      },
-      {
-        "linea": 52,
-        "ancla": "## Registro y actualización",
-        "explicacion": "JSON nuevo, IDs y sustitución de listas."
-      },
-      {
-        "linea": 97,
-        "ancla": "## SQL inicial",
-        "explicacion": "Preparación de una base nueva."
-      },
-      {
-        "linea": 113,
-        "ancla": "## Pruebas existentes",
-        "explicacion": "Resultados y ejecución en base desechable."
-      },
-      {
-        "linea": 131,
-        "ancla": "## Documentación PDF",
-        "explicacion": "Regeneración y alcance."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/model/CatalogoParentesco.java",
-    "lineas": 19,
-    "sha256": "976713f9536a4e7b45e69fd94b206f121a1d6b23a28c9d89e7124699beb6d0a0",
-    "referencias": [
-      {
-        "linea": 6,
-        "ancla": "@Table",
-        "explicacion": "Tabla catalogo_parentesco."
-      },
-      {
-        "linea": 9,
-        "ancla": "@GeneratedValue",
-        "explicacion": "ID generado."
-      },
-      {
-        "linea": 12,
-        "ancla": "@Column",
-        "explicacion": "Nombre obligatorio, único y de hasta 50 caracteres."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/repository/CatalogoParentescoRepository.java",
-    "lineas": 9,
-    "sha256": "60458d506b3087baf32c41c149cdedba57dd45f0a9586c2a3cca0920b79c5c27",
-    "referencias": [
-      {
-        "linea": 7,
-        "ancla": "extends JpaRepository",
-        "explicacion": "Hereda operaciones de catálogo."
-      },
-      {
-        "linea": 8,
-        "ancla": "findByNombre",
-        "explicacion": "Busca un nombre exacto para resolver el vínculo."
-      }
-    ]
-  },
-  {
-    "archivo": "src/main/java/com/example/demo/controller/ParentescoController.java",
-    "lineas": 22,
-    "sha256": "7aa9c5c58cbebc1ac8876babfa8cdfcae87caafb073c7463d03817b2371f0eb9",
-    "referencias": [
-      {
-        "linea": 9,
-        "ancla": "@RequestMapping",
-        "explicacion": "Ruta protegida /api/parentescos."
-      },
-      {
-        "linea": 18,
-        "ancla": "@GetMapping",
-        "explicacion": "Consulta HTTP GET."
-      },
-      {
-        "linea": 20,
-        "ancla": "return parentescos.findAll",
-        "explicacion": "Devuelve catálogo ordenado por ID."
-      }
-    ]
-  },
-  {
-    "archivo": "src/test/java/com/example/demo/security/JwtUtilTest.java",
-    "lineas": 21,
-    "sha256": "b4fa3c0d32d70d997b5b82cd7509a8c658f2dc2a637a92d59008e6bec8a0cfdb",
-    "referencias": [
-      {
-        "linea": 11,
-        "ancla": "void tokenDuraUnaHoraYConservaUsuario",
-        "explicacion": "Genera JWT y analiza sus fechas y usuario."
-      },
-      {
-        "linea": 18,
-        "ancla": "assertEquals(3600000L",
-        "explicacion": "Verifica una hora exacta entre emisión y vencimiento."
-      }
-    ]
+{
+  "schema_version": 2,
+  "review_date": "2026-10-15",
+  "base_commit": "c6c9bd220ed7d5a16e166f10305c7ef3ce34d870",
+  "note": "Puede incluir cambios locales documentales; hashes identifican las fuentes exactas.",
+  "sources": [
+    {
+      "path": "Proyecto-FullStackbackend/demo/.gitattributes",
+      "sha256": "1c8cc8fb65937e0ee87a7ed50745c6f87fb78ded993fb796aa800c877cc6d517",
+      "lines": 3,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/.gitignore",
+      "sha256": "089382e4d7944ab6cb6900a1269678ebff93c00d441ada788cd05a8da182b22b",
+      "lines": 33,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/.mvn/wrapper/maven-wrapper.properties",
+      "sha256": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706",
+      "lines": 3,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/AGENTS.md",
+      "sha256": "a5f4793816b2fcb78ffe7f64c8404470a285f3ad61ed7a66c0f320e874210db6",
+      "lines": 12,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contexto de agentes — Backend"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Reglas rápidas"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/README.md",
+      "sha256": "d66ee2c8b7432960c9f6cffca796000a05c8b1d3314030e643f95fbcf70ea482",
+      "lines": 76,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Backend de administración de personas"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Ejecución"
+        },
+        {
+          "line": 16,
+          "kind": "seccion",
+          "name": "Mapa de clases"
+        },
+        {
+          "line": 34,
+          "kind": "seccion",
+          "name": "Modelo y reglas"
+        },
+        {
+          "line": 48,
+          "kind": "seccion",
+          "name": "Seguridad y errores"
+        },
+        {
+          "line": 54,
+          "kind": "seccion",
+          "name": "SQL y pruebas"
+        },
+        {
+          "line": 62,
+          "kind": "seccion",
+          "name": "Guía PDF e índice de fuentes"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/docs/ESPECIFICACION_AGENTES.md",
+      "sha256": "35a017805dd54d52797e4f6d61096ef487a56f6c5fc6ca25a7a510666e28d48d",
+      "lines": 28,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contexto técnico backend"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Stack/capas"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Modelo y contratos"
+        },
+        {
+          "line": 24,
+          "kind": "seccion",
+          "name": "Pruebas/documentación"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/docs/generar_guia.py",
+      "sha256": "0ffc9d7382de99ce3e818814c0b666ef2ca512038bef1b61aa950e81fa2b006a",
+      "lines": 189,
+      "references": [
+        {
+          "line": 32,
+          "kind": "funcion",
+          "name": "source_paths"
+        },
+        {
+          "line": 46,
+          "kind": "funcion",
+          "name": "declarations"
+        },
+        {
+          "line": 65,
+          "kind": "funcion",
+          "name": "inventory"
+        },
+        {
+          "line": 77,
+          "kind": "funcion",
+          "name": "plain"
+        },
+        {
+          "line": 83,
+          "kind": "funcion",
+          "name": "styles"
+        },
+        {
+          "line": 100,
+          "kind": "funcion",
+          "name": "append_markdown"
+        },
+        {
+          "line": 119,
+          "kind": "funcion",
+          "name": "page_footer"
+        },
+        {
+          "line": 127,
+          "kind": "funcion",
+          "name": "generate_pdf"
+        },
+        {
+          "line": 159,
+          "kind": "funcion",
+          "name": "main"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/mvnw",
+      "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
+      "lines": 295,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/mvnw.cmd",
+      "sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
+      "lines": 189,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/pom.xml",
+      "sha256": "08d655df6a9f0862c150f8b0007b89281bdd1e619e5a3e9954d937313f7b35fb",
+      "lines": 137,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/scripts/HashPassword.java",
+      "sha256": "1599fa458ab3945867a199860e684309fe9234946844db5e89981bab89ee5a70",
+      "lines": 31,
+      "references": [
+        {
+          "line": 8,
+          "kind": "tipo",
+          "name": "HashPassword"
+        },
+        {
+          "line": 10,
+          "kind": "metodo",
+          "name": "main"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/DemoApplication.java",
+      "sha256": "e1bd99f8bd2cbf0f10991838de37dbc13063f1057834bc1095efe82d0bc64dbb",
+      "lines": 14,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "DemoApplication"
+        },
+        {
+          "line": 10,
+          "kind": "metodo",
+          "name": "main"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/config/SecurityConfig.java",
+      "sha256": "5153ba5293d2c78aebdaeaa912ce50aee155a5e62e6e9745984f2d666030947a",
+      "lines": 56,
+      "references": [
+        {
+          "line": 19,
+          "kind": "tipo",
+          "name": "SecurityConfig"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "securityFilterChain"
+        },
+        {
+          "line": 45,
+          "kind": "metodo",
+          "name": "userDetailsService"
+        },
+        {
+          "line": 53,
+          "kind": "metodo",
+          "name": "passwordEncoder"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/AuthController.java",
+      "sha256": "61911103ee4d5325f3a9df429fe92f8aebccf94ed932ab4c3706477a775dbf3b",
+      "lines": 81,
+      "references": [
+        {
+          "line": 19,
+          "kind": "tipo",
+          "name": "AuthController"
+        },
+        {
+          "line": 35,
+          "kind": "metodo",
+          "name": "obtenerUsuarioActual"
+        },
+        {
+          "line": 41,
+          "kind": "metodo",
+          "name": "obtenerDatosLogin"
+        },
+        {
+          "line": 47,
+          "kind": "metodo",
+          "name": "actualizarLogin"
+        },
+        {
+          "line": 55,
+          "kind": "metodo",
+          "name": "login"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/OcupacionController.java",
+      "sha256": "cc811cdd8c1f93314f224d5a2eb61f63833b9d354821d06b72d7e293292bbbef",
+      "lines": 21,
+      "references": [
+        {
+          "line": 11,
+          "kind": "tipo",
+          "name": "OcupacionController"
+        },
+        {
+          "line": 18,
+          "kind": "metodo",
+          "name": "obtenerOcupaciones"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/ParentescoController.java",
+      "sha256": "3a3e7f5667639715fa1c0ea0f808d39ca57d2f854a1bad60426823bbbd725f2f",
+      "lines": 24,
+      "references": [
+        {
+          "line": 11,
+          "kind": "tipo",
+          "name": "ParentescoController"
+        },
+        {
+          "line": 21,
+          "kind": "metodo",
+          "name": "obtenerTodos"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/PersonaController.java",
+      "sha256": "2d17af8089235afa31e2a0aff49cfe23a0692dc8ba158506cd5e95d050b93e56",
+      "lines": 145,
+      "references": [
+        {
+          "line": 21,
+          "kind": "tipo",
+          "name": "PersonaController"
+        },
+        {
+          "line": 24,
+          "kind": "metodo",
+          "name": "buscarContactos"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "obtenerContactos"
+        },
+        {
+          "line": 42,
+          "kind": "metodo",
+          "name": "guardarContactos"
+        },
+        {
+          "line": 53,
+          "kind": "metodo",
+          "name": "obtenerResumen"
+        },
+        {
+          "line": 59,
+          "kind": "metodo",
+          "name": "obtenerInactivos"
+        },
+        {
+          "line": 65,
+          "kind": "metodo",
+          "name": "obtenerDetalle"
+        },
+        {
+          "line": 71,
+          "kind": "metodo",
+          "name": "obtenerPorId"
+        },
+        {
+          "line": 77,
+          "kind": "metodo",
+          "name": "reactivar"
+        },
+        {
+          "line": 88,
+          "kind": "metodo",
+          "name": "obtenerPersonas"
+        },
+        {
+          "line": 103,
+          "kind": "metodo",
+          "name": "guardarPersona"
+        },
+        {
+          "line": 118,
+          "kind": "metodo",
+          "name": "actualizarPersona"
+        },
+        {
+          "line": 133,
+          "kind": "metodo",
+          "name": "eliminarPersona"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/BusquedaContactoDTO.java",
+      "sha256": "16adf76b407c7368ccc6dc06cbf975548b86fd16f1e34199e9db637bf6a296a2",
+      "lines": 3,
+      "references": [
+        {
+          "line": 3,
+          "kind": "tipo",
+          "name": "BusquedaContactoDTO"
+        },
+        {
+          "line": 3,
+          "kind": "metodo",
+          "name": "BusquedaContactoDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ContactoDTO.java",
+      "sha256": "e11e38730abb827200e60364da4b8625c774f8950b7b9db95d2d6d98792d0a68",
+      "lines": 8,
+      "references": [
+        {
+          "line": 6,
+          "kind": "tipo",
+          "name": "ContactoDTO"
+        },
+        {
+          "line": 6,
+          "kind": "metodo",
+          "name": "ContactoDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/EditarCuentaDTO.java",
+      "sha256": "3c98f2ea42fff341955cb53db9aabf1aa5d086fe043802a31f86d1ead5c94b4d",
+      "lines": 3,
+      "references": [
+        {
+          "line": 3,
+          "kind": "tipo",
+          "name": "EditarCuentaDTO"
+        },
+        {
+          "line": 3,
+          "kind": "metodo",
+          "name": "EditarCuentaDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaDTO.java",
+      "sha256": "828fd2ddd7b3cdcf0d3a711bc6c92bbe88e0b71d5872c3f969ab49f3ac836ba5",
+      "lines": 71,
+      "references": [
+        {
+          "line": 5,
+          "kind": "tipo",
+          "name": "PersonaDTO"
+        },
+        {
+          "line": 13,
+          "kind": "metodo",
+          "name": "getCorreos"
+        },
+        {
+          "line": 15,
+          "kind": "metodo",
+          "name": "setCorreos"
+        },
+        {
+          "line": 17,
+          "kind": "metodo",
+          "name": "getTelefonos"
+        },
+        {
+          "line": 19,
+          "kind": "metodo",
+          "name": "setTelefonos"
+        },
+        {
+          "line": 21,
+          "kind": "metodo",
+          "name": "getDirecciones"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "setDirecciones"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "getContactosEmergencia"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "setContactosEmergencia"
+        },
+        {
+          "line": 40,
+          "kind": "tipo",
+          "name": "DireccionDTO"
+        },
+        {
+          "line": 40,
+          "kind": "metodo",
+          "name": "DireccionDTO"
+        },
+        {
+          "line": 44,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 46,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 48,
+          "kind": "metodo",
+          "name": "getNombre"
+        },
+        {
+          "line": 50,
+          "kind": "metodo",
+          "name": "setNombre"
+        },
+        {
+          "line": 52,
+          "kind": "metodo",
+          "name": "getApellido"
+        },
+        {
+          "line": 54,
+          "kind": "metodo",
+          "name": "setApellido"
+        },
+        {
+          "line": 56,
+          "kind": "metodo",
+          "name": "getFechaNacimiento"
+        },
+        {
+          "line": 58,
+          "kind": "metodo",
+          "name": "setFechaNacimiento"
+        },
+        {
+          "line": 60,
+          "kind": "metodo",
+          "name": "getGenero"
+        },
+        {
+          "line": 62,
+          "kind": "metodo",
+          "name": "setGenero"
+        },
+        {
+          "line": 64,
+          "kind": "metodo",
+          "name": "getOcupacion"
+        },
+        {
+          "line": 66,
+          "kind": "metodo",
+          "name": "setOcupacion"
+        },
+        {
+          "line": 68,
+          "kind": "metodo",
+          "name": "getFechaBaja"
+        },
+        {
+          "line": 70,
+          "kind": "metodo",
+          "name": "setFechaBaja"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaDetalleDTO.java",
+      "sha256": "965e5981488b35ea58da2e010b1250df27aaee72d582853feab6fb4667a85547",
+      "lines": 7,
+      "references": [
+        {
+          "line": 6,
+          "kind": "tipo",
+          "name": "PersonaDetalleDTO"
+        },
+        {
+          "line": 6,
+          "kind": "metodo",
+          "name": "PersonaDetalleDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaResumenDTO.java",
+      "sha256": "6d68d607fb0fc55b11d131ea682761c1146fe6824680d8c5771630b9232767cd",
+      "lines": 10,
+      "references": [
+        {
+          "line": 6,
+          "kind": "tipo",
+          "name": "PersonaResumenDTO"
+        },
+        {
+          "line": 6,
+          "kind": "metodo",
+          "name": "PersonaResumenDTO"
+        },
+        {
+          "line": 9,
+          "kind": "tipo",
+          "name": "DireccionResumenDTO"
+        },
+        {
+          "line": 9,
+          "kind": "metodo",
+          "name": "DireccionResumenDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ResultadoDTO.java",
+      "sha256": "c25001a6773ee0a6d532312d6e4bf6d4fcc7b9c79ed72f45a594cb84accbc8d3",
+      "lines": 3,
+      "references": [
+        {
+          "line": 3,
+          "kind": "tipo",
+          "name": "ResultadoDTO"
+        },
+        {
+          "line": 3,
+          "kind": "metodo",
+          "name": "ResultadoDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ResumenDTO.java",
+      "sha256": "eb75d1dcfb81e399314660fb9b6fe7d54e7550ae3522885927df72c6641a7791",
+      "lines": 7,
+      "references": [
+        {
+          "line": 5,
+          "kind": "tipo",
+          "name": "ResumenDTO"
+        },
+        {
+          "line": 5,
+          "kind": "metodo",
+          "name": "ResumenDTO"
+        },
+        {
+          "line": 6,
+          "kind": "tipo",
+          "name": "Ocupacion"
+        },
+        {
+          "line": 6,
+          "kind": "metodo",
+          "name": "Ocupacion"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/UsuarioActualDTO.java",
+      "sha256": "08659bed20210331d9952f0ac29a0f47df26fecfc4779a8ef9db95a8313c6298",
+      "lines": 3,
+      "references": [
+        {
+          "line": 3,
+          "kind": "tipo",
+          "name": "UsuarioActualDTO"
+        },
+        {
+          "line": 3,
+          "kind": "metodo",
+          "name": "UsuarioActualDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/CatalogoOcupacion.java",
+      "sha256": "3053c17ceb118e39f1ca9776571b7eebefef4aa796c6d6e1e44effe36f7005f2",
+      "lines": 26,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "CatalogoOcupacion"
+        },
+        {
+          "line": 19,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 21,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "getNombre"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "setNombre"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/CatalogoParentesco.java",
+      "sha256": "fa884333ff21416c855663d84f4bfcbaaf3a0584ea0441bfaf9d3547b14656d6",
+      "lines": 25,
+      "references": [
+        {
+          "line": 9,
+          "kind": "tipo",
+          "name": "CatalogoParentesco"
+        },
+        {
+          "line": 18,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 20,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 22,
+          "kind": "metodo",
+          "name": "getNombre"
+        },
+        {
+          "line": 24,
+          "kind": "metodo",
+          "name": "setNombre"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/ContactoEmergencia.java",
+      "sha256": "f627a351382c7adf734f1764a74ca91912814bbd547a6905fbcf7ad19e80f125",
+      "lines": 44,
+      "references": [
+        {
+          "line": 10,
+          "kind": "tipo",
+          "name": "ContactoEmergencia"
+        },
+        {
+          "line": 29,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 33,
+          "kind": "metodo",
+          "name": "getPersona"
+        },
+        {
+          "line": 35,
+          "kind": "metodo",
+          "name": "setPersona"
+        },
+        {
+          "line": 37,
+          "kind": "metodo",
+          "name": "getContacto"
+        },
+        {
+          "line": 39,
+          "kind": "metodo",
+          "name": "setContacto"
+        },
+        {
+          "line": 41,
+          "kind": "metodo",
+          "name": "getParentesco"
+        },
+        {
+          "line": 43,
+          "kind": "metodo",
+          "name": "setParentesco"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/DireccionTitular.java",
+      "sha256": "c1341b885057485f42f30e79f39e4c2520e8d54781d9769c0d04fb5c36328b65",
+      "lines": 78,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "DireccionTitular"
+        },
+        {
+          "line": 41,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 43,
+          "kind": "metodo",
+          "name": "getPerfilTitular"
+        },
+        {
+          "line": 45,
+          "kind": "metodo",
+          "name": "setPerfilTitular"
+        },
+        {
+          "line": 47,
+          "kind": "metodo",
+          "name": "getOrden"
+        },
+        {
+          "line": 49,
+          "kind": "metodo",
+          "name": "setOrden"
+        },
+        {
+          "line": 51,
+          "kind": "metodo",
+          "name": "getPais"
+        },
+        {
+          "line": 53,
+          "kind": "metodo",
+          "name": "setPais"
+        },
+        {
+          "line": 55,
+          "kind": "metodo",
+          "name": "getEstado"
+        },
+        {
+          "line": 57,
+          "kind": "metodo",
+          "name": "setEstado"
+        },
+        {
+          "line": 59,
+          "kind": "metodo",
+          "name": "getMunicipio"
+        },
+        {
+          "line": 61,
+          "kind": "metodo",
+          "name": "setMunicipio"
+        },
+        {
+          "line": 63,
+          "kind": "metodo",
+          "name": "getColonia"
+        },
+        {
+          "line": 65,
+          "kind": "metodo",
+          "name": "setColonia"
+        },
+        {
+          "line": 67,
+          "kind": "metodo",
+          "name": "getCodigoPostal"
+        },
+        {
+          "line": 69,
+          "kind": "metodo",
+          "name": "setCodigoPostal"
+        },
+        {
+          "line": 71,
+          "kind": "metodo",
+          "name": "getCalle"
+        },
+        {
+          "line": 73,
+          "kind": "metodo",
+          "name": "setCalle"
+        },
+        {
+          "line": 75,
+          "kind": "metodo",
+          "name": "getNumero"
+        },
+        {
+          "line": 77,
+          "kind": "metodo",
+          "name": "setNumero"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PerfilTitular.java",
+      "sha256": "20077078eb48cc9a84f3246884cf1732dd7558f17e0e8e327c5bc3a9885c6baa",
+      "lines": 32,
+      "references": [
+        {
+          "line": 10,
+          "kind": "tipo",
+          "name": "PerfilTitular"
+        },
+        {
+          "line": 19,
+          "kind": "metodo",
+          "name": "getPersona"
+        },
+        {
+          "line": 21,
+          "kind": "metodo",
+          "name": "setPersona"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "getOcupacion"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "setOcupacion"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "getFechaBaja"
+        },
+        {
+          "line": 29,
+          "kind": "metodo",
+          "name": "setFechaBaja"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "getDirecciones"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/Persona.java",
+      "sha256": "a4ac0e5f3cae24351f9848ed23a2abc9b4b19ed5f965ec2a1c5c676a430175ea",
+      "lines": 60,
+      "references": [
+        {
+          "line": 12,
+          "kind": "tipo",
+          "name": "Persona"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "getNombre"
+        },
+        {
+          "line": 29,
+          "kind": "metodo",
+          "name": "setNombre"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "getApellido"
+        },
+        {
+          "line": 33,
+          "kind": "metodo",
+          "name": "setApellido"
+        },
+        {
+          "line": 35,
+          "kind": "metodo",
+          "name": "getFechaNacimiento"
+        },
+        {
+          "line": 37,
+          "kind": "metodo",
+          "name": "setFechaNacimiento"
+        },
+        {
+          "line": 39,
+          "kind": "metodo",
+          "name": "getGenero"
+        },
+        {
+          "line": 41,
+          "kind": "metodo",
+          "name": "setGenero"
+        },
+        {
+          "line": 43,
+          "kind": "metodo",
+          "name": "getPerfilTitular"
+        },
+        {
+          "line": 45,
+          "kind": "metodo",
+          "name": "setPerfilTitular"
+        },
+        {
+          "line": 47,
+          "kind": "metodo",
+          "name": "isTitular"
+        },
+        {
+          "line": 49,
+          "kind": "metodo",
+          "name": "setTitular"
+        },
+        {
+          "line": 51,
+          "kind": "metodo",
+          "name": "getFechaBaja"
+        },
+        {
+          "line": 53,
+          "kind": "metodo",
+          "name": "setFechaBaja"
+        },
+        {
+          "line": 55,
+          "kind": "metodo",
+          "name": "getContactosEmergencia"
+        },
+        {
+          "line": 57,
+          "kind": "metodo",
+          "name": "getCorreos"
+        },
+        {
+          "line": 59,
+          "kind": "metodo",
+          "name": "getTelefonos"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PersonaCorreo.java",
+      "sha256": "8385606bf2dae32cefdfbaa4249991223acf817cf431fb2ce90fa23bc0b083fd",
+      "lines": 34,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "PersonaCorreo"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "getPersona"
+        },
+        {
+          "line": 29,
+          "kind": "metodo",
+          "name": "setPersona"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "getCorreo"
+        },
+        {
+          "line": 33,
+          "kind": "metodo",
+          "name": "setCorreo"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PersonaTelefono.java",
+      "sha256": "e3f67b38258d7631bce312618cc7d00280366e8b42868c03e5d66c4eb13cdb84",
+      "lines": 34,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "PersonaTelefono"
+        },
+        {
+          "line": 23,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "getPersona"
+        },
+        {
+          "line": 29,
+          "kind": "metodo",
+          "name": "setPersona"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "getTelefono"
+        },
+        {
+          "line": 33,
+          "kind": "metodo",
+          "name": "setTelefono"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/Usuario.java",
+      "sha256": "97cc7126f230a9c7c922eba3840480a0fd89c2525b60d115d43f3c37d2503917",
+      "lines": 49,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "Usuario"
+        },
+        {
+          "line": 26,
+          "kind": "metodo",
+          "name": "getId"
+        },
+        {
+          "line": 28,
+          "kind": "metodo",
+          "name": "setId"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "getUsername"
+        },
+        {
+          "line": 33,
+          "kind": "metodo",
+          "name": "setUsername"
+        },
+        {
+          "line": 36,
+          "kind": "metodo",
+          "name": "getPassword"
+        },
+        {
+          "line": 38,
+          "kind": "metodo",
+          "name": "setPassword"
+        },
+        {
+          "line": 41,
+          "kind": "metodo",
+          "name": "getRol"
+        },
+        {
+          "line": 43,
+          "kind": "metodo",
+          "name": "setRol"
+        },
+        {
+          "line": 46,
+          "kind": "metodo",
+          "name": "getIdPersona"
+        },
+        {
+          "line": 48,
+          "kind": "metodo",
+          "name": "setIdPersona"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/CatalogoOcupacionRepository.java",
+      "sha256": "98b4a44c762a83ab57de7a07ff60f7be281201376de65b92be11d1f924938800",
+      "lines": 12,
+      "references": [
+        {
+          "line": 9,
+          "kind": "tipo",
+          "name": "CatalogoOcupacionRepository"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/CatalogoParentescoRepository.java",
+      "sha256": "de09d5761757d58545f9f4a1384bff7efa091b9894d17aeca54fe9cdd64892fc",
+      "lines": 10,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "CatalogoParentescoRepository"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/PersonaRepository.java",
+      "sha256": "3bb0e2e1b7b4b99de6f93c111cff3ec8a6e094983d937f3cbd46e564cb7adaf9",
+      "lines": 94,
+      "references": [
+        {
+          "line": 12,
+          "kind": "tipo",
+          "name": "PersonaRepository"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/UsuarioRepository.java",
+      "sha256": "a3be220b2d8a6223e364fbc1a1aba1512170e3a706c7c30d2bd73bcfc44adb61",
+      "lines": 16,
+      "references": [
+        {
+          "line": 7,
+          "kind": "tipo",
+          "name": "UsuarioRepository"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/security/JwtFilter.java",
+      "sha256": "9b18410e5ebecf7a227c721962bdb92d37a80502768a70c65f97a59b936fd033",
+      "lines": 51,
+      "references": [
+        {
+          "line": 18,
+          "kind": "tipo",
+          "name": "JwtFilter"
+        },
+        {
+          "line": 25,
+          "kind": "metodo",
+          "name": "doFilterInternal"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/security/JwtUtil.java",
+      "sha256": "724a6f1c73f097dfc7790af6a5540779d3482bd6fe65148725d19f33414bcb5f",
+      "lines": 45,
+      "references": [
+        {
+          "line": 15,
+          "kind": "tipo",
+          "name": "JwtUtil"
+        },
+        {
+          "line": 22,
+          "kind": "metodo",
+          "name": "getSigningKey"
+        },
+        {
+          "line": 27,
+          "kind": "metodo",
+          "name": "generateToken"
+        },
+        {
+          "line": 37,
+          "kind": "metodo",
+          "name": "extractUsername"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/CuentaService.java",
+      "sha256": "9547260a169fdf500d3051d1fc8b84d32f8b2e672e104923a18cbbbc0cb43363",
+      "lines": 79,
+      "references": [
+        {
+          "line": 17,
+          "kind": "tipo",
+          "name": "CuentaService"
+        },
+        {
+          "line": 31,
+          "kind": "metodo",
+          "name": "obtenerDatosLogin"
+        },
+        {
+          "line": 39,
+          "kind": "metodo",
+          "name": "actualizarLogin"
+        },
+        {
+          "line": 67,
+          "kind": "metodo",
+          "name": "obtenerUsuarioActual"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/PersonaService.java",
+      "sha256": "a4d73c7ed50f2b0b1284edd1ddbb5c017254b94e1b8551dec1d947c41797c831",
+      "lines": 496,
+      "references": [
+        {
+          "line": 18,
+          "kind": "tipo",
+          "name": "PersonaService"
+        },
+        {
+          "line": 24,
+          "kind": "metodo",
+          "name": "obtenerContactos"
+        },
+        {
+          "line": 34,
+          "kind": "metodo",
+          "name": "contactoDesdeFila"
+        },
+        {
+          "line": 51,
+          "kind": "metodo",
+          "name": "separarComunicaciones"
+        },
+        {
+          "line": 58,
+          "kind": "metodo",
+          "name": "guardarContactos"
+        },
+        {
+          "line": 84,
+          "kind": "metodo",
+          "name": "obtenerDetalle"
+        },
+        {
+          "line": 92,
+          "kind": "metodo",
+          "name": "obtenerPorId"
+        },
+        {
+          "line": 98,
+          "kind": "metodo",
+          "name": "obtenerTodos"
+        },
+        {
+          "line": 104,
+          "kind": "metodo",
+          "name": "obtenerInactivos"
+        },
+        {
+          "line": 110,
+          "kind": "metodo",
+          "name": "reactivar"
+        },
+        {
+          "line": 127,
+          "kind": "metodo",
+          "name": "guardar"
+        },
+        {
+          "line": 146,
+          "kind": "metodo",
+          "name": "actualizar"
+        },
+        {
+          "line": 176,
+          "kind": "metodo",
+          "name": "eliminarLogico"
+        },
+        {
+          "line": 188,
+          "kind": "metodo",
+          "name": "convertirADTO"
+        },
+        {
+          "line": 206,
+          "kind": "metodo",
+          "name": "convertirAEntidad"
+        },
+        {
+          "line": 235,
+          "kind": "metodo",
+          "name": "validarTitular"
+        },
+        {
+          "line": 244,
+          "kind": "metodo",
+          "name": "direccionesDe"
+        },
+        {
+          "line": 250,
+          "kind": "metodo",
+          "name": "convertirDirecciones"
+        },
+        {
+          "line": 258,
+          "kind": "metodo",
+          "name": "reemplazarDirecciones"
+        },
+        {
+          "line": 286,
+          "kind": "metodo",
+          "name": "length"
+        },
+        {
+          "line": 289,
+          "kind": "metodo",
+          "name": "valor"
+        },
+        {
+          "line": 294,
+          "kind": "metodo",
+          "name": "titularActivo"
+        },
+        {
+          "line": 302,
+          "kind": "metodo",
+          "name": "invalido"
+        },
+        {
+          "line": 308,
+          "kind": "metodo",
+          "name": "validarContactos"
+        },
+        {
+          "line": 338,
+          "kind": "metodo",
+          "name": "resolverParentesco"
+        },
+        {
+          "line": 345,
+          "kind": "metodo",
+          "name": "reemplazarContactos"
+        },
+        {
+          "line": 386,
+          "kind": "metodo",
+          "name": "normalizarCorreo"
+        },
+        {
+          "line": 392,
+          "kind": "metodo",
+          "name": "buscarContactos"
+        },
+        {
+          "line": 411,
+          "kind": "metodo",
+          "name": "validarComunicacion"
+        },
+        {
+          "line": 416,
+          "kind": "metodo",
+          "name": "validarComunicaciones"
+        },
+        {
+          "line": 432,
+          "kind": "metodo",
+          "name": "verificarCoincidencia"
+        },
+        {
+          "line": 439,
+          "kind": "metodo",
+          "name": "actualizarDatosContacto"
+        },
+        {
+          "line": 446,
+          "kind": "metodo",
+          "name": "actualizarComunicacion"
+        },
+        {
+          "line": 451,
+          "kind": "metodo",
+          "name": "sincronizarComunicaciones"
+        },
+        {
+          "line": 468,
+          "kind": "metodo",
+          "name": "resumirPersonas"
+        },
+        {
+          "line": 476,
+          "kind": "metodo",
+          "name": "convertirAResumen"
+        },
+        {
+          "line": 488,
+          "kind": "metodo",
+          "name": "obtenerResumen"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/resources/application.properties",
+      "sha256": "e554a6d068c355f0845cd3f8dddaf01e6e0947fb0b8b9bce34866554f61665c2",
+      "lines": 11,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/resources/data.sql",
+      "sha256": "2120fc1d063ec9109674f0521a984346173caa530accab5200db708911750f75",
+      "lines": 46,
+      "references": [],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/resources/schema.sql",
+      "sha256": "902f40c1b37137d8ac05185431d3dba791c230e2951e1e8fd7b8462d6b668bdf",
+      "lines": 70,
+      "references": [
+        {
+          "line": 1,
+          "kind": "tabla",
+          "name": "catalogo_ocupacion"
+        },
+        {
+          "line": 2,
+          "kind": "tabla",
+          "name": "catalogo_parentesco"
+        },
+        {
+          "line": 5,
+          "kind": "tabla",
+          "name": "persona"
+        },
+        {
+          "line": 14,
+          "kind": "tabla",
+          "name": "perfil_titular"
+        },
+        {
+          "line": 21,
+          "kind": "tabla",
+          "name": "direccion_titular"
+        },
+        {
+          "line": 35,
+          "kind": "tabla",
+          "name": "persona_correo"
+        },
+        {
+          "line": 41,
+          "kind": "tabla",
+          "name": "persona_telefono"
+        },
+        {
+          "line": 47,
+          "kind": "tabla",
+          "name": "persona_contacto_emergencia"
+        },
+        {
+          "line": 59,
+          "kind": "tabla",
+          "name": "usuario"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/DemoApplicationTests.java",
+      "sha256": "fc2a8f02e973bd98da9f05afc9e78e361f05736287f35aa2c4892519d1ec7ee2",
+      "lines": 173,
+      "references": [
+        {
+          "line": 28,
+          "kind": "tipo",
+          "name": "DemoApplicationTests"
+        },
+        {
+          "line": 37,
+          "kind": "metodo",
+          "name": "formulario"
+        },
+        {
+          "line": 48,
+          "kind": "metodo",
+          "name": "guardarConDatos"
+        },
+        {
+          "line": 54,
+          "kind": "metodo",
+          "name": "existente"
+        },
+        {
+          "line": 55,
+          "kind": "metodo",
+          "name": "count"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/security/JwtUtilTest.java",
+      "sha256": "b4fa3c0d32d70d997b5b82cd7509a8c658f2dc2a637a92d59008e6bec8a0cfdb",
+      "lines": 21,
+      "references": [
+        {
+          "line": 10,
+          "kind": "tipo",
+          "name": "JwtUtilTest"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/CuentaServiceTest.java",
+      "sha256": "0ce683e7bfae390f5f040fecd94967d764e05f39e342c0064a9e38194372fc8e",
+      "lines": 108,
+      "references": [
+        {
+          "line": 19,
+          "kind": "tipo",
+          "name": "CuentaServiceTest"
+        },
+        {
+          "line": 20,
+          "kind": "metodo",
+          "name": "cuentaEditable"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/PersonaContratosTest.java",
+      "sha256": "b623dfdd655a1f11b4ea61147685d60925de454d1169ca5c0de57e7e02e7d8c9",
+      "lines": 65,
+      "references": [
+        {
+          "line": 12,
+          "kind": "tipo",
+          "name": "PersonaContratosTest"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/RegistroCompletoTest.java",
+      "sha256": "dac22a1e7b3b4db042939330a843d2845f9abcda8a0ffda3584f9e28d42502d8",
+      "lines": 360,
+      "references": [
+        {
+          "line": 15,
+          "kind": "tipo",
+          "name": "RegistroCompletoTest"
+        },
+        {
+          "line": 46,
+          "kind": "metodo",
+          "name": "guardarConDatos"
+        },
+        {
+          "line": 89,
+          "kind": "metodo",
+          "name": "nuevo"
+        },
+        {
+          "line": 92,
+          "kind": "metodo",
+          "name": "existente"
+        },
+        {
+          "line": 95,
+          "kind": "metodo",
+          "name": "datos"
+        },
+        {
+          "line": 107,
+          "kind": "metodo",
+          "name": "persona"
+        },
+        {
+          "line": 113,
+          "kind": "metodo",
+          "name": "relacion"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackfrontend/README.md",
+      "sha256": "56531772bfce5860fc5371cba9b38eaad6d31e4c4a529e569f5395579f5e66ad",
+      "lines": 97,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Frontend Angular de administración de personas"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Ejecución"
+        },
+        {
+          "line": 18,
+          "kind": "seccion",
+          "name": "Entradas y organización"
+        },
+        {
+          "line": 36,
+          "kind": "seccion",
+          "name": "Rutas"
+        },
+        {
+          "line": 56,
+          "kind": "seccion",
+          "name": "Contratos y formularios"
+        },
+        {
+          "line": 68,
+          "kind": "seccion",
+          "name": "Servicios, cachés y errores"
+        },
+        {
+          "line": 83,
+          "kind": "seccion",
+          "name": "Tema y presentación"
+        },
+        {
+          "line": 91,
+          "kind": "seccion",
+          "name": "Verificación"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackfrontend/docs/ESPECIFICACION_AGENTES.md",
+      "sha256": "d90d0432677124647b5f03f614c54ff1da5236bc224f1f51f4dabf7f0e8ff2c4",
+      "lines": 30,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contexto técnico frontend"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Stack y ejecución"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Invariantes"
+        },
+        {
+          "line": 18,
+          "kind": "seccion",
+          "name": "Estado y errores"
+        },
+        {
+          "line": 26,
+          "kind": "seccion",
+          "name": "UI y verificación"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "bd0ea3d4c56befc429e0bcab0ef1175674801eb29a5636caeba4e24dbf7411cf",
+      "lines": 68,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Sistema de administración de personas"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Documentación técnica"
+        },
+        {
+          "line": 18,
+          "kind": "seccion",
+          "name": "Organización del repositorio"
+        },
+        {
+          "line": 36,
+          "kind": "seccion",
+          "name": "Tecnologías comprobadas"
+        },
+        {
+          "line": 49,
+          "kind": "seccion",
+          "name": "Inicio local"
+        },
+        {
+          "line": 58,
+          "kind": "seccion",
+          "name": "Modelo funcional vigente"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/API.md",
+      "sha256": "242a34736e5acbeef96c6e4e27e73b63f43599b5fc0dfae1a63580442124de43",
+      "lines": 135,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contrato HTTP vigente"
+        },
+        {
+          "line": 3,
+          "kind": "seccion",
+          "name": "Convenciones"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Endpoints"
+        },
+        {
+          "line": 34,
+          "kind": "seccion",
+          "name": "DTOs de lectura"
+        },
+        {
+          "line": 74,
+          "kind": "seccion",
+          "name": "Alta y actualización de titular"
+        },
+        {
+          "line": 96,
+          "kind": "seccion",
+          "name": "Contactos compartidos y sustitución de relaciones"
+        },
+        {
+          "line": 112,
+          "kind": "seccion",
+          "name": "Coincidencias"
+        },
+        {
+          "line": 116,
+          "kind": "seccion",
+          "name": "Cuenta y login"
+        },
+        {
+          "line": 122,
+          "kind": "seccion",
+          "name": "Errores y límites HTTP"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/ARQUITECTURA.md",
+      "sha256": "ec38bb9277e2fd64b38b73cd71095fc705560d5a804399c689d10c149b570072",
+      "lines": 108,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Arquitectura y flujos internos"
+        },
+        {
+          "line": 3,
+          "kind": "seccion",
+          "name": "1. Topología"
+        },
+        {
+          "line": 18,
+          "kind": "seccion",
+          "name": "2. Frontend"
+        },
+        {
+          "line": 26,
+          "kind": "seccion",
+          "name": "3. Backend"
+        },
+        {
+          "line": 40,
+          "kind": "seccion",
+          "name": "4. Persistencia y transacciones"
+        },
+        {
+          "line": 52,
+          "kind": "seccion",
+          "name": "5. Alta y edición"
+        },
+        {
+          "line": 79,
+          "kind": "seccion",
+          "name": "6. Autenticación y resiliencia"
+        },
+        {
+          "line": 91,
+          "kind": "seccion",
+          "name": "7. Política de cachés"
+        },
+        {
+          "line": 104,
+          "kind": "seccion",
+          "name": "8. Diseño y accesibilidad"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/BASE_DE_DATOS.md",
+      "sha256": "cceaab8c7312f4e858bcadc20aec2a2db55d7098f63c7207ec575cea6c1c58b4",
+      "lines": 123,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Modelo PostgreSQL y persistencia JPA"
+        },
+        {
+          "line": 3,
+          "kind": "seccion",
+          "name": "Fuente de verdad"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Relaciones"
+        },
+        {
+          "line": 26,
+          "kind": "seccion",
+          "name": "Diccionario de tablas"
+        },
+        {
+          "line": 28,
+          "kind": "seccion",
+          "name": "`persona`"
+        },
+        {
+          "line": 39,
+          "kind": "seccion",
+          "name": "`perfil_titular`"
+        },
+        {
+          "line": 49,
+          "kind": "seccion",
+          "name": "`direccion_titular`"
+        },
+        {
+          "line": 66,
+          "kind": "seccion",
+          "name": "Comunicaciones"
+        },
+        {
+          "line": 75,
+          "kind": "seccion",
+          "name": "`persona_contacto_emergencia`"
+        },
+        {
+          "line": 86,
+          "kind": "seccion",
+          "name": "Catálogos y usuario"
+        },
+        {
+          "line": 98,
+          "kind": "seccion",
+          "name": "Índices declarados"
+        },
+        {
+          "line": 109,
+          "kind": "seccion",
+          "name": "Semilla y secuencias"
+        },
+        {
+          "line": 119,
+          "kind": "seccion",
+          "name": "DDL automático y alcance de verificación"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/OPERACION_Y_PRUEBAS.md",
+      "sha256": "b8145bdbaa0ac8269ff712c0e0d9276477ea265d44565c4eeedf629083d175f6",
+      "lines": 164,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Instalación, operación y verificación"
+        },
+        {
+          "line": 3,
+          "kind": "seccion",
+          "name": "Requisitos y versiones"
+        },
+        {
+          "line": 13,
+          "kind": "seccion",
+          "name": "1. Crear el esquema de desarrollo"
+        },
+        {
+          "line": 26,
+          "kind": "seccion",
+          "name": "2. Configurar y arrancar el backend"
+        },
+        {
+          "line": 43,
+          "kind": "seccion",
+          "name": "Desde Proyecto-FullStackbackend/demo"
+        },
+        {
+          "line": 49,
+          "kind": "seccion",
+          "name": "3. Instalar y arrancar el frontend"
+        },
+        {
+          "line": 52,
+          "kind": "seccion",
+          "name": "Desde Proyecto-FullStackfrontend"
+        },
+        {
+          "line": 61,
+          "kind": "seccion",
+          "name": "4. Compilación"
+        },
+        {
+          "line": 76,
+          "kind": "seccion",
+          "name": "5. Pruebas frontend"
+        },
+        {
+          "line": 86,
+          "kind": "seccion",
+          "name": "6. Pruebas backend"
+        },
+        {
+          "line": 89,
+          "kind": "seccion",
+          "name": "Desde Proyecto-FullStackbackend/demo"
+        },
+        {
+          "line": 112,
+          "kind": "seccion",
+          "name": "Integración PostgreSQL, solo sobre una base desechable"
+        },
+        {
+          "line": 124,
+          "kind": "seccion",
+          "name": "Configurar TEST_DATABASE_USERNAME y TEST_DATABASE_PASSWORD en la sesión según la instancia."
+        },
+        {
+          "line": 130,
+          "kind": "seccion",
+          "name": "7. Contraseñas y documentación"
+        },
+        {
+          "line": 148,
+          "kind": "seccion",
+          "name": "8. Diagnóstico"
+        },
+        {
+          "line": 162,
+          "kind": "seccion",
+          "name": "Alcance de los resultados"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/REVISION_TECNICA.md",
+      "sha256": "a3badf0276dd72f01de3a35632050e15bec7af54a1cfe4f34f6c047f7de0addf",
+      "lines": 53,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Revisión técnica y limitaciones conocidas"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Resultados comprobados"
+        },
+        {
+          "line": 13,
+          "kind": "seccion",
+          "name": "Hallazgos"
+        },
+        {
+          "line": 38,
+          "kind": "seccion",
+          "name": "Diferencias entre requisitos de captura y backend"
+        },
+        {
+          "line": 49,
+          "kind": "seccion",
+          "name": "Cobertura y tareas pendientes de validación"
+        }
+      ],
+      "content_included": false
+    }
+  ],
+  "pdf": {
+    "path": "Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf",
+    "pages": 38,
+    "sha256": "f801c2645a5c5fdc1af3121689f09af4608ce831b4dd775c4f794df8d0e631a9"
   }
-]
+}

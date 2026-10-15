@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError, timeout, TimeoutError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
+/** Añade el JWT a la API local y cierra sesión ante desconexión, 401, 5xx o timeout. */
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith('http://localhost:8080/api/')) return next(req);
 

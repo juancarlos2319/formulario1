@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 /** Ejecutar desde una terminal con el classpath generado por Maven; ver README.md. */
 class HashPassword {
+    /** Solicita y confirma una contraseña por consola, valida sus límites y genera BCrypt. */
     public static void main(String[] args) {
         Console console = System.console();
         if (console == null) {

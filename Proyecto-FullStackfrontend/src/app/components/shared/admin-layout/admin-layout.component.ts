@@ -18,6 +18,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   styleUrl: './admin-layout.component.css'
 })
 export class AdminLayoutComponent implements OnInit {
+  /** Adapta el modo del menú al breakpoint de pantalla. */
   readonly esMovil = toSignal(inject(BreakpointObserver).observe('(max-width: 760px)').pipe(
     map(estado => estado.matches)
   ), { initialValue: window.matchMedia('(max-width: 760px)').matches });
@@ -26,6 +27,7 @@ export class AdminLayoutComponent implements OnInit {
   readonly cargandoCuenta = signal(true);
   readonly errorCuenta = signal(false);
 
+  /** Recupera el perfil del header y controla su carga y error. */
   ngOnInit(): void {
     this.authService.obtenerUsuarioActual().pipe(
       finalize(() => this.cargandoCuenta.set(false))
@@ -36,9 +38,11 @@ export class AdminLayoutComponent implements OnInit {
 
 
   private route = inject(ActivatedRoute);
+  /** Indica si la ruta hija activa corresponde al dashboard. */
   get esDashboard(): boolean {
     return this.route.firstChild?.snapshot.routeConfig?.path === 'dashboard';
   }
+  /** Obtiene el título de la ruta hija o usa el texto predeterminado. */
   get titulo(): string {
     return this.route.firstChild?.snapshot.data['titulo'] ?? 'Administración';
   }

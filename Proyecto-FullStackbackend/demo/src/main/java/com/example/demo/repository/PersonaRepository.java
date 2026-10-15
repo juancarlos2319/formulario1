@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
+    /** Consulta los vínculos del titular activo y agrupa sus comunicaciones en SQL. */
     @Query(value = """
         SELECT contacto.id, contacto.nombre, contacto.apellido, contacto.fecha_nacimiento, contacto.genero,
           COALESCE((SELECT string_agg(c.correo, chr(31) ORDER BY c.id)
@@ -27,6 +28,7 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
         """, nativeQuery = true)
     List<Object[]> obtenerContactosDetallados(@Param("id") Long id);
 
+    /** Cuenta titulares activos y cuántos tienen al menos un correo o teléfono. */
     @Query(value = """
         SELECT count(*),
           count(*) FILTER (WHERE EXISTS (SELECT 1 FROM persona_correo c WHERE c.id_persona = t.id_persona)),
@@ -35,16 +37,18 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
         """, nativeQuery = true)
     List<Object[]> totalesActivos();
 
+    /** Obtiene las cinco ocupaciones con más titulares activos y su cantidad. */
     @Query(value = """
         SELECT o.nombre, count(*) FROM perfil_titular t
         JOIN catalogo_ocupacion o ON o.id = t.id_ocupacion
         WHERE t.fecha_baja IS NULL GROUP BY o.nombre ORDER BY count(*) DESC, o.nombre LIMIT 5
         """, nativeQuery = true)
     List<Object[]> resumenPorOcupacion();
-    // Serializa altas, sustituciones y limpieza de contactos dentro de la transacción.
+    /** Adquiere un bloqueo global hasta terminar la transacción de alta o contactos. */
     @Query(value = "SELECT 1 FROM pg_advisory_xact_lock(74192301)", nativeQuery = true)
     Integer bloquearContactos();
 
+    /** Busca candidatos por correo o teléfono, excluyendo la persona indicada. */
     @Query(value = """
         SELECT p.* FROM persona p
         WHERE p.id <> COALESCE(:excluir, 0)
@@ -58,6 +62,7 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
     List<Persona> buscarContactos(@Param("email") String email, @Param("telefono") String telefono,
                                  @Param("excluir") Long excluir);
 
+    /** Busca candidatos por cualquiera de las comunicaciones proporcionadas. */
     @Query(value = """
         SELECT p.* FROM persona p
         WHERE p.id <> COALESCE(:excluir, 0)
@@ -71,6 +76,7 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
     List<Persona> buscarContactosPorComunicaciones(@Param("correos") List<String> correos,
             @Param("telefonos") List<String> telefonos, @Param("excluir") Long excluir);
 
+    /** Elimina una persona solo si no tiene perfil, cuenta ni vínculos restantes. */
     @Modifying
     @Query(value = """
         DELETE FROM persona p WHERE p.id = :id
@@ -79,7 +85,10 @@ public interface PersonaRepository extends JpaRepository<Persona, Long> {
           AND NOT EXISTS (SELECT 1 FROM persona_contacto_emergencia r WHERE r.id_contacto = p.id OR r.id_persona = p.id)
         """, nativeQuery = true)
     int eliminarContactoSinReferencias(@Param("id") Long id);
+    /** Lista personas con perfil titular activo. */
     List<Persona> findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
+    /** Lista personas cuyo perfil titular tiene fecha de baja. */
     List<Persona> findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull();
+    /** Cuenta perfiles titulares activos para comprobar la capacidad disponible. */
     long countByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
 }

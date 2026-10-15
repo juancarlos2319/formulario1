@@ -25,22 +25,26 @@ export class FeedbackService {
   private nextNoticeId = 0;
   private resolveConfirmation?: (confirmed: boolean) => void;
 
+  /** Agrega un aviso y programa su retirada automática. */
   notify(message: string, kind: FeedbackKind = 'info', durationMs = 5000): void {
     const id = ++this.nextNoticeId;
     this.notices.update(notices => [...notices, { id, message, kind }]);
     setTimeout(() => this.dismiss(id), durationMs);
   }
 
+  /** Elimina únicamente el aviso indicado. */
   dismiss(id: number): void {
     this.notices.update(notices => notices.filter(notice => notice.id !== id));
   }
 
+  /** Cancela la confirmación anterior y devuelve la decisión como promesa. */
   confirm(options: ConfirmationOptions): Promise<boolean> {
     this.finishConfirmation(false);
     this.confirmation.set(options);
     return new Promise(resolve => this.resolveConfirmation = resolve);
   }
 
+  /** Cierra el diálogo y entrega la decisión al código que la esperaba. */
   finishConfirmation(confirmed: boolean): void {
     const resolve = this.resolveConfirmation;
     this.resolveConfirmation = undefined;

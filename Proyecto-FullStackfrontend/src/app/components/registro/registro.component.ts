@@ -29,10 +29,13 @@ export class RegistroComponent implements OnInit {
   personaId: number | null = null;
   readonly cargandoPersona = signal(false);
   readonly guardando = signal(false);
+  /** Distingue la edición de un titular del primer paso de un alta. */
   get editando(): boolean { return this.personaId !== null; }
 
   readonly personaCargada = signal(false);
+  /** Bloquea el guardado durante cargas, envíos o una edición aún no recuperada. */
   readonly edicionBloqueada = computed(() => this.guardando() || this.cargandoPersona() || (this.editando && !this.personaCargada()));
+  /** Indica si alguna consulta postal sigue pendiente antes de permitir guardar. */
   get hayDireccionCargando(): boolean { return this.direccionesCargando().some(estado => estado); }
 
   registroForm!: FormGroup;
@@ -42,6 +45,7 @@ export class RegistroComponent implements OnInit {
   readonly mensajeError = signal('');
 
 
+  /** Prepara el formulario y carga el borrador o el titular indicado por la ruta. */
   ngOnInit(): void {
     this.initForm();
     this.cargarOcupaciones();
@@ -84,6 +88,7 @@ export class RegistroComponent implements OnInit {
     }
   }
 
+  /** Define controles y validaciones, incluidas las colecciones dinámicas. */
   private initForm(): void {
     this.registroForm = this.fb.group({
       nombres: ['', [Validators.required, Validators.minLength(2)]],
@@ -106,10 +111,14 @@ export class RegistroComponent implements OnInit {
     this.sincronizarAliasNombre(this.registroForm);
   }
 
+  /** Expone los controles de correo del titular. */
   get correos(): FormArray { return this.registroForm.get('correos') as FormArray; }
+  /** Expone los controles de teléfono del titular. */
   get telefonos(): FormArray { return this.registroForm.get('telefonos') as FormArray; }
+  /** Expone los grupos de dirección del formulario. */
   get direcciones(): FormArray { return this.registroForm.get('direcciones') as FormArray; }
 
+  /** Crea una dirección con sus validaciones y valores iniciales o guardados. */
   private crearDireccionGroup(datos?: Partial<DireccionPersistida>): FormGroup {
     return this.fb.group({
       pais: [datos?.pais ?? 'México', Validators.required],
@@ -122,12 +131,14 @@ export class RegistroComponent implements OnInit {
     });
   }
 
+  /** Añade una dirección y prepara sus colonias y estado de consulta. */
   agregarDireccion(datos?: Partial<DireccionPersistida>): void {
     this.direcciones.push(this.crearDireccionGroup(datos));
     this.coloniasPorDireccion.push(datos?.colonia ? [datos.colonia] : []);
     this.direccionesCargando.update(estados => [...estados, false]);
   }
 
+  /** Elimina una dirección y su estado postal sin quitar la última. */
   quitarDireccion(index: number): void {
     if (this.direcciones.length <= 1) return;
     this.direcciones.removeAt(index);
@@ -135,6 +146,7 @@ export class RegistroComponent implements OnInit {
     this.direccionesCargando.update(estados => estados.filter((_, i) => i !== index));
   }
 
+  /** Restaura las direcciones guardadas sin consultar el servicio postal. */
   private cargarDirecciones(persona: { direcciones?: DireccionPersistida[] }): void {
     this.direcciones.clear();
     this.coloniasPorDireccion = [];
@@ -152,6 +164,7 @@ export class RegistroComponent implements OnInit {
     // Conserva la ubicacion guardada sin depender de una consulta externa al abrir.
   }
 
+  /** Descompone formatos antiguos de calle para recuperar los campos de dirección. */
   private convertirDireccionAntigua(direccion: string, ciudad: string): DireccionPersistida {
     const partes = /^(.*?) #(.+?), Col\. (.*?), C\.P\. (\d{5}), (.+)$/.exec(direccion);
     if (partes) {
@@ -166,30 +179,37 @@ export class RegistroComponent implements OnInit {
     return { pais: 'México', estado: '', municipio: ciudad, colonia: '', codigoPostal: '', calle: direccion, numero: '' };
   }
 
+  /** Añade un control de correo con validación. */
   agregarCorreo(): void {
     this.correos.push(this.crearControlCorreo());
   }
 
+  /** Retira un correo conservando al menos uno. */
   quitarCorreo(index: number): void {
     if (this.correos.length > 1) this.correos.removeAt(index);
   }
 
+  /** Añade un control de teléfono con validación. */
   agregarTelefono(): void {
     this.telefonos.push(this.crearControlTelefono());
   }
 
+  /** Retira un teléfono conservando al menos uno. */
   quitarTelefono(index: number): void {
     if (this.telefonos.length > 1) this.telefonos.removeAt(index);
   }
 
+  /** Crea un correo obligatorio con validación de formato. */
   private crearControlCorreo(valor = '') {
     return this.fb.control(valor, [Validators.required, Validators.email]);
   }
 
+  /** Crea un teléfono obligatorio de diez dígitos. */
   private crearControlTelefono(valor = '') {
     return this.fb.control(valor, [Validators.required, Validators.pattern('^[0-9]{10}$')]);
   }
 
+  /** Adapta los nombres guardados a los controles separados del formulario. */
   private separarNombre(nombre?: string, apellido?: string): { nombres: string; apellidoPaterno: string; apellidoMaterno: string } {
     const apellidos = (apellido ?? '').trim();
     const partesApellido = apellidos.split(/\s+/).filter(Boolean);
@@ -200,7 +220,9 @@ export class RegistroComponent implements OnInit {
     };
   }
 
+  /** Mantiene compatibles los controles separados y los campos del contrato HTTP. */
   private sincronizarAliasNombre(form: FormGroup): void {
+    /** Combina los nombres separados sin volver a disparar sus observadores. */
     const actualizarDesdeNuevos = () => {
       const nombres = (form.get('nombres')?.value ?? '').trim();
       const apellidoPaterno = (form.get('apellidoPaterno')?.value ?? '').trim();
@@ -209,6 +231,7 @@ export class RegistroComponent implements OnInit {
       if ((form.get('nombre')?.value ?? '') !== nombres) form.get('nombre')?.setValue(nombres, { emitEvent: false });
       if ((form.get('apellido')?.value ?? '') !== apellido) form.get('apellido')?.setValue(apellido, { emitEvent: false });
     };
+    /** Distribuye los campos del contrato en los controles separados sin generar un ciclo. */
     const actualizarDesdeLegacy = () => {
       const nombre = (form.get('nombre')?.value ?? '').trim();
       const apellido = (form.get('apellido')?.value ?? '').trim();
@@ -231,11 +254,13 @@ export class RegistroComponent implements OnInit {
     actualizarDesdeNuevos();
   }
 
+  /** Carga los nombres de una persona en los controles separados. */
   private aplicarNombreDesdePersona(persona: { nombre?: string; apellido?: string }): void {
     this.registroForm.patchValue(this.separarNombre(persona.nombre, persona.apellido));
     this.sincronizarAliasNombre(this.registroForm);
   }
 
+  /** Reconstruye los correos y teléfonos guardados usando controles validados. */
   private cargarComunicaciones(persona: { correos?: string[]; telefonos?: string[] }): void {
     for (const tipo of ['correos', 'telefonos'] as const) {
       const array = this.registroForm.get(tipo) as FormArray;
@@ -246,6 +271,7 @@ export class RegistroComponent implements OnInit {
     }
   }
 
+  /** Marca correos o teléfonos repetidos después de normalizarlos. */
   private datosContactoDistintos(control: AbstractControl): ValidationErrors | null {
     const errores: ValidationErrors = {};
     for (const tipo of ['correos', 'telefonos']) {
@@ -255,6 +281,7 @@ export class RegistroComponent implements OnInit {
     return Object.keys(errores).length ? errores : null;
   }
 
+  /** Autocompleta ubicación por CP e ignora respuestas obsoletas o de grupos eliminados. */
   buscarCodigoPostal(index: number): void {
     const grupo = this.direcciones.at(index);
     const cp = grupo.get('cp')?.value;
@@ -296,6 +323,7 @@ export class RegistroComponent implements OnInit {
     });
   }
 
+  /** Consulta las ocupaciones y muestra el error si no están disponibles. */
   cargarOcupaciones(): void {
     this.registroService.obtenerOcupaciones().subscribe({
       next: (data) => this.ocupaciones = data,
@@ -303,11 +331,13 @@ export class RegistroComponent implements OnInit {
     });
   }
 
+  /** Indica si debe mostrarse el error de un campo ya tocado o modificado. */
   campoInvalido(nombre: string): boolean {
     const campo = this.registroForm.get(nombre);
     return !!campo && campo.invalid && (campo.touched || campo.dirty);
   }
 
+  /** Traduce la validación fallida del control a un mensaje de captura. */
   errorCampo(nombre: string): string {
     const errores = this.registroForm.get(nombre)?.errors;
     if (errores?.['required']) return 'Este campo es obligatorio.';
@@ -317,6 +347,7 @@ export class RegistroComponent implements OnInit {
     return 'Revisa este campo.';
   }
 
+  /** Convierte el formulario al DTO y guarda un borrador o actualiza el titular. */
   onSubmit(): void {
   if (this.edicionBloqueada() || this.hayDireccionCargando) return;
   if (this.registroForm.invalid) {

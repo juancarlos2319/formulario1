@@ -33,8 +33,10 @@ export class PersonasComponent implements OnInit {
   readonly columnas = ['persona', 'telefono', 'ocupacion', 'ciudad', 'acciones'];
   readonly columnaDetalle = ['detalle'];
 
+  /** Indica a la tabla qué persona tiene abierta la fila de detalles. */
   esFilaDetalle = (_indice: number, persona: PersonaResumen): boolean => this.detalleId() === persona.id;
 
+  /** Filtra los datos descargados mediante la búsqueda normalizada. */
   get usuariosFiltrados(): PersonaResumen[] {
     const texto = this.normalizar(this.busqueda().trim());
     return this.usuarios().filter(u => this.normalizar(
@@ -42,12 +44,15 @@ export class PersonasComponent implements OnInit {
     ).includes(texto));
   }
 
+  /** Elimina acentos y diferencias de mayúsculas para comparar búsquedas. */
   private normalizar(valor: string): string {
     return valor.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
+  /** Prepara la pantalla y solicita los datos iniciales necesarios. */
   ngOnInit(): void { this.cargarUsuarios(); }
 
+  /** Obtiene el resumen de personas y actualiza carga, errores y detalle visible. */
   cargarUsuarios(): void {
     this.detalle.set(null);
     this.cargando.set(true);
@@ -58,6 +63,7 @@ export class PersonasComponent implements OnInit {
     });
   }
 
+  /** Abre o cierra detalles y solo aplica respuestas de la persona seleccionada. */
   verDetalle(persona: PersonaResumen): void {
     if (persona.id == null) return;
     if (this.detalleId() === persona.id) { this.detalleId.set(null); this.detalle.set(null); return; }
@@ -71,6 +77,7 @@ export class PersonasComponent implements OnInit {
     });
   }
 
+  /** Confirma una baja permitida y retira la persona del listado si se completa. */
   async eliminar(id: number | undefined): Promise<void> {
     if (id == null || this.eliminando() !== null) return;
     const persona = this.usuarios().find(usuario => usuario.id === id);
@@ -95,6 +102,7 @@ export class PersonasComponent implements OnInit {
     });
   }
 
+  /** Forma las iniciales del nombre y apellido para mostrarlas en el avatar. */
   obtenerIniciales(nombre: string = '', apellido: string = ''): string {
     return ((nombre || '').charAt(0) + (apellido || '').charAt(0)).toUpperCase();
   }

@@ -11,10 +11,12 @@ import java.util.List;
 public class ParentescoController {
     private final CatalogoParentescoRepository parentescos;
 
+    /** Recibe el repositorio utilizado para consultar el catálogo de parentescos. */
     public ParentescoController(CatalogoParentescoRepository parentescos) {
         this.parentescos = parentescos;
     }
 
+    /** Devuelve los parentescos ordenados por identificador. */
     @GetMapping
     public List<CatalogoParentesco> obtenerTodos() {
         return parentescos.findAll(org.springframework.data.domain.Sort.by("id"));

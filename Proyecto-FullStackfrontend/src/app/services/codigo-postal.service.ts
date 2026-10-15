@@ -17,6 +17,7 @@ export class CodigoPostalService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'https://www.correosmexico.com.mx/api/cp';
 
+  /** Consulta el proveedor postal y comunica el fallo para permitir captura manual. */
   consultar(codigoPostal: string): Observable<RespuestaCodigoPostal> {
     return this.http.get<RespuestaCodigoPostal>(this.apiUrl, {
       params: { cp: codigoPostal }

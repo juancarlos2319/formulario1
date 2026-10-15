@@ -19,6 +19,7 @@ public class PersonaService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonaService.class);
 
+    /** Consulta los contactos y comprueba que el titular exista si no hay resultados. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.ContactoDTO> obtenerContactos(Long id) {
         List<Object[]> filas = personaRepository.obtenerContactosDetallados(id);
@@ -29,6 +30,7 @@ public class PersonaService {
         return filas.stream().map(this::contactoDesdeFila).toList();
     }
 
+    /** Convierte una fila SQL agregada al DTO de contacto y sus comunicaciones. */
     private com.example.demo.dto.ContactoDTO contactoDesdeFila(Object[] fila) {
         LocalDate fechaNacimiento = fila[3] instanceof java.sql.Date fechaSql
                 ? fechaSql.toLocalDate()
@@ -45,11 +47,13 @@ public class PersonaService {
                 (String) fila[8]);
     }
 
+    /** Reconstruye la lista de comunicaciones usando el separador de la consulta SQL. */
     private List<String> separarComunicaciones(String valores) {
         if (valores == null || valores.isEmpty()) return List.of();
         return java.util.Arrays.asList(valores.split(java.util.regex.Pattern.quote(String.valueOf((char) 31)), -1));
     }
 
+    /** Valida y reemplaza vínculos dentro de una transacción con bloqueo compartido. */
     @org.springframework.transaction.annotation.Transactional
     public void guardarContactos(Long id, List<com.example.demo.dto.ContactoDTO> contactos) {
         try {
@@ -75,6 +79,7 @@ public class PersonaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    /** Construye los datos adicionales del titular sin repetir el resumen de la tabla. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public com.example.demo.dto.PersonaDetalleDTO obtenerDetalle(Long id) {
         Persona persona = titularActivo(id);
@@ -82,21 +87,25 @@ public class PersonaService {
                 convertirDirecciones(persona.getPerfilTitular()));
     }
 
+    /** Recupera un titular activo y lo convierte al DTO completo de edición. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PersonaDTO obtenerPorId(Long id) {
         return convertirADTO(titularActivo(id));
     }
 
+    /** Lista titulares activos y prepara sus resúmenes y permisos de baja. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.PersonaResumenDTO> obtenerTodos() {
         return resumirPersonas(personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull());
     }
 
+    /** Lista titulares dados de baja y prepara sus resúmenes. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.PersonaResumenDTO> obtenerInactivos() {
         return resumirPersonas(personaRepository.findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNotNull());
     }
 
+    /** Comprueba que el titular esté dado de baja y que exista capacidad para reactivarlo. */
     @org.springframework.transaction.annotation.Transactional
     public void reactivar(Long id) {
         Persona persona = personaRepository.findById(id)
@@ -113,6 +122,7 @@ public class PersonaService {
         personaRepository.save(persona);
     }
 
+    /** Valida y guarda titular y contactos en una sola transacción, respetando la capacidad. */
     @org.springframework.transaction.annotation.Transactional
     public Long guardar(PersonaDTO dto) {
         personaRepository.bloquearContactos();
@@ -131,6 +141,7 @@ public class PersonaService {
         return guardada.getId();
     }
 
+    /** Actualiza personales, direcciones, comunicaciones y ocupación sin sustituir contactos. */
     @org.springframework.transaction.annotation.Transactional
     public void actualizar(Long id, PersonaDTO dto) {
         validarTitular(dto);
@@ -160,6 +171,7 @@ public class PersonaService {
         personaRepository.save(persona);
     }
 
+    /** Marca la baja del titular activo e impide desactivar cuentas administradoras. */
     @org.springframework.transaction.annotation.Transactional
     public void eliminarLogico(Long id) {
         Persona persona = titularActivo(id);
@@ -172,6 +184,7 @@ public class PersonaService {
         personaRepository.save(persona);
     }
 
+    /** Construye el formulario del titular sin cargar sus contactos en la respuesta. */
     private PersonaDTO convertirADTO(Persona p) {
         PersonaDTO dto = new PersonaDTO();
         dto.setId(p.getId());
@@ -189,6 +202,7 @@ public class PersonaService {
         return dto;
     }
 
+    /** Crea la persona y su perfil, resuelve la ocupación y asigna ubicación y comunicaciones. */
     private Persona convertirAEntidad(PersonaDTO dto) {
         Persona p = new Persona();
         p.setNombre(dto.getNombre());
@@ -217,6 +231,7 @@ public class PersonaService {
         return p;
     }
 
+    /** Exige nombre, apellido y fecha de nacimiento válidos antes de escribir. */
     private void validarTitular(PersonaDTO dto) {
         if (dto == null || dto.getNombre() == null || dto.getNombre().isBlank() || dto.getNombre().length() > 100 ||
                 dto.getApellido() == null || dto.getApellido().isBlank() || dto.getApellido().length() > 100 ||
@@ -225,11 +240,13 @@ public class PersonaService {
         }
     }
 
+    /** Exige al menos una dirección y devuelve el arreglo recibido. */
     private List<PersonaDTO.DireccionDTO> direccionesDe(PersonaDTO dto) {
         if (dto.getDirecciones() != null && !dto.getDirecciones().isEmpty()) return dto.getDirecciones();
         throw invalido("Se requiere al menos una dirección");
     }
 
+    /** Transforma las direcciones persistidas en los objetos expuestos por la API. */
     private List<PersonaDTO.DireccionDTO> convertirDirecciones(PerfilTitular perfil) {
         return perfil.getDirecciones().stream()
             .map(d -> new PersonaDTO.DireccionDTO(d.getPais(), d.getEstado(), d.getMunicipio(),
@@ -237,6 +254,7 @@ public class PersonaService {
             .toList();
     }
 
+    /** Valida campos y cantidad antes de reconstruir las direcciones en el orden recibido. */
     private void reemplazarDirecciones(PerfilTitular perfil, PersonaDTO dto) {
         List<PersonaDTO.DireccionDTO> direcciones = direccionesDe(dto);
         if (direcciones.size() > 20) throw invalido("No se pueden registrar más de 20 direcciones");
@@ -264,12 +282,15 @@ public class PersonaService {
         }
     }
 
+    /** Mide una cadena considerando null como longitud cero. */
     private int length(String value) { return value == null ? 0 : value.length(); }
 
+    /** Recorta una cadena o aplica el valor por defecto si está vacía. */
     private String valor(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value.trim();
     }
 
+    /** Busca una persona con perfil activo o devuelve un error de no encontrado. */
     private Persona titularActivo(Long id) {
         return personaRepository.findById(id)
                 .filter(p -> p.getPerfilTitular() != null && p.getPerfilTitular().getFechaBaja() == null)
@@ -277,11 +298,13 @@ public class PersonaService {
                         org.springframework.http.HttpStatus.NOT_FOUND, "Titular no encontrado"));
     }
 
+    /** Construye un error HTTP 400 para comunicar una validación de negocio. */
     private org.springframework.web.server.ResponseStatusException invalido(String mensaje) {
         return new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.BAD_REQUEST, mensaje);
     }
 
+    /** Comprueba el mínimo de contactos, IDs, datos personales y comunicaciones sin repetidos. */
     private void validarContactos(List<com.example.demo.dto.ContactoDTO> contactos) {
         if (contactos == null || contactos.isEmpty()) throw invalido("Se requiere al menos un contacto de emergencia");
         var ids = new java.util.HashSet<Long>();
@@ -311,12 +334,14 @@ public class PersonaService {
         }
     }
 
+    /** Resuelve un parentesco existente por ID o nombre y rechaza valores desconocidos. */
     private CatalogoParentesco resolverParentesco(com.example.demo.dto.ContactoDTO dto) {
         return (dto.idParentesco() != null ? parentescoRepository.findById(dto.idParentesco()) :
                 parentescoRepository.findByNombre(dto.parentesco().trim()))
                 .orElseThrow(() -> invalido("Parentesco inexistente"));
     }
 
+    /** Crea o reutiliza personas, conserva los vínculos pedidos y limpia contactos sin referencias. */
     private void reemplazarContactos(Persona titular, List<com.example.demo.dto.ContactoDTO> datos) {
         var anteriores = titular.getContactosEmergencia().stream().map(r -> r.getContacto().getId()).toList();
         var conservadas = new java.util.ArrayList<ContactoEmergencia>();
@@ -357,10 +382,12 @@ public class PersonaService {
                 .forEach(personaRepository::eliminarContactoSinReferencias);
     }
 
+    /** Recorta el correo y lo convierte a minúsculas para comparar y guardar. */
     private String normalizarCorreo(String email) {
         return email == null ? "" : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 
+    /** Valida la búsqueda y devuelve candidatos coincidentes por sus comunicaciones. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<com.example.demo.dto.ContactoDTO> buscarContactos(com.example.demo.dto.BusquedaContactoDTO busqueda) {
         if (busqueda == null) throw invalido("Consulta invalida");
@@ -380,10 +407,12 @@ public class PersonaService {
                 .toList();
     }
 
+    /** Aplica las reglas de correos y teléfonos al DTO del titular. */
     private void validarComunicacion(PersonaDTO dto) {
         validarComunicaciones(dto.getCorreos(), dto.getTelefonos());
     }
 
+    /** Exige al menos un correo y teléfono, con formato correcto y sin duplicados. */
     private void validarComunicaciones(List<String> correos, List<String> telefonos) {
         if (correos == null || correos.isEmpty() || telefonos == null || telefonos.isEmpty())
             throw invalido("Se requiere al menos un correo y un telefono");
@@ -399,22 +428,26 @@ public class PersonaService {
         }
     }
 
+    /** Rechaza comunicaciones ya registradas para exigir reutilización del contacto. */
     private void verificarCoincidencia(String correo, String telefono, Long excluir) {
         if (!personaRepository.buscarContactos(normalizarCorreo(correo), telefono, excluir).isEmpty())
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,
                     "El correo o telefono ya esta registrado. Confirma el autocompletado para reutilizar el contacto.");
     }
 
+    /** Actualiza los datos compartidos de la persona y sincroniza sus comunicaciones. */
     private void actualizarDatosContacto(Persona persona, com.example.demo.dto.ContactoDTO dto) {
         persona.setNombre(dto.nombre().trim()); persona.setApellido(dto.apellido().trim());
         persona.setFechaNacimiento(dto.fechaNacimiento()); persona.setGenero(dto.genero().trim());
         sincronizarComunicaciones(persona, dto.correos(), dto.telefonos());
     }
 
+    /** Sincroniza las comunicaciones del titular con las recibidas en el DTO. */
     private void actualizarComunicacion(Persona persona, PersonaDTO dto) {
         sincronizarComunicaciones(persona, dto.getCorreos(), dto.getTelefonos());
     }
 
+    /** Normaliza valores, retira los ausentes y agrega comunicaciones nuevas sin duplicarlas. */
     private void sincronizarComunicaciones(Persona persona, List<String> correos, List<String> telefonos) {
         var correosDeseados = correos.stream().map(this::normalizarCorreo).toList();
         persona.getCorreos().removeIf(c -> !correosDeseados.contains(normalizarCorreo(c.getCorreo())));
@@ -431,6 +464,7 @@ public class PersonaService {
         }
     }
 
+    /** Consulta administradores en lote y construye los permisos y resúmenes del listado. */
     private List<com.example.demo.dto.PersonaResumenDTO> resumirPersonas(List<Persona> personas) {
         if (personas.isEmpty()) return List.of();
         java.util.Set<Long> administradores = usuarioRepository.buscarPersonasConRol(
@@ -438,6 +472,7 @@ public class PersonaService {
         return personas.stream().map(p -> convertirAResumen(p, !administradores.contains(p.getId()))).toList();
     }
 
+    /** Construye los datos de tabla e incluye solo el municipio de la dirección principal. */
     private com.example.demo.dto.PersonaResumenDTO convertirAResumen(Persona p, boolean puedeEliminar) {
         return new com.example.demo.dto.PersonaResumenDTO(p.getId(), p.getNombre(), p.getApellido(),
                 p.getPerfilTitular().getOcupacion().getNombre(),
@@ -448,6 +483,7 @@ public class PersonaService {
                 puedeEliminar);
     }
 
+    /** Combina conteos de titulares activos y las ocupaciones más frecuentes. */
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public com.example.demo.dto.ResumenDTO obtenerResumen() {
         var grupos = personaRepository.resumenPorOcupacion().stream().map(fila ->
