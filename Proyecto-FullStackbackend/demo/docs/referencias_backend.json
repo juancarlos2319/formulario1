@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "review_date": "2026-10-15",
-  "base_commit": "f19c2c93b9f7b05ff95503f78af7ef2e93aab658",
+  "base_commit": "05b543030369c24c84cedad432c3af8a98ded8d5",
   "note": "Puede incluir cambios locales documentales; hashes identifican las fuentes exactas.",
   "sources": [
     {
@@ -1392,7 +1392,7 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/PersonaService.java",
-      "sha256": "8c8e74426813279de24709191afb348a77a3210a04a26123eb50184d47ff4819",
+      "sha256": "188b71bfdbd879ddeefeeb0d10970e24e10ac4a4532c4c5c15e7f46cf4536773",
       "lines": 533,
       "references": [
         {
@@ -1721,7 +1721,7 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/PersonaContratosTest.java",
-      "sha256": "8b6a8b7dfeffb5bfce33f755e256147640b185a37f9133efb543ddd57e3a32c2",
+      "sha256": "af4a4e79dca3fe6a43c68609ad021dfb329c38d8c3f424ec14ef20930d6dc77e",
       "lines": 84,
       "references": [
         {
@@ -1734,7 +1734,7 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/RegistroCompletoTest.java",
-      "sha256": "5a84eebc7b46ab916c8f4d9c119179e5ff2684ebd784e850ae0bcabfe30bb476",
+      "sha256": "d5a0586e0cc19f48659053926185823e8a4841a974a65d3dffeaa5c44ff4d698",
       "lines": 404,
       "references": [
         {
@@ -2203,6 +2203,6 @@
   "pdf": {
     "path": "Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf",
     "pages": 39,
-    "sha256": "9987189c661c5067d3076d8c71b2bdeb6c13019f0902c133c3b81a1ff035449c"
+    "sha256": "b8ae14ac75c377d7f20e34d70e3a6325881abaf72449d0d0ac1571ef7bf48b80"
   }
 }

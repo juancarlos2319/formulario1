@@ -247,9 +247,9 @@ public class PersonaService {
         p.setFechaNacimiento(dto.getFechaNacimiento());
         p.setGenero(dto.getGenero());
 
-        // ValidaciÃƒÂ³n explÃƒÂ­cita de ocupaciÃƒÂ³n obligatoria
+        // Validación explícita de ocupación obligatoria
         if (dto.getOcupacion() == null || dto.getOcupacion().trim().isEmpty()) {
-            throw new RuntimeException("La ocupaciÃƒÂ³n es obligatoria para registrar a la persona.");
+            throw new RuntimeException("La ocupación es obligatoria para registrar a la persona.");
         }
 
         CatalogoOcupacion ocupacion = ocupacionRepository.findByNombre(dto.getOcupacion())

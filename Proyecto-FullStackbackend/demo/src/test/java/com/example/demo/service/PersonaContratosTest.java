@@ -29,7 +29,7 @@ class PersonaContratosTest {
 
     @Test void contratoExponeSoloElArregloDeDirecciones() throws Exception {
         var propiedades = java.util.Arrays.stream(java.beans.Introspector.getBeanInfo(PersonaDTO.class)
-                .getPropertyDescriptors()).map(java.beans.PropertyDescriptor::getName).toList();
+            .getPropertyDescriptors()).map(descriptor -> descriptor.getName()).toList();
         assertTrue(propiedades.contains("direcciones"));
         assertFalse(propiedades.contains("direccion"));
         assertFalse(propiedades.contains("ciudad"));
@@ -46,9 +46,9 @@ class PersonaContratosTest {
         assertEquals(detalle, controller.obtenerDetalle(7L));
         verify(service, never()).obtenerPorId(any());
         assertEquals(List.of("genero", "fechaNacimiento", "direcciones"), java.util.Arrays.stream(
-                com.example.demo.dto.PersonaDetalleDTO.class.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName).toList());
+                com.example.demo.dto.PersonaDetalleDTO.class.getRecordComponents()).map(component -> component.getName()).toList());
         assertEquals(List.of("municipio"), java.util.Arrays.stream(
-                com.example.demo.dto.PersonaResumenDTO.DireccionResumenDTO.class.getRecordComponents()).map(java.lang.reflect.RecordComponent::getName).toList());
+            com.example.demo.dto.PersonaResumenDTO.DireccionResumenDTO.class.getRecordComponents()).map(component -> component.getName()).toList());
     }
 
     @Test void edicionDevuelveSoloLaFilaActualizadaYLasDemasEscriturasConfirmacion() {

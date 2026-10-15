@@ -19,7 +19,7 @@ class RegistroCompletoTest {
         var direccion = titular.getPerfilTitular().getDirecciones().getFirst();
         PersonaParcialDTO cambios = new PersonaParcialDTO();
         cambios.setNombre("Nombre editado");
-        clearInvocations(personas, ocupaciones, usuarios);
+        clearInvocations((Object) personas, ocupaciones, usuarios);
         assertEquals(Map.of("nombre", "Nombre editado"), service.actualizarParcial(creada.getId(), cambios));
         assertEquals(creada.getApellido(), titular.getApellido());
         assertEquals(creada.getCorreos(), service.obtenerPorId(creada.getId()).getCorreos());
@@ -107,8 +107,8 @@ class RegistroCompletoTest {
                 Persona contacto = relacion.getContacto();
                 return new Object[] { contacto.getId(), contacto.getNombre(), contacto.getApellido(),
                     contacto.getFechaNacimiento(), contacto.getGenero(),
-                    String.join(String.valueOf((char) 31), contacto.getCorreos().stream().map(PersonaCorreo::getCorreo).toList()),
-                    String.join(String.valueOf((char) 31), contacto.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList()),
+                    String.join(String.valueOf((char) 31), contacto.getCorreos().stream().map(correo -> correo.getCorreo()).toList()),
+                    String.join(String.valueOf((char) 31), contacto.getTelefonos().stream().map(telefono -> telefono.getTelefono()).toList()),
                     relacion.getParentesco().getId(), relacion.getParentesco().getNombre() };
             }).toList();
         });
