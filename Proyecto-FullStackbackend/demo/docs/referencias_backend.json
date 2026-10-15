@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "review_date": "2026-10-15",
-  "base_commit": "05b543030369c24c84cedad432c3af8a98ded8d5",
+  "base_commit": "3782768e5d7bd76b1a95c9e74a715225886ee99d",
   "note": "Puede incluir cambios locales documentales; hashes identifican las fuentes exactas.",
   "sources": [
     {
@@ -226,26 +226,26 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/config/SecurityConfig.java",
-      "sha256": "5153ba5293d2c78aebdaeaa912ce50aee155a5e62e6e9745984f2d666030947a",
-      "lines": 56,
+      "sha256": "b70476be6e1e267a7b606f17dfe9bd71017445465f9a16f5fa2c67ef571ed958",
+      "lines": 55,
       "references": [
         {
-          "line": 19,
+          "line": 18,
           "kind": "tipo",
           "name": "SecurityConfig"
         },
         {
-          "line": 25,
+          "line": 24,
           "kind": "metodo",
           "name": "securityFilterChain"
         },
         {
-          "line": 45,
+          "line": 44,
           "kind": "metodo",
           "name": "userDetailsService"
         },
         {
-          "line": 53,
+          "line": 52,
           "kind": "metodo",
           "name": "passwordEncoder"
         }
@@ -2203,6 +2203,6 @@
   "pdf": {
     "path": "Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf",
     "pages": 39,
-    "sha256": "b8ae14ac75c377d7f20e34d70e3a6325881abaf72449d0d0ac1571ef7bf48b80"
+    "sha256": "75911613223f2f8c6acf16520bc8aa03b1e41224cf748a0f766abe06f13b31f8"
   }
 }
