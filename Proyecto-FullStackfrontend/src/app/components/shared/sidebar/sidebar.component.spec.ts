@@ -16,8 +16,8 @@ describe('AdminLayoutComponent: cuenta autenticada', () => {
   beforeEach(async () => {
     movil = new BehaviorSubject<{ matches: boolean }>({ matches: false });
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['obtenerUsuarioActual', 'logout'],
-      { usuarioActual: signal({ nombre: 'Nombre de prueba', correo: 'persona@example.com' }) });
-    authService.obtenerUsuarioActual.and.returnValue(of({ nombre: 'Nombre de prueba', correo: 'persona@example.com' }));
+      { usuarioActual: signal({ idPersona: 1, nombre: 'Nombre de prueba', correo: 'persona@example.com' }) });
+    authService.obtenerUsuarioActual.and.returnValue(of({ idPersona: 1, nombre: 'Nombre de prueba', correo: 'persona@example.com' }));
 
     await TestBed.configureTestingModule({
       imports: [AdminLayoutComponent],

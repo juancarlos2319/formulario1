@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "review_date": "2026-10-15",
-  "base_commit": "c6c9bd220ed7d5a16e166f10305c7ef3ce34d870",
+  "base_commit": "f19c2c93b9f7b05ff95503f78af7ef2e93aab658",
   "note": "Puede incluir cambios locales documentales; hashes identifican las fuentes exactas.",
   "sources": [
     {
@@ -45,8 +45,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/README.md",
-      "sha256": "d66ee2c8b7432960c9f6cffca796000a05c8b1d3314030e643f95fbcf70ea482",
-      "lines": 76,
+      "sha256": "8de46df64880a22f28f66241de27dae5d655c1941289afaa66c46af4799fad4b",
+      "lines": 78,
       "references": [
         {
           "line": 1,
@@ -88,8 +88,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/docs/ESPECIFICACION_AGENTES.md",
-      "sha256": "35a017805dd54d52797e4f6d61096ef487a56f6c5fc6ca25a7a510666e28d48d",
-      "lines": 28,
+      "sha256": "c0122cd8f772108f399fd462fe198009d581880e71c3fd6dac35e55a81f3956b",
+      "lines": 30,
       "references": [
         {
           "line": 1,
@@ -323,8 +323,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/PersonaController.java",
-      "sha256": "2d17af8089235afa31e2a0aff49cfe23a0692dc8ba158506cd5e95d050b93e56",
-      "lines": 145,
+      "sha256": "2a7393963ea00bec6abf317a60f2f2a66485630e454c2932a0349af71422a8fe",
+      "lines": 152,
       "references": [
         {
           "line": 21,
@@ -389,6 +389,11 @@
         {
           "line": 133,
           "kind": "metodo",
+          "name": "actualizarParcial"
+        },
+        {
+          "line": 140,
+          "kind": "metodo",
           "name": "eliminarPersona"
         }
       ],
@@ -444,6 +449,24 @@
           "line": 3,
           "kind": "metodo",
           "name": "EditarCuentaDTO"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaActualizadaDTO.java",
+      "sha256": "6def8e1f98c64d7534bdd5b3eac2d21c9db2a95fbbf90475015e8d567878e012",
+      "lines": 4,
+      "references": [
+        {
+          "line": 4,
+          "kind": "tipo",
+          "name": "PersonaActualizadaDTO"
+        },
+        {
+          "line": 4,
+          "kind": "metodo",
+          "name": "PersonaActualizadaDTO"
         }
       ],
       "content_included": false
@@ -600,6 +623,24 @@
       "content_included": false
     },
     {
+      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaParcialDTO.java",
+      "sha256": "b2477a0dfd37e90181ec359872f79851b97ffe6fc66bff7f006bab0add2324c4",
+      "lines": 24,
+      "references": [
+        {
+          "line": 4,
+          "kind": "tipo",
+          "name": "PersonaParcialDTO"
+        },
+        {
+          "line": 7,
+          "kind": "metodo",
+          "name": "camposPresentes"
+        }
+      ],
+      "content_included": false
+    },
+    {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaResumenDTO.java",
       "sha256": "6d68d607fb0fc55b11d131ea682761c1146fe6824680d8c5771630b9232767cd",
       "lines": 10,
@@ -675,7 +716,7 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/UsuarioActualDTO.java",
-      "sha256": "08659bed20210331d9952f0ac29a0f47df26fecfc4779a8ef9db95a8313c6298",
+      "sha256": "b994e11dc196673032570950a13343a203fcd5cb94eec934b29ec820209198b0",
       "lines": 3,
       "references": [
         {
@@ -1323,7 +1364,7 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/CuentaService.java",
-      "sha256": "9547260a169fdf500d3051d1fc8b84d32f8b2e672e104923a18cbbbc0cb43363",
+      "sha256": "5bccc87ac65c761b2590c0e7c6f6795480168d32623b0a7e6d7c2f0f592619aa",
       "lines": 79,
       "references": [
         {
@@ -1351,8 +1392,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/PersonaService.java",
-      "sha256": "a4d73c7ed50f2b0b1284edd1ddbb5c017254b94e1b8551dec1d947c41797c831",
-      "lines": 496,
+      "sha256": "8c8e74426813279de24709191afb348a77a3210a04a26123eb50184d47ff4819",
+      "lines": 533,
       "references": [
         {
           "line": 18,
@@ -1415,127 +1456,132 @@
           "name": "actualizar"
         },
         {
-          "line": 176,
+          "line": 177,
+          "kind": "metodo",
+          "name": "actualizarParcial"
+        },
+        {
+          "line": 213,
           "kind": "metodo",
           "name": "eliminarLogico"
         },
         {
-          "line": 188,
+          "line": 225,
           "kind": "metodo",
           "name": "convertirADTO"
         },
         {
-          "line": 206,
+          "line": 243,
           "kind": "metodo",
           "name": "convertirAEntidad"
         },
         {
-          "line": 235,
+          "line": 272,
           "kind": "metodo",
           "name": "validarTitular"
         },
         {
-          "line": 244,
+          "line": 281,
           "kind": "metodo",
           "name": "direccionesDe"
         },
         {
-          "line": 250,
+          "line": 287,
           "kind": "metodo",
           "name": "convertirDirecciones"
         },
         {
-          "line": 258,
+          "line": 295,
           "kind": "metodo",
           "name": "reemplazarDirecciones"
         },
         {
-          "line": 286,
+          "line": 323,
           "kind": "metodo",
           "name": "length"
         },
         {
-          "line": 289,
+          "line": 326,
           "kind": "metodo",
           "name": "valor"
         },
         {
-          "line": 294,
+          "line": 331,
           "kind": "metodo",
           "name": "titularActivo"
         },
         {
-          "line": 302,
+          "line": 339,
           "kind": "metodo",
           "name": "invalido"
         },
         {
-          "line": 308,
+          "line": 345,
           "kind": "metodo",
           "name": "validarContactos"
         },
         {
-          "line": 338,
+          "line": 375,
           "kind": "metodo",
           "name": "resolverParentesco"
         },
         {
-          "line": 345,
+          "line": 382,
           "kind": "metodo",
           "name": "reemplazarContactos"
         },
         {
-          "line": 386,
+          "line": 423,
           "kind": "metodo",
           "name": "normalizarCorreo"
         },
         {
-          "line": 392,
+          "line": 429,
           "kind": "metodo",
           "name": "buscarContactos"
         },
         {
-          "line": 411,
+          "line": 448,
           "kind": "metodo",
           "name": "validarComunicacion"
         },
         {
-          "line": 416,
+          "line": 453,
           "kind": "metodo",
           "name": "validarComunicaciones"
         },
         {
-          "line": 432,
+          "line": 469,
           "kind": "metodo",
           "name": "verificarCoincidencia"
         },
         {
-          "line": 439,
+          "line": 476,
           "kind": "metodo",
           "name": "actualizarDatosContacto"
         },
         {
-          "line": 446,
+          "line": 483,
           "kind": "metodo",
           "name": "actualizarComunicacion"
         },
         {
-          "line": 451,
+          "line": 488,
           "kind": "metodo",
           "name": "sincronizarComunicaciones"
         },
         {
-          "line": 468,
+          "line": 505,
           "kind": "metodo",
           "name": "resumirPersonas"
         },
         {
-          "line": 476,
+          "line": 513,
           "kind": "metodo",
           "name": "convertirAResumen"
         },
         {
-          "line": 488,
+          "line": 525,
           "kind": "metodo",
           "name": "obtenerResumen"
         }
@@ -1657,8 +1703,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/CuentaServiceTest.java",
-      "sha256": "0ce683e7bfae390f5f040fecd94967d764e05f39e342c0064a9e38194372fc8e",
-      "lines": 108,
+      "sha256": "562b3e3968b749ff226a8db20db275939d284f067be9e8c2f16923d198a56465",
+      "lines": 109,
       "references": [
         {
           "line": 19,
@@ -1675,8 +1721,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/PersonaContratosTest.java",
-      "sha256": "b623dfdd655a1f11b4ea61147685d60925de454d1169ca5c0de57e7e02e7d8c9",
-      "lines": 65,
+      "sha256": "8b6a8b7dfeffb5bfce33f755e256147640b185a37f9133efb543ddd57e3a32c2",
+      "lines": 84,
       "references": [
         {
           "line": 12,
@@ -1688,8 +1734,8 @@
     },
     {
       "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/RegistroCompletoTest.java",
-      "sha256": "dac22a1e7b3b4db042939330a843d2845f9abcda8a0ffda3584f9e28d42502d8",
-      "lines": 360,
+      "sha256": "5a84eebc7b46ab916c8f4d9c119179e5ff2684ebd784e850ae0bcabfe30bb476",
+      "lines": 404,
       "references": [
         {
           "line": 15,
@@ -1697,32 +1743,32 @@
           "name": "RegistroCompletoTest"
         },
         {
-          "line": 46,
+          "line": 90,
           "kind": "metodo",
           "name": "guardarConDatos"
         },
         {
-          "line": 89,
+          "line": 133,
           "kind": "metodo",
           "name": "nuevo"
         },
         {
-          "line": 92,
+          "line": 136,
           "kind": "metodo",
           "name": "existente"
         },
         {
-          "line": 95,
+          "line": 139,
           "kind": "metodo",
           "name": "datos"
         },
         {
-          "line": 107,
+          "line": 151,
           "kind": "metodo",
           "name": "persona"
         },
         {
-          "line": 113,
+          "line": 157,
           "kind": "metodo",
           "name": "relacion"
         }
@@ -1731,8 +1777,8 @@
     },
     {
       "path": "Proyecto-FullStackfrontend/README.md",
-      "sha256": "56531772bfce5860fc5371cba9b38eaad6d31e4c4a529e569f5395579f5e66ad",
-      "lines": 97,
+      "sha256": "edc991f7ab194d2b1b69164c3c988b80bde88d448a7e5339b9139123a2e0a3ad",
+      "lines": 99,
       "references": [
         {
           "line": 1,
@@ -1779,8 +1825,8 @@
     },
     {
       "path": "Proyecto-FullStackfrontend/docs/ESPECIFICACION_AGENTES.md",
-      "sha256": "d90d0432677124647b5f03f614c54ff1da5236bc224f1f51f4dabf7f0e8ff2c4",
-      "lines": 30,
+      "sha256": "4bce6f01c8be94c9b1cc54bd7cd6316b59906be12d209cb51301d9e156abf710",
+      "lines": 32,
       "references": [
         {
           "line": 1,
@@ -1850,8 +1896,8 @@
     },
     {
       "path": "docs/API.md",
-      "sha256": "242a34736e5acbeef96c6e4e27e73b63f43599b5fc0dfae1a63580442124de43",
-      "lines": 135,
+      "sha256": "0577c14adfa56f25f05a3d7f26aaa438bdb528578d97624ecc667609befea09d",
+      "lines": 146,
       "references": [
         {
           "line": 1,
@@ -1869,42 +1915,47 @@
           "name": "Endpoints"
         },
         {
-          "line": 34,
+          "line": 36,
           "kind": "seccion",
           "name": "DTOs de lectura"
         },
         {
-          "line": 74,
+          "line": 77,
           "kind": "seccion",
           "name": "Alta y actualización de titular"
         },
         {
-          "line": 96,
+          "line": 99,
           "kind": "seccion",
           "name": "Contactos compartidos y sustitución de relaciones"
         },
         {
-          "line": 112,
+          "line": 115,
           "kind": "seccion",
           "name": "Coincidencias"
         },
         {
-          "line": 116,
+          "line": 119,
           "kind": "seccion",
           "name": "Cuenta y login"
         },
         {
-          "line": 122,
+          "line": 125,
           "kind": "seccion",
           "name": "Errores y límites HTTP"
+        },
+        {
+          "line": 140,
+          "kind": "seccion",
+          "name": "Edicion parcial del titular"
         }
       ],
       "content_included": false
     },
     {
       "path": "docs/ARQUITECTURA.md",
-      "sha256": "ec38bb9277e2fd64b38b73cd71095fc705560d5a804399c689d10c149b570072",
-      "lines": 108,
+      "sha256": "deb67d172155dcd2bc644deaaf0a5f13680725cddc8701be6c0f4c326897c500",
+      "lines": 112,
       "references": [
         {
           "line": 1,
@@ -1947,7 +1998,7 @@
           "name": "7. Política de cachés"
         },
         {
-          "line": 104,
+          "line": 106,
           "kind": "seccion",
           "name": "8. Diseño y accesibilidad"
         }
@@ -2029,8 +2080,8 @@
     },
     {
       "path": "docs/OPERACION_Y_PRUEBAS.md",
-      "sha256": "b8145bdbaa0ac8269ff712c0e0d9276477ea265d44565c4eeedf629083d175f6",
-      "lines": 164,
+      "sha256": "dbda8edbc82d5e8825f24eb2b13c6ee69c9889b1a50afc9d81947f2b351f6d09",
+      "lines": 166,
       "references": [
         {
           "line": 1,
@@ -2088,27 +2139,27 @@
           "name": "Desde Proyecto-FullStackbackend/demo"
         },
         {
-          "line": 112,
+          "line": 114,
           "kind": "seccion",
           "name": "Integración PostgreSQL, solo sobre una base desechable"
         },
         {
-          "line": 124,
+          "line": 126,
           "kind": "seccion",
           "name": "Configurar TEST_DATABASE_USERNAME y TEST_DATABASE_PASSWORD en la sesión según la instancia."
         },
         {
-          "line": 130,
+          "line": 132,
           "kind": "seccion",
           "name": "7. Contraseñas y documentación"
         },
         {
-          "line": 148,
+          "line": 150,
           "kind": "seccion",
           "name": "8. Diagnóstico"
         },
         {
-          "line": 162,
+          "line": 164,
           "kind": "seccion",
           "name": "Alcance de los resultados"
         }
@@ -2117,8 +2168,8 @@
     },
     {
       "path": "docs/REVISION_TECNICA.md",
-      "sha256": "a3badf0276dd72f01de3a35632050e15bec7af54a1cfe4f34f6c047f7de0addf",
-      "lines": 53,
+      "sha256": "68e95c145c7ad1eaee4434b82735f69c09466366ee1ac5e6cdbe92d551f7c944",
+      "lines": 55,
       "references": [
         {
           "line": 1,
@@ -2151,7 +2202,7 @@
   ],
   "pdf": {
     "path": "Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf",
-    "pages": 38,
-    "sha256": "f801c2645a5c5fdc1af3121689f09af4608ce831b4dd775c4f794df8d0e631a9"
+    "pages": 39,
+    "sha256": "9987189c661c5067d3076d8c71b2bdeb6c13019f0902c133c3b81a1ff035449c"
   }
 }

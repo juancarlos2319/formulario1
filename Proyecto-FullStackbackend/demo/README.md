@@ -29,7 +29,7 @@ Configuración: src/main/resources/application.properties. Datasource/clave JWT 
 | JwtUtil / JwtFilter | HS256, una hora, subject y autenticación stateless |
 | SecurityConfig | CORS, autenticación, CSRF deshabilitado y BCrypt |
 
-DTOs separan PersonaResumenDTO (tabla), PersonaDetalleDTO (adicionales), PersonaDTO (formulario), ContactoDTO y agregados. Escrituras devuelven ResultadoDTO; DELETE, 204.
+DTOs separan PersonaResumenDTO (tabla), PersonaDetalleDTO (adicionales), PersonaDTO (formulario), ContactoDTO y agregados. PUT del titular devuelve PersonaActualizadaDTO (ok y PersonaResumenDTO de la fila editada); otras escrituras devuelven ResultadoDTO; DELETE, 204. El perfil UsuarioActualDTO incluye idPersona para identificar cambios de la cuenta activa.
 
 ## Modelo y reglas
 
@@ -55,7 +55,7 @@ Los controllers no unifican errores: POST/PUT/DELETE tienen mapeos distintos de 
 
 Ejecutar [schema.sql](src/main/resources/schema.sql), después [data.sql](src/main/resources/data.sql), una vez sobre base vacía. No migraciones activas; IF NOT EXISTS no elimina columnas. Semilla con IDs explícitos, solo persona_id_seq reajustada y direcciones no idempotentes; varios campos iniciales pendientes de completar.
 
-2026-10-15: Maven reportó 52 pruebas, 39 ejecutadas/aprobadas, 13 integraciones omitidas, 0 fallos/errores. JwtUtilTest: 1; CuentaServiceTest: 7; PersonaContratosTest: 4; RegistroCompletoTest: 27; DemoApplicationTests: 13.
+2026-10-15: ejecución seleccionada de 43 pruebas unitarias, todas aprobadas, sin fallos/errores. JwtUtilTest: 1; CuentaServiceTest: 7; PersonaContratosTest: 5; RegistroCompletoTest: 30. Las 13 de DemoApplicationTests se excluyeron expresamente; no se ejecutó integración con PostgreSQL.
 
 Integración requiere TEST_DATABASE_URL local /nomina_backend_test y ejecuta TRUNCATE CASCADE. Nunca usar desarrollo. [Variables y procedimiento](../../docs/OPERACION_Y_PRUEBAS.md). Trazas ERROR de casos negativos no equivalen a fallo de suite.
 
@@ -74,3 +74,5 @@ Requiere ReportLab/pypdf, usa fuente del sistema si existe y fallback portable. 
 scripts/HashPassword.java es una utilidad interactiva BCrypt con coste 12, mínimo 12 caracteres/máximo 72 bytes. Su política difiere de edición de cuenta. Ver procedimiento en Operación; no copiar credenciales/hashes a entregables.
 
 Los métodos declarados de controllers, servicios, repositorios, seguridad, entidades, PersonaDTO y la utilidad BCrypt tienen comentarios breves de propósito. Getters y setters describen el dato expuesto; las operaciones de negocio resumen su validación o efecto. No se modificaron contratos ni lógica al documentarlos.
+
+Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.

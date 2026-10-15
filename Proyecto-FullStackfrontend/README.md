@@ -74,9 +74,9 @@ Cuenta valida username, contraseña actual, nueva y confirmación, con máximo d
 | CodigoPostalService | GET https://www.correosmexico.com.mx/api/cp con parámetro cp; sin JWT |
 | FeedbackService | Avisos de 5 s, confirmación Promise y señales |
 
-JWT: jwt_token/localStorage. Borrador: registro_borrador/sessionStorage. Header usa datos del login o /auth/me al recargar; refresh después de actualización exitosa de personas/contactos, sin polling de perfil.
+JWT: jwt_token/localStorage. Borrador: registro_borrador/sessionStorage. Header usa datos del login o /auth/me al recargar; actualización selectiva por idPersona cuando cambia nombre completo o correo principal, sin polling de perfil. La fila del PUT permite actualizar la cuenta propia localmente; contactos compartidos solo disparan /auth/me si afectan esos campos de la cuenta activa.
 
-Listas activas/inactivas y detalles: memoria sin TTL. Contactos: 30 s desde crear entrada. Parentescos: sesión. Formulario por ID/ocupaciones/resumen: solo compartir pendientes. Invalida listas/detalles tras escrituras y sesión; contactos tras edición de personas/contactos/sesión. [Matriz y límites](../docs/ARQUITECTURA.md).
+Listas activas/inactivas y detalles: memoria sin TTL. Contactos: 30 s desde crear entrada. Parentescos: sesión. Formulario por ID/ocupaciones/resumen: solo compartir pendientes. Editar un titular conserva el listado y reemplaza solo su ID con el resumen del PUT, sin otro GET. Invalida únicamente los detalles de ese ID; altas/bajas/reactivaciones/contactos y sesión mantienen invalidación completa. Contactos se invalidan tras edición de personas/contactos/sesión. [Matriz y límites](../docs/ARQUITECTURA.md).
 
 jwtInterceptor afecta solo http://localhost:8080/api/. Añade Bearer, timeout por emisión 15 s, logout para 401/0/5xx si coincide token capturado. No logout por 403/validación/CP externo. Detecta caída al pedir datos, no periódicamente. PersonasService convierte HttpErrorResponse a Error con mensaje; no siempre se conserva status original en consumidores.
 
@@ -90,8 +90,10 @@ Feedback usa dialog nativo/showModal, no MatDialog. Login/dashboard tienen anima
 
 ## Verificación
 
-2026-10-15: build aprobado y 86 pruebas Angular aprobadas, con warnings de tamaño. Verificación visual previa del login en Chrome. No E2E ni pruebas de todos los componentes conectados a backend real.
+2026-10-15: build aprobado y 94 pruebas Angular aprobadas, con warnings de tamaño. Verificación visual previa del login en Chrome. No E2E ni pruebas de todos los componentes conectados a backend real.
 
 Antes de modificar HTTP contrastar DTO Java/TypeScript. La respuesta de ocupaciones es objeto id/nombre aunque el servicio declara string[] y Registro usa any[]; no asumir que los generics equivalen a contrato runtime. Actualizar documentación compartida al cambiar modelo/rutas.
 
 Las funciones de componentes, servicios, guards e interceptor incluyen comentarios breves de propósito y lógica. Se documentan también getters, helpers locales y estado derivado relevante; no se añaden comentarios repetitivos a cada callback HTTP o prueba. Los comentarios no cambian contratos ni comportamiento.
+
+Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.

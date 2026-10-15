@@ -20,7 +20,7 @@ Los IDs JSON corresponden a `Long`, las fechas a `LocalDate` (`YYYY-MM-DD`) y la
 | GET | `/api/personas/{id}` | ID titular activo | 200: `PersonaDTO` completo para editar |
 | GET | `/api/personas/{id}/detalles` | ID titular activo | 200: `PersonaDetalleDTO` |
 | POST | `/api/personas` | `PersonaDTO` con `contactosEmergencia` | 201: `{ok:true}` |
-| PUT | `/api/personas/{id}` | `PersonaDTO`, sin sustituir contactos | 200: `{ok:true}` |
+| PUT | `/api/personas/{id}` | `PersonaDTO`, sin sustituir contactos | 200: `PersonaActualizadaDTO` (`ok` y fila `persona`) |
 | DELETE | `/api/personas/{id}` | ID titular activo | 204, sin cuerpo; baja lógica |
 | PUT | `/api/personas/{id}/reactivar` | Sin cuerpo útil | 200: `{ok:true}` |
 | GET | `/api/personas/{id}/contactos` | ID titular activo | 200: `ContactoDTO[]`; header `Server-Timing` |
@@ -29,7 +29,9 @@ Los IDs JSON corresponden a `Long`, las fechas a `LocalDate` (`YYYY-MM-DD`) y la
 | GET | `/api/ocupaciones` | — | 200: objetos `{id,nombre}` |
 | GET | `/api/parentescos` | — | 200: objetos `{id,nombre}`, ordenados por ID |
 
-`POST /api/personas` crea una unidad transaccional y no devuelve su ID. La UI vuelve al listado después de guardar. No hay endpoint de alta de usuario, refresco/revocación JWT, salud del backend, borrado físico de titular ni actualización parcial PATCH.
+`PUT /api/personas/{id}` devuelve `{ok:true,persona:PersonaResumenDTO}` construido dentro de la misma transacción. El frontend reemplaza esa fila por ID y no hace otro GET del listado ni del formulario para reflejar el guardado. Los detalles almacenados de esa persona se invalidan; los de los demás permanecen. `usuarioActual.idPersona`, tanto en login como en `/auth/me`, identifica de forma inequívoca la cuenta del encabezado.
+
+`POST /api/personas` crea una unidad transaccional y no devuelve su ID. La UI vuelve al listado después de guardar. No hay endpoint de alta de usuario, refresco/revocación JWT, salud del backend, borrado físico de titular.
 
 ## DTOs de lectura
 
@@ -58,7 +60,8 @@ type ContactoDTO = {
   correos: string[] | null; telefonos: string[] | null;
   idParentesco: number | null; parentesco: string | null;
 };
-type UsuarioActualDTO = { nombre: string; correo: string | null };
+type PersonaActualizadaDTO = { ok: boolean; persona: PersonaResumenDTO };
+type UsuarioActualDTO = { idPersona: number; nombre: string; correo: string | null };
 type ResumenDTO = {
   total: number; conCorreo: number; conTelefono: number;
   ocupaciones: { nombre: string; cantidad: number }[];
@@ -133,3 +136,11 @@ Login no verifica baja ni rol. Devuelve 404 si no encuentra username y 401 si BC
 | GET por ID/detalles/contactos, PUT contactos, cuenta | Excepciones se propagan al manejo de Spring; cuerpo final depende de esa configuración |
 
 No se garantiza un JSON uniforme de errores ni un código uniforme para fallos de persistencia. Un 404 en PUT/DELETE puede ocultar un fallo interno traducido por el controller. El interceptor frontend cierra sesión ante 401, 0, timeout y 5xx de la API, pero no ante 403 ni errores de validación. Las pruebas unitarias no sustituyen una prueba HTTP real de filtros, serialización y base.
+
+### Edicion parcial del titular
+
+`PATCH /api/personas/{id}` requiere JWT. El frontend compara contra el formulario original en memoria y envia exclusivamente campos modificados: `nombre`, `apellido`, `genero`, `fechaNacimiento`, `ocupacion`, `correos`, `telefonos`, `direcciones`. Los campos omitidos se conservan; null explicito se rechaza. Las colecciones se sustituyen completas solamente cuando cambian.
+
+Ejemplo de peticion: `{ "nombre": "Nuevo nombre" }`. Respuesta: `{ "ok": true, "persona": { "nombre": "Nuevo nombre" } }`. `persona` es un objeto parcial con los valores persistidos de los campos enviados; no incluye el resto del formulario ni repite la fila completa. PUT completo sigue disponible por compatibilidad.
+
+La respuesta se fusiona por ID con la lista y los detalles en memoria. No hay GET posterior al guardar. Una edicion sin cambios no genera peticion. El encabezado se actualiza localmente solo cuando cambia nombre completo o correo principal de la cuenta activa.

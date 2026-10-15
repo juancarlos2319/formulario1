@@ -14,7 +14,7 @@ Java 21, Spring Boot 4.1.1, MVC/Security/JPA/JDBC, JJWT 0.11.5 y PostgreSQL. Wra
 - Parentesco del vínculo, persona compartida. No REMOVE desde vínculo hacia contacto.
 - Omitidos en sustitución se desvinculan; cleanup solo sin perfil/cuenta/vínculos entrantes o salientes.
 - ADMIN vinculado no se da de baja; reactivar solo dado de baja con capacidad disponible.
-- Listado PersonaResumenDTO, adicionales PersonaDetalleDTO, editar PersonaDTO sin contactos rellenados. Escrituras ResultadoDTO; DELETE 204.
+- Listado PersonaResumenDTO, adicionales PersonaDetalleDTO, editar PersonaDTO sin contactos rellenados. PUT titular devuelve PersonaActualizadaDTO con su fila de listado; otras escrituras ResultadoDTO; DELETE 204. UsuarioActualDTO incluye idPersona.
 - POST crea con contactos; PUT titular no sustituye contactos; PUT contactos sustituye conjunto entero.
 - El servicio crea ocupación desconocida; parentesco debe existir. No documentar la regla contraria.
 - Advisory lock en alta/sustitución contactos, no reactivación; límite no garantizado en toda concurrencia.
@@ -23,6 +23,8 @@ Java 21, Spring Boot 4.1.1, MVC/Security/JPA/JDBC, JJWT 0.11.5 y PostgreSQL. Wra
 
 ## Pruebas/documentación
 
-mvnw.cmd test desde demo. Integración requiere TEST_DATABASE_URL local /nomina_backend_test; usa TRUNCATE CASCADE. Nunca desarrollo. Revisión 2026-10-15: 39 unitarias aprobadas y 13 integraciones omitidas.
+mvnw.cmd test desde demo. Integración requiere TEST_DATABASE_URL local /nomina_backend_test; usa TRUNCATE CASCADE. Nunca desarrollo. Revisión 2026-10-15: 43 unitarias aprobadas y 13 integraciones excluidas expresamente de la ejecución.
 
 Actualizar API/BD/READMEs al cambiar modelo/rutas. PDF/manifiesto con generador que calcula referencias, no reescribe README ni reproduce secretos o datos personales. Regenerar tras cambios; no conservar referencias a archivos eliminados.
+
+Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.

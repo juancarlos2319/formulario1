@@ -3,13 +3,18 @@ import { PersonasService } from './personas.service';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap, shareReplay } from 'rxjs';
 import { UsuarioActual } from '../interfaces/usuario-actual.interface';
-import { Resultado } from '../interfaces/usuario.interface';
+import { CambioPersona, Resultado } from '../interfaces/usuario.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly cuentaActual = signal<UsuarioActual | null>(null);
+  private readonly cuentaActual = signal<UsuarioActual | null>(null, {
+    equal: (anterior, siguiente) => anterior === siguiente || (
+      anterior?.idPersona === siguiente?.idPersona && anterior?.nombre === siguiente?.nombre &&
+      anterior?.correo === siguiente?.correo
+    )
+  });
   readonly usuarioActual = this.cuentaActual.asReadonly();
   private consultaCuenta?: Observable<UsuarioActual>;
   private revisionCuenta = 0;
@@ -20,15 +25,29 @@ export class AuthService {
   private expirationTimer?: ReturnType<typeof setTimeout>;
   private readonly tokenMonitor = window.setInterval(() => this.detectExternalTokenChange(), 250);
 
-  /** Vigila cambios de sesión y refresca el perfil tras actualizar datos personales. */
+  /** Vigila la sesión y aplica solo cambios del nombre o correo de la cuenta activa. */
   constructor(private http: HttpClient) {
-    this.registroService.datosPersonalesActualizados$?.subscribe(() => {
-      if (this.tokenSubject.value) {
-        this.actualizarUsuarioActual().subscribe({ error: () => {} });
-      }
-    });
+    this.registroService.datosPersonalesActualizados$?.subscribe(cambio => this.aplicarCambioPersonal(cambio));
     window.addEventListener('storage', this.onStorageChange);
     this.scheduleExpiration(this.tokenSubject.value);
+  }
+
+  /** Actualiza el header únicamente si cambia su nombre o correo; ignora otras personas. */
+  private aplicarCambioPersonal(cambio: CambioPersona): void {
+    const cuenta = this.cuentaActual();
+    if (!this.tokenSubject.value || !cuenta || cuenta.idPersona !== cambio.id) return;
+    const nombre = cambio.nombre != null && cambio.apellido != null
+      ? `${cambio.nombre} ${cambio.apellido}` : cuenta.nombre;
+    const correo = cambio.correos?.length ? cambio.correos[0].trim().toLowerCase() : cuenta.correo;
+    if (cuenta.nombre === nombre && cuenta.correo === correo) return;
+
+    if (cambio.datosPersistidos) {
+      this.revisionCuenta++;
+      this.consultaCuenta = undefined;
+      this.cuentaActual.set({ ...cuenta, nombre, correo });
+    } else {
+      this.actualizarUsuarioActual().subscribe({ error: () => {} });
+    }
   }
 
   /** Envía las credenciales y conserva el token y el perfil devueltos por el backend. */

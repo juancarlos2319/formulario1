@@ -74,6 +74,6 @@ public class CuentaService {
                 .map(contacto -> contacto.getCorreo())
                 .orElse(null);
         String nombreCompleto = String.join(" ", persona.getNombre(), persona.getApellido());
-        return new UsuarioActualDTO(nombreCompleto, correo);
+        return new UsuarioActualDTO(usuario.getIdPersona(), nombreCompleto, correo);
     }
 }

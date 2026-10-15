@@ -76,7 +76,7 @@ class CuentaServiceTest {
     private final CuentaService service = new CuentaService(usuarios, personas, encoder);
 
     @Test
-    void devuelveSoloNombreYCorreoDeLaCuentaAutenticada() {
+    void identificaLaPersonaDelPerfilAutenticadoSinExponerCredenciales() {
         Usuario usuario = new Usuario();
         usuario.setIdPersona(42L);
         Persona persona = new Persona();
@@ -90,6 +90,7 @@ class CuentaServiceTest {
 
         var resultado = service.obtenerUsuarioActual("usuario-prueba");
 
+        assertEquals(42L, resultado.idPersona());
         assertEquals("Nombre de prueba Apellido de prueba", resultado.nombre());
         assertEquals("usuario@example.com", resultado.correo());
         verify(usuarios).findByUsername("usuario-prueba");

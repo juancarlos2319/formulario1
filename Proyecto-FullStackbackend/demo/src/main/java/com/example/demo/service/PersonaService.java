@@ -141,9 +141,9 @@ public class PersonaService {
         return guardada.getId();
     }
 
-    /** Actualiza personales, direcciones, comunicaciones y ocupación sin sustituir contactos. */
+    /** Actualiza el titular y devuelve su fila de listado sin consultar a las demás personas. */
     @org.springframework.transaction.annotation.Transactional
-    public void actualizar(Long id, PersonaDTO dto) {
+    public com.example.demo.dto.PersonaResumenDTO actualizar(Long id, PersonaDTO dto) {
         validarTitular(dto);
         validarComunicacion(dto);
         Persona persona = titularActivo(id);
@@ -169,6 +169,43 @@ public class PersonaService {
         actualizarComunicacion(persona, dto);
 
         personaRepository.save(persona);
+        return convertirAResumen(persona, !usuarioRepository.existsByIdPersonaAndRol(id, "ROLE_ADMIN"));
+    }
+
+    /** Fusiona los campos recibidos y devuelve unicamente sus valores persistidos. */
+    @org.springframework.transaction.annotation.Transactional
+    public java.util.Map<String, Object> actualizarParcial(Long id, com.example.demo.dto.PersonaParcialDTO cambios) {
+        Persona persona = titularActivo(id);
+        PersonaDTO completa = convertirADTO(persona);
+        org.springframework.beans.BeanWrapper entrada = new org.springframework.beans.BeanWrapperImpl(cambios);
+        org.springframework.beans.BeanWrapper destino = new org.springframework.beans.BeanWrapperImpl(completa);
+        for (String campo : cambios.camposPresentes()) {
+            if (entrada.getPropertyValue(campo) == null) throw invalido("El campo " + campo + " no admite null");
+            destino.setPropertyValue(campo, entrada.getPropertyValue(campo));
+        }
+        if (cambios.camposPresentes().isEmpty()) return java.util.Map.of();
+        validarTitular(completa);
+        validarComunicacion(completa);
+        var campos = cambios.camposPresentes();
+        if (campos.contains("nombre")) persona.setNombre(completa.getNombre());
+        if (campos.contains("apellido")) persona.setApellido(completa.getApellido());
+        if (campos.contains("genero")) persona.setGenero(completa.getGenero());
+        if (campos.contains("fechaNacimiento")) persona.setFechaNacimiento(completa.getFechaNacimiento());
+        if (campos.contains("direcciones")) reemplazarDirecciones(persona.getPerfilTitular(), completa);
+        if (campos.contains("ocupacion")) {
+            if (completa.getOcupacion().isBlank()) throw invalido("La ocupacion es obligatoria");
+            persona.getPerfilTitular().setOcupacion(ocupacionRepository.findByNombre(completa.getOcupacion()).orElseGet(() -> {
+                CatalogoOcupacion nueva = new CatalogoOcupacion();
+                nueva.setNombre(completa.getOcupacion());
+                return ocupacionRepository.save(nueva);
+            }));
+        }
+        if (campos.contains("correos") || campos.contains("telefonos")) actualizarComunicacion(persona, completa);
+        personaRepository.save(persona);
+        org.springframework.beans.BeanWrapper persistida = new org.springframework.beans.BeanWrapperImpl(convertirADTO(persona));
+        java.util.Map<String, Object> resultado = new java.util.LinkedHashMap<>();
+        for (String campo : cambios.camposPresentes()) resultado.put(campo, persistida.getPropertyValue(campo));
+        return resultado;
     }
 
     /** Marca la baja del titular activo e impide desactivar cuentas administradoras. */
@@ -197,8 +234,8 @@ public class PersonaService {
         dto.setFechaBaja(p.getPerfilTitular().getFechaBaja());
         dto.setOcupacion(p.getPerfilTitular().getOcupacion().getNombre());
 
-        dto.setCorreos(p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList());
-        dto.setTelefonos(p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList());
+        dto.setCorreos(p.getCorreos().stream().map(correo -> correo.getCorreo()).toList());
+        dto.setTelefonos(p.getTelefonos().stream().map(telefono -> telefono.getTelefono()).toList());
         return dto;
     }
 
@@ -402,8 +439,8 @@ public class PersonaService {
                 telefonos.isEmpty() ? List.of("") : telefonos, busqueda.excluirId()).stream()
                 .map(p -> new com.example.demo.dto.ContactoDTO(p.getId(), p.getNombre(), p.getApellido(),
                     p.getFechaNacimiento(), p.getGenero(),
-                    p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
-                    p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), null, null))
+                    p.getCorreos().stream().map(correo -> correo.getCorreo()).toList(),
+                    p.getTelefonos().stream().map(telefono -> telefono.getTelefono()).toList(), null, null))
                 .toList();
     }
 
@@ -468,7 +505,7 @@ public class PersonaService {
     private List<com.example.demo.dto.PersonaResumenDTO> resumirPersonas(List<Persona> personas) {
         if (personas.isEmpty()) return List.of();
         java.util.Set<Long> administradores = usuarioRepository.buscarPersonasConRol(
-                personas.stream().map(Persona::getId).toList(), "ROLE_ADMIN");
+                personas.stream().map(persona -> persona.getId()).toList(), "ROLE_ADMIN");
         return personas.stream().map(p -> convertirAResumen(p, !administradores.contains(p.getId()))).toList();
     }
 
@@ -476,8 +513,8 @@ public class PersonaService {
     private com.example.demo.dto.PersonaResumenDTO convertirAResumen(Persona p, boolean puedeEliminar) {
         return new com.example.demo.dto.PersonaResumenDTO(p.getId(), p.getNombre(), p.getApellido(),
                 p.getPerfilTitular().getOcupacion().getNombre(),
-                p.getCorreos().stream().map(PersonaCorreo::getCorreo).toList(),
-                p.getTelefonos().stream().map(PersonaTelefono::getTelefono).toList(), p.getFechaBaja(),
+                p.getCorreos().stream().filter(c -> c != null).map(c -> c.getCorreo()).toList(),
+                p.getTelefonos().stream().filter(t -> t != null).map(t -> t.getTelefono()).toList(), p.getFechaBaja(),
                 p.getPerfilTitular().getDirecciones().stream().limit(1)
                     .map(d -> new com.example.demo.dto.PersonaResumenDTO.DireccionResumenDTO(d.getMunicipio())).toList(),
                 puedeEliminar);

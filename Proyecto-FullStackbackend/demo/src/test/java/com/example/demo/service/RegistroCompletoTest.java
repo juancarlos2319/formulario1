@@ -13,6 +13,50 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RegistroCompletoTest {
+    @Test void edicionParcialDevuelveSoloElCampoModificadoYConservaDirecciones() {
+        PersonaDTO creada = guardarConDatos(datos(1));
+        Persona titular = guardadas.get(creada.getId());
+        var direccion = titular.getPerfilTitular().getDirecciones().getFirst();
+        PersonaParcialDTO cambios = new PersonaParcialDTO();
+        cambios.setNombre("Nombre editado");
+        clearInvocations(personas, ocupaciones, usuarios);
+        assertEquals(Map.of("nombre", "Nombre editado"), service.actualizarParcial(creada.getId(), cambios));
+        assertEquals(creada.getApellido(), titular.getApellido());
+        assertEquals(creada.getCorreos(), service.obtenerPorId(creada.getId()).getCorreos());
+        assertSame(direccion, titular.getPerfilTitular().getDirecciones().getFirst());
+        verifyNoInteractions(ocupaciones, usuarios);
+        verify(personas, never()).findAll();
+    }
+
+    @Test void edicionParcialRechazaNullSinGuardar() {
+        PersonaDTO creada = guardarConDatos(datos(1));
+        clearInvocations(personas);
+        PersonaParcialDTO cambios = new PersonaParcialDTO();
+        cambios.setNombre(null);
+        assertThrows(ResponseStatusException.class, () -> service.actualizarParcial(creada.getId(), cambios));
+        verify(personas, never()).save(any());
+    }
+
+    @Test void actualizarDevuelveResumenNormalizadoSinRecargarElListado() {
+        Persona titular = persona(7, true);
+        CatalogoOcupacion ocupacion = new CatalogoOcupacion();
+        ocupacion.setNombre("Docente");
+        titular.getPerfilTitular().setOcupacion(ocupacion);
+        PersonaDTO dto = datos(1);
+        dto.setCorreos(List.of("NUEVO@example.com"));
+        when(usuarios.existsByIdPersonaAndRol(7L, "ROLE_ADMIN")).thenReturn(true);
+
+        var fila = service.actualizar(7L, dto);
+
+        assertEquals(7L, fila.id());
+        assertEquals(dto.getNombre(), fila.nombre());
+        assertEquals(List.of("nuevo@example.com"), fila.correos());
+        assertEquals("Ciudad de prueba", fila.direcciones().getFirst().municipio());
+        assertFalse(fila.puedeEliminar());
+        verify(personas, never()).findByPerfilTitularIsNotNullAndPerfilTitularFechaBajaIsNull();
+        verify(personas, never()).findAll();
+    }
+
     @Test void consultaSoloElTitularSolicitado() {
         Persona titular = persona(7, true);
         CatalogoOcupacion ocupacion = new CatalogoOcupacion();

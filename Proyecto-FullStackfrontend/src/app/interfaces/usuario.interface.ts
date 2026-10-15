@@ -35,7 +35,16 @@ export interface Usuario extends PersonaResumen {
   contactosEmergencia?: ContactoEmergencia[];
 }
 
-export interface Resultado { ok: boolean; }
+export interface Resultado { ok: boolean; persona?: Partial<Usuario>; }
+
+/** Identifica los cambios personales; datosPersistidos indica que proceden del backend. */
+export interface CambioPersona {
+  id: number;
+  nombre?: string;
+  apellido?: string;
+  correos?: string[];
+  datosPersistidos: boolean;
+}
 export interface Resumen {
   total: number;
   conCorreo: number;

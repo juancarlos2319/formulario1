@@ -79,7 +79,7 @@ La última verificación pasó con paquete inicial aproximado de 1.01 MB y estil
 npm.cmd test -- --watch=false --browsers=ChromeHeadless
 ```
 
-La suite usa Jasmine/Karma, HttpTestingController y pruebas de componentes standalone. En esta revisión: **86 pruebas aprobadas**, salida 0. Se comprobaron respuestas HTTP simuladas, invalidación de cachés, guards/flujos de sesión, formularios, navegación, feedback y timeout/errores del interceptor.
+La suite usa Jasmine/Karma, HttpTestingController y pruebas de componentes standalone. En esta revisión: **94 pruebas aprobadas**, salida 0. Se comprobaron respuestas HTTP simuladas, invalidación de cachés, guards/flujos de sesión, formularios, navegación, feedback y timeout/errores del interceptor.
 
 No hay script E2E, configuración Playwright/Cypress ni prueba de todos los flujos conectados a una base real. Una prueba de componentes no verifica el contrato efectivo Spring/Jackson/PostgreSQL. Existe una verificación visual previa del login en Chrome; no equivale a cobertura visual de todas las resoluciones/pantallas.
 
@@ -102,10 +102,12 @@ No cambiar variables de entorno de usuario/sistema como HOME para corregir este 
 | --- | --- |
 | `JwtUtilTest` | 1 aprobada |
 | `CuentaServiceTest` | 7 aprobadas |
-| `PersonaContratosTest` | 4 aprobadas |
-| `RegistroCompletoTest` | 27 aprobadas |
-| `DemoApplicationTests` | 13 omitidas por falta de base de integración |
-| Total Surefire | 52 reportadas, 39 ejecutadas, 13 omitidas, 0 fallos/errores |
+| `PersonaContratosTest` | 5 aprobadas |
+| `RegistroCompletoTest` | 30 aprobadas |
+| `DemoApplicationTests` | 13 excluidas expresamente; sin integración |
+| Total Surefire de la selección unitaria | 43 reportadas/ejecutadas, 0 fallos/errores; integración no incluida |
+
+Para reproducir la selección unitaria, añadir `"-Dtest=JwtUtilTest,CuentaServiceTest,PersonaContratosTest,RegistroCompletoTest"` a `mvnw.cmd test`. Esta selección no inicia DemoApplicationTests aunque haya variables TEST_DATABASE_* presentes.
 
 Las trazas ERROR de casos negativos de contactos aparecen durante la suite por el logger del servicio; no indican por sí mismas una prueba fallida. Hay warnings de deprecación/adjunción de agente Mockito; la ejecución terminó en BUILD SUCCESS.
 

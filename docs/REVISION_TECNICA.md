@@ -5,8 +5,8 @@ Revisión del 15 de octubre de 2026 sobre el código versionado. Los hallazgos s
 ## Resultados comprobados
 
 - `npm.cmd run build`: aprobado; conserva warnings de presupuesto inicial/CSS.
-- Angular/Karma/ChromeHeadless: 86 pruebas aprobadas.
-- Maven: 52 reportadas, 39 ejecutadas y aprobadas, 13 integraciones omitidas.
+- Angular/Karma/ChromeHeadless: 94 pruebas aprobadas.
+- Maven: 43 unitarias seleccionadas, ejecutadas y aprobadas; 13 integraciones excluidas expresamente.
 - Login: verificación visual previa con tema Material activo, controles de 56 px y botón de 49 px. No hay auditoría visual completa.
 - No se usó ni vació la base de desarrollo para esta revisión.
 
@@ -49,5 +49,7 @@ Las prioridades indican impacto potencial para futuras tareas; no son una certif
 ## Cobertura y tareas pendientes de validación
 
 La suite usa mocks y pruebas HTTP simuladas; las pruebas de integración no se ejecutaron. Quedan sin comprobación empírica: serialización real de errores de Spring Security, URLs fuera de localhost, CORS del proveedor postal, persistencia y rollback con PostgreSQL, concurrencia de reactivaciones, planes de consulta, flujo completo en navegador con backend real y revisión de accesibilidad.
+
+La actualización selectiva del listado se verificó con respuestas HTTP simuladas: reemplazo por ID, conservación de otras filas/detalles, ediciones sucesivas, petición inicial tardía y escritura de una sesión anterior. El encabezado se comprobó con cambios propios/ajenos, campos no visibles, contacto compartido, guardado fallido y perfil antiguo pendiente.
 
 Los números de pruebas se documentan con fecha y no deben copiarse indefinidamente. Los manifiestos de la guía tienen hashes/line numbers para identificar la revisión exacta; después de cambiar fuentes, regenerarlos.

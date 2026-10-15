@@ -16,7 +16,7 @@ import java.util.List;
 @CrossOrigin(
         origins = "http://localhost:4200",
         allowedHeaders = "*",
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE, RequestMethod.OPTIONS}
 )
 public class PersonaController {
     /** Consulta coincidencias por comunicaciones antes de reutilizar una persona. */
@@ -113,12 +113,12 @@ public class PersonaController {
         }
     }
 
-    /** Actualiza el titular indicado y traduce los errores según el contrato HTTP. */
+    /** Actualiza el titular y devuelve su resumen para reemplazar únicamente la fila editada. */
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarPersona(@PathVariable Long id, @RequestBody PersonaDTO dto) {
         try {
-            personaService.actualizar(id, dto);
-            return ResponseEntity.ok(new ResultadoDTO(true));
+            PersonaResumenDTO persona = personaService.actualizar(id, dto);
+            return ResponseEntity.ok(new com.example.demo.dto.PersonaActualizadaDTO(true, persona));
         } catch (org.springframework.web.server.ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (IllegalArgumentException e) {
@@ -126,6 +126,13 @@ public class PersonaController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    /** Recibe y devuelve solo los campos editados. */
+    @PatchMapping("/{id}")
+    public java.util.Map<String, Object> actualizarParcial(@PathVariable Long id,
+            @RequestBody com.example.demo.dto.PersonaParcialDTO cambios) {
+        return java.util.Map.of("ok", true, "persona", personaService.actualizarParcial(id, cambios));
     }
 
     /** Aplica la baja lógica y devuelve 204 sin cuerpo cuando se completa. */

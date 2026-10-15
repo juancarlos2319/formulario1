@@ -43,7 +43,7 @@ No existe `@ControllerAdvice` propio ni un formato único de error. Las entidade
 
 Las colecciones de personas usan cascada y `orphanRemoval`; en relaciones de emergencia, borrar el vínculo no aplica cascada REMOVE a la persona referenciada. La limpieza explícita ejecuta `eliminarContactoSinReferencias` después de `saveAndFlush`, dentro de la transacción.
 
-Operaciones de escritura de `PersonaService` y `CuentaService` usan `@Transactional`; las lecturas principales usan `readOnly=true`. Ante una excepción no controlada dentro de una transacción se revierte la unidad de trabajo. Las confirmaciones HTTP no contienen la entidad resultante.
+Operaciones de escritura de `PersonaService` y `CuentaService` usan `@Transactional`; las lecturas principales usan `readOnly=true`. Ante una excepción no controlada dentro de una transacción se revierte la unidad de trabajo. Las escrituras confirman el resultado; PUT del titular también devuelve su PersonaResumenDTO para actualizar una fila sin consultar el listado completo.
 
 `guardar` y `guardarContactos` adquieren `pg_advisory_xact_lock(74192301)`: un bloqueo global transaccional para serializar esos caminos de alta/sustitución/limpieza. No está presente en `reactivar` ni `actualizar`. Por tanto, no se debe describir el límite de 20 como protegido en todos los caminos concurrentes.
 
@@ -84,7 +84,7 @@ El login busca `Usuario` por `username`, compara BCrypt y genera JWT HS256 con `
 
 Hay tres mecanismos de invalidación local: temporizador de vencimiento, evento `storage` y revisión del token en `localStorage` cada 250 ms. Este intervalo no realiza HTTP. Cambiar/cerrar sesión limpia perfil, consultas de cuenta, borrador y cachés de `PersonasService`.
 
-El perfil se usa desde el login; al recargar, `/api/auth/me` lo recupera. Un guardado exitoso de personas o contactos emite `datosPersonalesActualizados$` y refresca el header. `revisionCuenta` y comparación de token evitan que una respuesta anterior sobrescriba el perfil vigente.
+El perfil se usa desde el login; al recargar, `/api/auth/me` lo recupera. Los cambios emiten `datosPersonalesActualizados$` con el ID afectado. AuthService compara ese ID con `usuarioActual.idPersona` y comprueba nombre completo/correo principal. Para un titular combina los campos persistidos del PATCH y aplica el perfil localmente, sin GET `/auth/me`; para un contacto compartido solo consulta el perfil si el cambio personal corresponde a la cuenta activa. Cambios de otra persona, dirección, teléfono, ocupación o correo secundario no refrescan el encabezado. `revisionCuenta` y comparación de token evitan que una respuesta anterior sobrescriba el perfil vigente.
 
 `jwtInterceptor` afecta únicamente a URLs cuyo prefijo es `http://localhost:8080/api/`. Añade Bearer cuando existe token, aplica `timeout({each:15000})` y convierte TimeoutError a `HttpErrorResponse` con estado 0. Ante 401, 0 o 500–599 cierra sesión si el token actual coincide con el capturado al iniciar la solicitud. Propaga el error al consumidor. 400/403/404/409/422 no cierran sesión. Una caída no se detecta mientras no haya peticiones, y una respuesta obtenida de caché no prueba disponibilidad del backend.
 
@@ -92,12 +92,14 @@ El perfil se usa desde el login; al recargar, `/api/auth/me` lo recupera. Un gua
 
 | Consulta | Persistencia | Deduplicación e invalidación |
 | --- | --- | --- |
-| Listado activo/inactivo y `/{id}/detalles` | Map en memoria, sin TTL | `shareReplay(1)`, `refCount:false`; se limpia tras alta, actualización, baja, reactivación, cambio de contactos y cambio de sesión; errores eliminan la entrada |
+| Listado activo/inactivo y `/{id}/detalles` | Map en memoria, sin TTL | `shareReplay(1)`, `refCount:false`; edición de titular mantiene listados con una capa de filas actualizadas por ID y combina los campos modificados de sus detalles; alta, baja, reactivación, contactos y sesión limpian la caché completa; errores eliminan la entrada |
 | `/{id}` para editar | Solo mientras la petición está pendiente | Map `solicitudes`, `finalize` elimina URL, `refCount:true`; no conserva la respuesta para futuras consultas |
 | `/resumen` y `/ocupaciones` | Solo solicitudes pendientes | Mismo mecanismo anterior |
 | `/{id}/contactos` | TTL de 30 s desde creación de la entrada | `shareReplay`, `refCount:false`; se limpia al actualizar personas/contactos o sesión; error elimina entrada |
 | `/parentescos` | Memoria por sesión | `shareReplay`, sin TTL; se limpia al cambiar sesión o fallar |
 | `/auth/me` | Señal del perfil y observable compartido | Revisión de cuenta/token al actualizar; limpia al cambiar sesión |
+
+La capa `filasActualizadas` mantiene solo la versión más reciente por ID y se aplica al leer listados; evita cadenas de observables acumuladas y también cubre peticiones iniciales que terminen después del guardado. Las respuestas de escrituras iniciadas en otra sesión se descartan mediante `revisionSesion`. La señal del perfil compara ID/nombre/correo y no notifica por objetos equivalentes.
 
 No hay IndexedDB, Service Worker, sincronización en tiempo real ni invalidación entre navegadores distintos. La invalidación elimina referencias del Map; no cancela automáticamente observables HTTP anteriores. Ver los límites de concurrencia y caché en la revisión técnica.
 
@@ -106,3 +108,5 @@ No hay IndexedDB, Service Worker, sincronización en tiempo real ni invalidació
 `styles.scss` importa el tema con `@use './material-typography'`. El tema Material 3 mantiene Azure/Blue, agrega Sora para títulos y Plus Jakarta Sans para texto, e incluye solo los módulos usados. Las variables `--app-font-*` unifican estilos locales; IBM Plex Mono se reserva para estadísticas y campos numéricos. `index.html` carga Google Fonts con `display=swap`, preconnect y familias de respaldo.
 
 El feedback usa señales, avisos temporizados de 5 s y `<dialog>` nativo con `showModal()`, no `MatDialog`. El login y dashboard usan animaciones Angular y respetan `prefers-reduced-motion`. Formularios incluyen etiquetas, errores, estados de carga y atributos ARIA. Hay vistas móviles para Personas, Desactivadas y Contactos; la revisión de código no equivale a una auditoría de accesibilidad completa.
+
+Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.
