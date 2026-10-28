@@ -11,22 +11,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-inicio',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule],
-  templateUrl: './inicio.component.html',
-  styleUrls: ['./inicio.component.css'],
-  animations: [
-    trigger('entrada', [
-      state('oculto', style({ opacity: 0, transform: 'translateY({{desplazamiento}})' }),
-        { params: { desplazamiento: '10px' } }),
-      state('visible', style({ opacity: 1, transform: 'translateY(0)' })),
-      transition('oculto => visible', [
-        animate('{{duracion}}ms {{retraso}}ms cubic-bezier(0.2, 0, 0, 1)',
-          style({ opacity: 1, transform: 'translateY(0)' }))
-      ], { params: { retraso: 0, duracion: 450, desplazamiento: '10px' } })
-    ])
-  ]
+    selector: 'app-inicio',
+    imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule],
+    templateUrl: './inicio.component.html',
+    styleUrls: ['./inicio.component.css'],
+    animations: [
+        trigger('entrada', [
+            state('oculto', style({ opacity: 0, transform: 'translateY({{desplazamiento}})' }), { params: { desplazamiento: '10px' } }),
+            state('visible', style({ opacity: 1, transform: 'translateY(0)' })),
+            transition('oculto => visible', [
+                animate('{{duracion}}ms {{retraso}}ms cubic-bezier(0.2, 0, 0, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+            ], { params: { retraso: 0, duracion: 450, desplazamiento: '10px' } })
+        ])
+    ]
 })
 export class InicioComponent implements OnInit, OnDestroy {
   private temporizadorEntrada?: ReturnType<typeof setTimeout>;

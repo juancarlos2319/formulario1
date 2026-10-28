@@ -13,11 +13,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 
 @Component({
-  selector: 'app-personas',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
-  templateUrl: './personas.component.html',
-  styleUrls: ['../shared/admin-pages.css', './personas.component.css']
+    selector: 'app-personas',
+    imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
+    templateUrl: './personas.component.html',
+    styleUrls: ['../shared/admin-pages.css', './personas.component.css']
 })
 export class PersonasComponent implements OnInit {
   private registroService = inject(PersonasService);

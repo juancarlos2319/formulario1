@@ -10,17 +10,15 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['../shared/admin-pages.css', './dashboard.component.css'],
-  animations: [trigger('entradaDashboard', [
-    state('oculto', style({ opacity: 0, transform: 'scale({{escala}})' }), { params: { escala: 0.99 } }),
-    state('visible', style({ opacity: 1, transform: 'scale(1)' })),
-    transition('oculto => visible', animate('{{duracion}}ms {{retraso}}ms cubic-bezier(0.2,0,0,1)'),
-      { params: { duracion: 280, retraso: 0 } })
-  ])]
+    selector: 'app-dashboard',
+    imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['../shared/admin-pages.css', './dashboard.component.css'],
+    animations: [trigger('entradaDashboard', [
+            state('oculto', style({ opacity: 0, transform: 'scale({{escala}})' }), { params: { escala: 0.99 } }),
+            state('visible', style({ opacity: 1, transform: 'scale(1)' })),
+            transition('oculto => visible', animate('{{duracion}}ms {{retraso}}ms cubic-bezier(0.2,0,0,1)'), { params: { duracion: 280, retraso: 0 } })
+        ])]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private temporizadorCabecera?: ReturnType<typeof setTimeout>;

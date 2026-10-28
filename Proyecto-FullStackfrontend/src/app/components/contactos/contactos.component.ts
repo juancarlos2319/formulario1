@@ -13,12 +13,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-contactos',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
-  templateUrl: './contactos.component.html',
-  styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
+    selector: 'app-contactos',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+    templateUrl: './contactos.component.html',
+    styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
 })
 export class ContactosComponent implements OnInit, OnDestroy {
   readonly guardando = signal(false);

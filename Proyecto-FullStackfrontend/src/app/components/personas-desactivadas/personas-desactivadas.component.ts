@@ -13,11 +13,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
 @Component({
-  selector: 'app-personas-desactivadas',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
-  templateUrl: './personas-desactivadas.component.html',
-  styleUrls: ['../shared/admin-pages.css', './personas-desactivadas.component.css']
+    selector: 'app-personas-desactivadas',
+    imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
+    templateUrl: './personas-desactivadas.component.html',
+    styleUrls: ['../shared/admin-pages.css', './personas-desactivadas.component.css']
 })
 export class PersonasDesactivadasComponent implements OnInit {
   private readonly registroService = inject(PersonasService);

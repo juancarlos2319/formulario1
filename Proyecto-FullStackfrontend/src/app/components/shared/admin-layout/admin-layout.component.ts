@@ -11,11 +11,10 @@ import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-admin-layout',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
-  templateUrl: './admin-layout.component.html',
-  styleUrl: './admin-layout.component.css'
+    selector: 'app-admin-layout',
+    imports: [CommonModule, RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
+    templateUrl: './admin-layout.component.html',
+    styleUrl: './admin-layout.component.css'
 })
 export class AdminLayoutComponent implements OnInit {
   /** Adapta el modo del menú al breakpoint de pantalla. */

@@ -11,11 +11,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 
 @Component({
-  selector: 'app-contactos-lista',
-  standalone: true,
-  imports: [CommonModule, RouterLink, MatButtonModule, MatCardModule, MatProgressBarModule, MatTableModule],
-  templateUrl: './contactos-lista.component.html',
-  styleUrls: ['../shared/admin-pages.css', './contactos-lista.component.css']
+    selector: 'app-contactos-lista',
+    imports: [CommonModule, RouterLink, MatButtonModule, MatCardModule, MatProgressBarModule, MatTableModule],
+    templateUrl: './contactos-lista.component.html',
+    styleUrls: ['../shared/admin-pages.css', './contactos-lista.component.css']
 })
 export class ContactosListaComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

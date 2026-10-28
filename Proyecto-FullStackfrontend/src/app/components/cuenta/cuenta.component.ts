@@ -11,9 +11,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
-  selector: 'app-cuenta', standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
-  templateUrl: './cuenta.component.html', styleUrl: './cuenta.component.css'
+    selector: 'app-cuenta',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
+    templateUrl: './cuenta.component.html', styleUrl: './cuenta.component.css'
 })
 export class CuentaComponent implements OnInit {
   private auth = inject(AuthService);
