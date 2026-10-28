@@ -1,18 +1,26 @@
 <section class="welcome" [@entradaDashboard]="{ value: cabeceraVisible() ? 'visible' : 'oculto', params: entradas[0] }">
   <div><p class="eyebrow">{{ fecha }}</p><h1>Tu comunidad, en un solo lugar</h1><p>Consulta y administra la información de las personas registradas.</p></div>
-  <a mat-flat-button *ngIf="!cargando() && !mensajeError() && lugaresDisponibles > 0" class="register-action" routerLink="/registro">＋ Registrar persona</a>
+  @if (!cargando() && !mensajeError() && lugaresDisponibles > 0) {
+    <a mat-flat-button class="register-action" routerLink="/registro">＋ Registrar persona</a>
+  }
 </section>
-<mat-card *ngIf="mensajeError()" appearance="outlined" class="error" role="alert">
-  <mat-card-content class="notice">{{ mensajeError() }} <button mat-button type="button" (click)="cargarUsuarios()" [disabled]="cargando()">Reintentar</button></mat-card-content>
-</mat-card>
-<div *ngIf="cargando()" class="loading" role="status">
-  <p>Cargando información de tu comunidad…</p>
-  <mat-progress-bar mode="indeterminate" aria-label="Cargando resumen"></mat-progress-bar>
-</div>
-<ng-container *ngIf="!cargando() && (!mensajeError() || resumen().total > 0)">
-  <mat-card *ngIf="lugaresDisponibles === 0" appearance="outlined" role="status" class="capacity-notice">
-    <mat-card-content>Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</mat-card-content>
+@if (mensajeError()) {
+  <mat-card appearance="outlined" class="error" role="alert">
+    <mat-card-content class="notice">{{ mensajeError() }} <button mat-button type="button" (click)="cargarUsuarios()" [disabled]="cargando()">Reintentar</button></mat-card-content>
   </mat-card>
+}
+@if (cargando()) {
+  <div class="loading" role="status">
+    <p>Cargando información de tu comunidad…</p>
+    <mat-progress-bar mode="indeterminate" aria-label="Cargando resumen"></mat-progress-bar>
+  </div>
+}
+@if (!cargando() && (!mensajeError() || resumen().total > 0)) {
+  @if (lugaresDisponibles === 0) {
+    <mat-card appearance="outlined" role="status" class="capacity-notice">
+      <mat-card-content>Se ha alcanzado el límite de 20 personas. Puedes consultar y editar los registros existentes.</mat-card-content>
+    </mat-card>
+  }
   <section class="stats" aria-label="Resumen de registros">
     <mat-card appearance="outlined" class="panel" [@entradaDashboard]="{ value: contenidoVisible() ? 'visible' : 'oculto', params: entradas[1] }"><mat-card-content><span class="tile" aria-hidden="true">♙</span><p>Total de personas</p><strong class="stat-value">{{ resumen().total }}</strong><small>Registros en el sistema</small></mat-card-content></mat-card>
     <mat-card appearance="outlined" class="panel" [@entradaDashboard]="{ value: contenidoVisible() ? 'visible' : 'oculto', params: entradas[2] }"><mat-card-content><span class="tile green" aria-hidden="true">＠</span><p>Con correo electrónico</p><strong class="stat-value">{{ conEmail }}</strong><small>Personas con email registrado</small></mat-card-content></mat-card>
@@ -22,19 +30,25 @@
   <section class="overview">
     <mat-card appearance="outlined" class="panel distribution" [@entradaDashboard]="{ value: contenidoVisible() ? 'visible' : 'oculto', params: entradas[5] }"><mat-card-content>
       <h2>Tu comunidad por ocupación</h2><p class="muted">Las cinco ocupaciones con más registros</p>
-      <div *ngFor="let grupo of ocupaciones" class="bar-row">
-        <div><span>{{ grupo.nombre }}</span><strong class="app-numeric">{{ grupo.cantidad }}</strong></div>
-        <mat-progress-bar mode="determinate" [value]="grupo.porcentaje" [attr.aria-label]="'Porcentaje de personas con ocupación ' + grupo.nombre"></mat-progress-bar>
-      </div>
-      <p *ngIf="!resumen().total" class="empty">El resumen aparecerá cuando registres a tu primera persona.</p>
+      @for (grupo of ocupaciones; track grupo) {
+        <div class="bar-row">
+          <div><span>{{ grupo.nombre }}</span><strong class="app-numeric">{{ grupo.cantidad }}</strong></div>
+          <mat-progress-bar mode="determinate" [value]="grupo.porcentaje" [attr.aria-label]="'Porcentaje de personas con ocupación ' + grupo.nombre"></mat-progress-bar>
+        </div>
+      }
+      @if (!resumen().total) {
+        <p class="empty">El resumen aparecerá cuando registres a tu primera persona.</p>
+      }
     </mat-card-content></mat-card>
     <mat-card appearance="outlined" class="panel quick" [@entradaDashboard]="{ value: contenidoVisible() ? 'visible' : 'oculto', params: entradas[6] }"><mat-card-content>
       <h2>Acciones rápidas</h2><p class="muted">Lo que necesitas, a un clic</p>
       <mat-nav-list aria-label="Acciones de personas">
-        <a mat-list-item *ngIf="lugaresDisponibles > 0" routerLink="/registro"><span matListItemIcon class="tile" aria-hidden="true">＋</span><span matListItemTitle>Nueva persona</span><span matListItemLine>Crear un registro completo</span><span matListItemMeta aria-hidden="true">→</span></a>
+        @if (lugaresDisponibles > 0) {
+          <a mat-list-item routerLink="/registro"><span matListItemIcon class="tile" aria-hidden="true">＋</span><span matListItemTitle>Nueva persona</span><span matListItemLine>Crear un registro completo</span><span matListItemMeta aria-hidden="true">→</span></a>
+        }
         <a mat-list-item routerLink="/personas"><span matListItemIcon class="tile green" aria-hidden="true">♙</span><span matListItemTitle>Consultar personas</span><span matListItemLine>Busca, edita y gestiona contactos</span><span matListItemMeta aria-hidden="true">→</span></a>
       </mat-nav-list>
       <button mat-stroked-button type="button" class="refresh-action" (click)="cargarUsuarios()" [disabled]="cargando()">↻ Actualizar resumen</button>
     </mat-card-content></mat-card>
   </section>
-</ng-container>
+}

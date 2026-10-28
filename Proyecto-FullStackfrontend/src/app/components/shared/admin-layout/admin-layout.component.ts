@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { finalize, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -12,7 +12,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
     selector: 'app-admin-layout',
-    imports: [CommonModule, RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
+    imports: [RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.css'
 })

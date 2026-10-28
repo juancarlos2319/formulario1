@@ -20,17 +20,27 @@
         <mat-form-field appearance="outline" class="field" [@entrada]="entradas[11]">
           <mat-label>Usuario</mat-label>
           <input matInput id="username" name="username" #usuario="ngModel" [(ngModel)]="credentials.username" placeholder="Escribe tu usuario" [attr.autocomplete]="usuarioActivado ? 'username' : 'off'" (focus)="usuarioActivado = true" autocapitalize="none" spellcheck="false" required [readonly]="isLoading || !usuarioActivado">
-          <mat-error *ngIf="usuario.hasError('required')">Escribe tu usuario.</mat-error>
+          @if (usuario.hasError('required')) {
+            <mat-error>Escribe tu usuario.</mat-error>
+          }
         </mat-form-field>
         <mat-form-field appearance="outline" class="field" [@entrada]="entradas[12]">
           <mat-label>Contraseña</mat-label>
           <input matInput id="password" name="password" #password="ngModel" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password" placeholder="Escribe tu contraseña" [attr.autocomplete]="passwordActivado ? 'current-password' : 'off'" (focus)="passwordActivado = true" required [readonly]="isLoading || !passwordActivado">
           <button mat-button matSuffix class="password-toggle" type="button" [disabled]="isLoading" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showPassword">{{ showPassword ? 'Ocultar' : 'Mostrar' }}</button>
-          <mat-error *ngIf="password.hasError('required')">Escribe tu contraseña.</mat-error>
+          @if (password.hasError('required')) {
+            <mat-error>Escribe tu contraseña.</mat-error>
+          }
         </mat-form-field>
-        <p *ngIf="errorMessage" class="error-alert" role="alert">{{ errorMessage }}</p>
+        @if (errorMessage) {
+          <p class="error-alert" role="alert">{{ errorMessage }}</p>
+        }
         <button mat-flat-button class="submit" [@entrada]="entradas[13]" type="submit" [disabled]="loginForm.invalid || isLoading">
-          <span class="submit-content"><mat-spinner *ngIf="isLoading" diameter="18" aria-hidden="true"></mat-spinner>{{ isLoading ? 'Ingresando…' : 'Iniciar sesión' }} <span *ngIf="!isLoading" aria-hidden="true">→</span></span>
+          <span class="submit-content">@if (isLoading) {
+            <mat-spinner diameter="18" aria-hidden="true"></mat-spinner>
+            }{{ isLoading ? 'Ingresando…' : 'Iniciar sesión' }} @if (!isLoading) {
+            <span aria-hidden="true">→</span>
+          }</span>
         </button>
         <span class="sr-only" role="status">{{ isLoading ? 'Validando tus credenciales' : '' }}</span>
       </form>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AbstractControl, ValidationErrors, FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, merge, of, debounceTime, map, tap, switchMap, catchError } from 'rxjs';
@@ -15,7 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 @Component({
     selector: 'app-contactos',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+    imports: [ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule],
     templateUrl: './contactos.component.html',
     styleUrls: ['../shared/admin-pages.css', './contactos.component.css']
 })

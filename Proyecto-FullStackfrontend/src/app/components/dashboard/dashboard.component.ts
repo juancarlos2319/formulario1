@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { Resumen } from '../../interfaces/usuario.interface';
@@ -11,7 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
+    imports: [RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
     templateUrl: './dashboard.component.html',
     styleUrls: ['../shared/admin-pages.css', './dashboard.component.css'],
     animations: [trigger('entradaDashboard', [
