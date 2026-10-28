@@ -6,7 +6,7 @@ header{position:sticky;top:0;z-index:10}
 .header-toolbar{min-height:76px;height:auto;padding:14px 32px;background:#fff;color:#302a42;border-bottom:1px solid #ecebf2;gap:16px;font:12px var(--app-font-body);white-space:normal}
 .page-title{min-width:0;overflow-wrap:anywhere}
 .muted{color:#928a9d}
-main{flex:1;width:100%;padding:30px;max-width:1600px;margin:auto;box-sizing:border-box}
+main{flex:1;width:100%;padding:clamp(24px,2.2vw,36px);max-width:none;margin:0;box-sizing:border-box}
 footer{text-align:center;font-size:11px;color:#a298ad;padding:0 15px 28px}
 .account{display:flex;align-items:center;gap:12px;min-width:0;margin-left:auto}
 .account-data{min-width:0;text-align:right}

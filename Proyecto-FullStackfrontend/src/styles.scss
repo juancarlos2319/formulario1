@@ -1,4 +1,7 @@
 @use './material-typography';
+@use '@angular/cdk' as cdk;
+
+@include cdk.a11y-visually-hidden();
 
 :root {
   --app-primary: #7155d9;

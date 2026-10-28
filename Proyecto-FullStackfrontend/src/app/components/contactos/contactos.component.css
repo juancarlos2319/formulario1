@@ -6,7 +6,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
-.form-wrapper{max-width:880px;margin:0 auto 24px;padding:24px;background:#fff;border:1px solid #eae8f0;border-radius:8px;box-shadow:none}
+.form-wrapper{width:min(100%,1100px);max-width:none;margin:0 auto 24px;padding:clamp(20px,2vw,32px);background:#fff;border:1px solid #eae8f0;border-radius:8px;box-shadow:none}
 .form-title{margin:0 0 18px;color:#302a42;font:700 16px var(--app-font-heading)}
 .card-section{margin:0 0 16px;padding:18px;border:1px solid #eae8f0;border-radius:8px;background:#faf9fc}
 .card-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}

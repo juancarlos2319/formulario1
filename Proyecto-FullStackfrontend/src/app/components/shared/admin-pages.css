@@ -15,7 +15,10 @@ small{display:block;color:var(--app-text-muted);font-size:11px;margin-top:5px}
 .muted{color:var(--app-text-muted);font-size:12px}
 
 
-.welcome{display:flex;justify-content:space-between;align-items:center;gap:var(--app-space-xl);margin-bottom:25px}
+.welcome{display:flex;justify-content:space-between;align-items:center;gap:var(--app-space-xl);margin-bottom:18px;padding:0 clamp(0px,1vw,14px)}
+.welcome .eyebrow{margin:0 0 4px}
+.welcome h1{font-size:clamp(23px,2vw,27px);line-height:1.2;margin:0 0 5px}
+.welcome>div>p:last-child{margin:0;line-height:1.45}
 h1{font:800 26px var(--app-font-heading);letter-spacing:-.8px;margin:10px 0}
 .welcome>div>p:last-child{color:var(--app-text-muted);font-size:13px}
 .primary{background:var(--app-primary);color:white;padding:13px 17px;border-radius:10px;white-space:nowrap;font-weight:600;font-size:12px}
@@ -27,6 +30,10 @@ button,.row-actions a{border:1px solid #e9e3f2;background:var(--app-primary-pale
 .notice,.empty{padding:var(--app-space-xl);text-align:center;color:#82748b}
 .error{color:#b34d64;background:#fff0f3;border-radius:var(--app-radius-md)}
 .notice button{margin-left:10px}
+
+/* Shared canvas rules: lists and panels can grow, while standalone forms keep
+   a readable measure and remain visually centered. */
+.panel{width:100%;min-width:0}
 
 @media(max-width:1150px){.welcome{align-items:flex-start;flex-direction:column}}
 @media(max-width:760px){h1{font-size:23px}.primary{width:100%;text-align:center}}
