@@ -5,7 +5,6 @@ import { AuthService } from '../../services/auth.service';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Subject } from 'rxjs';
-import { provideAnimations, provideNoopAnimations } from '@angular/platform-browser/animations';
 if (!window.matchMedia) {
     Object.defineProperty(window, 'matchMedia', {
         writable: true,
@@ -28,7 +27,6 @@ describe('InicioComponent', () => {
         await TestBed.configureTestingModule({
             imports: [InicioComponent],
             providers: [
-                provideNoopAnimations(),
                 { provide: AuthService, useValue: {
                         login: vi.fn().mockName("AuthService.login")
                     } },
@@ -130,87 +128,17 @@ describe('InicioComponent', () => {
         expect(password.readOnly).toBe(true);
     });
 });
-describe('InicioComponent: animación real de entrada', () => {
-    it('comprueba la preferencia real del navegador y la animación resultante', async () => {
-        await TestBed.configureTestingModule({ imports: [InicioComponent], providers: [provideAnimations(),
-                { provide: AuthService, useValue: {
-                        login: vi.fn().mockName("AuthService.login")
-                    } },
-                { provide: Router, useValue: {
-                        navigate: vi.fn().mockName("Router.navigate")
-                    } }
-            ] }).compileComponents();
+describe('InicioComponent: animaciones CSS de entrada', () => {
+    it('configura el escalonado y la duración de entrada', async () => {
+        await TestBed.configureTestingModule({ imports: [InicioComponent], providers: [
+            { provide: AuthService, useValue: { login: vi.fn() } },
+            { provide: Router, useValue: { navigate: vi.fn() } }
+        ] }).compileComponents();
         const fixture = TestBed.createComponent(InicioComponent);
         fixture.detectChanges();
-        await new Promise<void>(resolve => setTimeout(resolve, 200));
-        fixture.detectChanges();
-        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
-        const tarjeta: HTMLElement = fixture.nativeElement.querySelector('.field');
-        const animacionesTarjeta = webAnimations(tarjeta);
-        if (fixture.componentInstance.movimientoReducido) {
-            expect(fixture.componentInstance.entradas[11].params.desplazamiento).toBe('0px');
-            expect(fixture.componentInstance.entradas[11].params.duracion).toBe(250);
-        }
-        const password = fixture.nativeElement.querySelectorAll('.field')[1] as HTMLElement;
-        const boton = fixture.nativeElement.querySelector('.submit') as HTMLElement;
-        const animacionesPassword = webAnimations(password);
-        const animacionesBoton = webAnimations(boton);
-        if (animacionesTarjeta.length && animacionesPassword.length && animacionesBoton.length) {
-            const finUsuario = animacionesTarjeta[0].effect!.getComputedTiming().endTime;
-            const finPassword = animacionesPassword[0].effect!.getComputedTiming().endTime;
-            const finBoton = animacionesBoton[0].effect!.getComputedTiming().endTime;
-            expect(Number(finPassword)).toBeGreaterThan(Number(finUsuario));
-            expect(Number(finBoton)).toBeGreaterThan(Number(finPassword));
-        }
-        await fixture.whenRenderingDone();
-    });
-    it('ejecuta la entrada en el primer render y deja el formulario visible al finalizar', async () => {
-        vi.spyOn(window, 'matchMedia').mockImplementation(query => ({ matches: false, media: query, onchange: null, addListener: () => { }, removeListener: () => { }, addEventListener: () => { }, removeEventListener: () => { }, dispatchEvent: () => true } as MediaQueryList));
-        await TestBed.configureTestingModule({ imports: [InicioComponent], providers: [provideAnimations(),
-                { provide: AuthService, useValue: {
-                        login: vi.fn().mockName("AuthService.login")
-                    } },
-                { provide: Router, useValue: {
-                        navigate: vi.fn().mockName("Router.navigate")
-                    } }
-            ] }).compileComponents();
-        const fixture = TestBed.createComponent(InicioComponent);
-        fixture.detectChanges();
-        await new Promise<void>(resolve => setTimeout(resolve, 200));
-        fixture.detectChanges();
-        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
-        const tarjeta: HTMLElement = fixture.nativeElement.querySelector('.field');
-        const animaciones = webAnimations(tarjeta);
-        if (animaciones.length) {
-            expect(animaciones.some(animacion => Number(animacion.effect?.getTiming().duration) >= 450)).toBe(true);
-            expect(animaciones.some(animacion => (animacion.effect as KeyframeEffect).getKeyframes()
-                .some(fotograma => Number(fotograma['opacity']) === 0))).toBe(true);
-        } else {
-            expect(fixture.componentInstance.entradas[0].params.duracion).toBe(450);
-        }
-        await fixture.whenRenderingDone();
-        expect(fixture.componentInstance.entradas[0].params.duracion).toBe(450);
-    });
-});
-const webAnimations = (element: HTMLElement): Animation[] => element.getAnimations?.() ?? [];
-describe('InicioComponent: entrada desde el router', () => {
-    it('anima al navegar al login después de renderizar la ruta', async () => {
-        await TestBed.configureTestingModule({ providers: [provideAnimations(),
-                provideRouter([{ path: 'inicio', component: InicioComponent }]),
-                { provide: AuthService, useValue: {
-                        login: vi.fn().mockName("AuthService.login")
-                    } }
-            ] }).compileComponents();
-        const harness = await RouterTestingHarness.create();
-        const component = await harness.navigateByUrl('/inicio', InicioComponent);
-        expect(component.entradas[11].value).toBe('oculto');
-        await new Promise<void>(resolve => setTimeout(resolve, 200));
-        harness.detectChanges();
-        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
-        expect(component.entradas[11].value).toBe('visible');
-        const tarjeta = harness.routeNativeElement!.querySelector('.field') as HTMLElement;
-        const animacionesTarjeta = webAnimations(tarjeta);
-        await harness.fixture.whenRenderingDone();
-        expect(component.entradas[11].value).toBe('visible');
+        const campos = fixture.nativeElement.querySelectorAll('.field') as NodeListOf<HTMLElement>;
+        expect(campos[0].style.getPropertyValue('--entrada-retraso')).toBe('480ms');
+        expect(campos[1].style.getPropertyValue('--entrada-retraso')).toBe('600ms');
+        expect(campos[0].style.getPropertyValue('--entrada-duracion')).toBe(`${fixture.componentInstance.duracionEntrada}ms`);
     });
 });

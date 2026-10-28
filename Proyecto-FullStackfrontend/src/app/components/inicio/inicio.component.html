@@ -1,30 +1,30 @@
 <div class="login-shell">
   <section class="intro">
-    <div class="brand" [@entrada]="entradas[0]"><span class="brand-mark">P</span>Portal<span>System</span></div>
+    <div class="brand" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[0]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'"><span class="brand-mark">P</span>Portal<span>System</span></div>
     <div class="intro-copy">
-      <span class="eyebrow" [@entrada]="entradas[1]">TU ESPACIO DE ADMINISTRACIÓN</span>
-      <h1 [@entrada]="entradas[2]">Las personas,<br>en el centro<br>de todo.</h1>
-      <p [@entrada]="entradas[3]">Organiza tus registros y mantén la información de tu comunidad en un solo lugar.</p>
-      <div class="feature" [@entrada]="entradas[4]"><span aria-hidden="true">✓</span><div><strong>Información organizada</strong><small>Personas, datos y contactos a tu alcance.</small></div></div>
-      <div class="feature" [@entrada]="entradas[5]"><span aria-hidden="true">✓</span><div><strong>Una gestión más sencilla</strong><small>Consulta y actualiza tus registros fácilmente.</small></div></div>
+      <span class="eyebrow" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[1]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">TU ESPACIO DE ADMINISTRACIÓN</span>
+      <h1 [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[2]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">Las personas,<br>en el centro<br>de todo.</h1>
+      <p [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[3]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">Organiza tus registros y mantén la información de tu comunidad en un solo lugar.</p>
+      <div class="feature" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[4]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'"><span aria-hidden="true">✓</span><div><strong>Información organizada</strong><small>Personas, datos y contactos a tu alcance.</small></div></div>
+      <div class="feature" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[5]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'"><span aria-hidden="true">✓</span><div><strong>Una gestión más sencilla</strong><small>Consulta y actualiza tus registros fácilmente.</small></div></div>
     </div>
-    <span class="intro-footer" [@entrada]="entradas[6]">Conecta. Organiza. Administra.</span>
+    <span class="intro-footer" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[6]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">Conecta. Organiza. Administra.</span>
   </section>
   <section class="access" aria-labelledby="login-title">
     <div class="login-card">
-      <span class="access-icon" [@entrada]="entradas[7]" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span>
-      <span class="eyebrow" [@entrada]="entradas[8]">BIENVENIDO DE NUEVO</span>
-      <h2 id="login-title" [@entrada]="entradas[9]">Inicia sesión</h2>
-      <p class="description" [@entrada]="entradas[10]">Ingresa tus credenciales para acceder a tu panel de administración.</p>
+      <span class="access-icon" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[7]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span>
+      <span class="eyebrow" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[8]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">BIENVENIDO DE NUEVO</span>
+      <h2 id="login-title" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[9]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">Inicia sesión</h2>
+      <p class="description" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[10]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">Ingresa tus credenciales para acceder a tu panel de administración.</p>
       <form #loginForm="ngForm" (ngSubmit)="onLogin()" autocomplete="off" [attr.aria-busy]="isLoading">
-        <mat-form-field appearance="outline" class="field" [@entrada]="entradas[11]">
+        <mat-form-field appearance="outline" class="field" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[11]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">
           <mat-label>Usuario</mat-label>
           <input matInput id="username" name="username" #usuario="ngModel" [(ngModel)]="credentials.username" placeholder="Escribe tu usuario" [attr.autocomplete]="usuarioActivado ? 'username' : 'off'" (focus)="usuarioActivado = true" autocapitalize="none" spellcheck="false" required [readonly]="isLoading || !usuarioActivado">
           @if (usuario.hasError('required')) {
             <mat-error>Escribe tu usuario.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline" class="field" [@entrada]="entradas[12]">
+        <mat-form-field appearance="outline" class="field" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[12]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">
           <mat-label>Contraseña</mat-label>
           <input matInput id="password" name="password" #password="ngModel" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="credentials.password" placeholder="Escribe tu contraseña" [attr.autocomplete]="passwordActivado ? 'current-password' : 'off'" (focus)="passwordActivado = true" required [readonly]="isLoading || !passwordActivado">
           <button mat-button matSuffix class="password-toggle" type="button" [disabled]="isLoading" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="showPassword">{{ showPassword ? 'Ocultar' : 'Mostrar' }}</button>
@@ -35,7 +35,7 @@
         @if (errorMessage) {
           <p class="error-alert" role="alert">{{ errorMessage }}</p>
         }
-        <button mat-flat-button class="submit" [@entrada]="entradas[13]" type="submit" [disabled]="loginForm.invalid || isLoading">
+        <button mat-flat-button class="submit" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[13]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'" type="submit" [disabled]="loginForm.invalid || isLoading">
           <span class="submit-content">@if (isLoading) {
             <mat-spinner diameter="18" aria-hidden="true"></mat-spinner>
             }{{ isLoading ? 'Ingresando…' : 'Iniciar sesión' }} @if (!isLoading) {
@@ -44,8 +44,8 @@
         </button>
         <span class="sr-only" role="status">{{ isLoading ? 'Validando tus credenciales' : '' }}</span>
       </form>
-      <p class="help" [@entrada]="entradas[14]">¿Necesitas acceso?<br><span>Contacta al administrador de tu organización.</span></p>
+      <p class="help" [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[14]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">¿Necesitas acceso?<br><span>Contacta al administrador de tu organización.</span></p>
     </div>
-    <footer [@entrada]="entradas[15]">PortalSystem · Administración de personas</footer>
+    <footer [animate.enter]="'login-enter'" [style.--entrada-retraso.ms]="retrasosEntrada[15]" [style.--entrada-duracion.ms]="duracionEntrada" [style.--entrada-desplazamiento]="movimientoReducido ? '0px' : '10px'">PortalSystem · Administración de personas</footer>
   </section>
 </div>

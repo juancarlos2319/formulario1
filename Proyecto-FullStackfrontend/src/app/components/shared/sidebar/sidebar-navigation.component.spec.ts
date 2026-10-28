@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { SidebarComponent } from './sidebar.component';
 import { AuthService } from '../../../services/auth.service';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 @Component({ standalone: true, changeDetection: ChangeDetectionStrategy.Eager,
     template: '' })
@@ -13,7 +12,6 @@ class PaginaPrueba {
 describe('SidebarComponent: edición de persona', () => {
     it('activa el subapartado de edición y reserva Registro para las altas', async () => {
         await TestBed.configureTestingModule({ imports: [SidebarComponent], providers: [
-                provideNoopAnimations(),
                 provideRouter([{ path: 'registro', component: PaginaPrueba },
                     { path: 'registro/:id', component: PaginaPrueba }, { path: 'personas', component: PaginaPrueba }]),
                 { provide: AuthService, useValue: { logout: () => { } } }

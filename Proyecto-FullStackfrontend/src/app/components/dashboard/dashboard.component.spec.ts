@@ -5,7 +5,6 @@ import { DashboardComponent } from './dashboard.component';
 import { PersonasService } from '../../services/personas.service';
 import { Resumen } from '../../interfaces/usuario.interface';
 import { provideRouter } from '@angular/router';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, Subject } from 'rxjs';
 
 describe('DashboardComponent', () => {
@@ -39,7 +38,7 @@ describe('DashboardComponent', () => {
         servicio.obtenerResumen.mockReturnValue(respuesta);
         await TestBed.configureTestingModule({
             imports: [DashboardComponent],
-            providers: [provideRouter([]), provideNoopAnimations(), { provide: PersonasService, useValue: servicio }]
+            providers: [provideRouter([]), { provide: PersonasService, useValue: servicio }]
         })
             .compileComponents();
 

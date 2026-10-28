@@ -4,7 +4,6 @@ import { signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { MatSidenav } from '@angular/material/sidenav';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
@@ -45,7 +44,6 @@ describe('AdminLayoutComponent: cuenta autenticada', () => {
         await TestBed.configureTestingModule({
             imports: [AdminLayoutComponent],
             providers: [
-                provideNoopAnimations(),
                 { provide: BreakpointObserver, useValue: { observe: () => movil.asObservable() } },
                 provideRouter([{ path: 'dashboard', children: [] }]),
                 { provide: AuthService, useValue: authService }
