@@ -8,11 +8,10 @@ import { filter, map, startWith } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [NgIf, RouterLink, RouterLinkActive, MatListModule, MatButtonModule],
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
+    selector: 'app-sidebar',
+    imports: [NgIf, RouterLink, RouterLinkActive, MatListModule, MatButtonModule],
+    templateUrl: './sidebar.component.html',
+    styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {
   @Output() readonly navegacion = new EventEmitter<void>();

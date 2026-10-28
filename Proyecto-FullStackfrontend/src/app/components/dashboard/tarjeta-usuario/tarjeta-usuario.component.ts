@@ -5,11 +5,10 @@ import { CommonModule } from '@angular/common';
 import { Usuario } from '../../../interfaces/usuario.interface';
 
 @Component({
-  selector: 'app-tarjeta-usuario',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './tarjeta-usuario.component.html',
-  styleUrls: ['./tarjeta-usuario.component.css']
+    selector: 'app-tarjeta-usuario',
+    imports: [CommonModule],
+    templateUrl: './tarjeta-usuario.component.html',
+    styleUrls: ['./tarjeta-usuario.component.css']
 })
 export class TarjetaUsuarioComponent {
   @Input() usuario!: Usuario;

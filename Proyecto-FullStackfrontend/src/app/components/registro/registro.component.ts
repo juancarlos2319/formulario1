@@ -13,11 +13,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-registro',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatSelectModule],
-  templateUrl: './registro.component.html',
-  styleUrls: ['./registro.component.css']
+    selector: 'app-registro',
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatSelectModule],
+    templateUrl: './registro.component.html',
+    styleUrls: ['./registro.component.css']
 })
 export class RegistroComponent implements OnInit {
   private fb = inject(FormBuilder);

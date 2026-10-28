@@ -5,11 +5,10 @@ import { AuthService } from './services/auth.service';
 import { FeedbackComponent } from './components/shared/feedback/feedback.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, FeedbackComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    imports: [RouterOutlet, FeedbackComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent {
   /** Observa la sesión y devuelve al login cuando se pierde el token. */

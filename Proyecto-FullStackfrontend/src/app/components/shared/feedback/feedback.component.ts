@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FeedbackService } from './feedback.service';
 
 @Component({
-  selector: 'app-feedback',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './feedback.component.html',
-  styleUrl: './feedback.component.css'
+    selector: 'app-feedback',
+    imports: [CommonModule],
+    templateUrl: './feedback.component.html',
+    styleUrl: './feedback.component.css'
 })
 export class FeedbackComponent implements AfterViewChecked {
   readonly feedback = inject(FeedbackService);
