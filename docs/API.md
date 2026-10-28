@@ -20,7 +20,8 @@ Los IDs JSON corresponden a `Long`, las fechas a `LocalDate` (`YYYY-MM-DD`) y la
 | GET | `/api/personas/{id}` | ID titular activo | 200: `PersonaDTO` completo para editar |
 | GET | `/api/personas/{id}/detalles` | ID titular activo | 200: `PersonaDetalleDTO` |
 | POST | `/api/personas` | `PersonaDTO` con `contactosEmergencia` | 201: `{ok:true}` |
-| PUT | `/api/personas/{id}` | `PersonaDTO`, sin sustituir contactos | 200: `PersonaActualizadaDTO` (`ok` y fila `persona`) |
+| PATCH | `/api/personas/{id}` | Objeto parcial con campos modificados | 200: `PersonaActualizadaDTO` (`ok` y objeto parcial `persona`) |
+| PUT | `/api/personas/{id}` | `PersonaDTO` completo, sin sustituir contactos | 200: `PersonaActualizadaDTO` (`ok` y fila `persona`); compatibilidad |
 | DELETE | `/api/personas/{id}` | ID titular activo | 204, sin cuerpo; baja lógica |
 | PUT | `/api/personas/{id}/reactivar` | Sin cuerpo útil | 200: `{ok:true}` |
 | GET | `/api/personas/{id}/contactos` | ID titular activo | 200: `ContactoDTO[]`; header `Server-Timing` |

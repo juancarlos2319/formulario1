@@ -75,4 +75,4 @@ scripts/HashPassword.java es una utilidad interactiva BCrypt con coste 12, míni
 
 Los métodos declarados de controllers, servicios, repositorios, seguridad, entidades, PersonaDTO y la utilidad BCrypt tienen comentarios breves de propósito. Getters y setters describen el dato expuesto; las operaciones de negocio resumen su validación o efecto. No se modificaron contratos ni lógica al documentarlos.
 
-Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.
+Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible en la API por compatibilidad.

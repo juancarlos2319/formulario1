@@ -29,4 +29,4 @@ Tema Material completo para módulos utilizados: core/base/color/densidad/tipogr
 
 Revisión 2026-10-15: build y 94 pruebas aprobadas. No E2E/integración HTTP real. Consultar hallazgos antes de afirmar igualdad de validaciones/tipos/cachés. Sincronizar DTOs, interfaz y documentación al modificar contratos.
 
-Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.
+Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El servicio compara con una copia en memoria, omite peticiones sin cambios y fusiona cambios de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible por compatibilidad.

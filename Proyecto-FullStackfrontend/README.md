@@ -96,4 +96,4 @@ Antes de modificar HTTP contrastar DTO Java/TypeScript. La respuesta de ocupacio
 
 Las funciones de componentes, servicios, guards e interceptor incluyen comentarios breves de propósito y lógica. Se documentan también getters, helpers locales y estado derivado relevante; no se añaden comentarios repetitivos a cada callback HTTP o prueba. Los comentarios no cambian contratos ni comportamiento.
 
-Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.
+Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El servicio compara con una copia en memoria, omite peticiones sin cambios y fusiona los deltas de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible en la API por compatibilidad. La guía explicada de Angular está en [razi](../razi/Guia_Funcionamiento_Angular.docx).

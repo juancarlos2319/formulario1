@@ -12,13 +12,15 @@ Aplicación cliente-servidor para administrar titulares, direcciones múltiples,
 | [Operación y pruebas](docs/OPERACION_Y_PRUEBAS.md) | Instalación, configuración, ejecución, verificación y diagnóstico |
 | [Revisión técnica](docs/REVISION_TECNICA.md) | Inconsistencias, límites de la implementación y cobertura comprobada |
 | [Frontend](Proyecto-FullStackfrontend/README.md) | Pantallas, rutas, formularios, servicios y Angular Material |
+| [Guía de funcionamiento Angular](razi/Guia_Funcionamiento_Angular.docx) | Ejemplos explicados de componentes, señales, RxJS, formularios y flujos |
 | [Backend](Proyecto-FullStackbackend/demo/README.md) | Paquetes Java, reglas de negocio y generación de documentación |
 | [Guía PDF del backend](Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf) | Documentación técnica exportada e índice de fuentes con líneas |
 
 ## Organización del repositorio
 
 ```text
-docs/                                  Documentación compartida
+  docs/                                  Documentación compartida
+razi/Guia_Funcionamiento_Angular.docx Guía explicada del frontend Angular
 Proyecto-FullStackfrontend/
   src/app/                             Aplicación Angular standalone
   src/styles.scss                      Entrada global de estilos
