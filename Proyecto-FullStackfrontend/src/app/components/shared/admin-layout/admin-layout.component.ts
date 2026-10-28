@@ -6,7 +6,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../services/auth.service';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
@@ -14,6 +14,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
     selector: 'app-admin-layout',
     imports: [RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
     templateUrl: './admin-layout.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './admin-layout.component.css'
 })
 export class AdminLayoutComponent implements OnInit {

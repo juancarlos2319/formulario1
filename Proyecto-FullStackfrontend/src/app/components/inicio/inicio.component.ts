@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
     imports: [FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatProgressSpinnerModule],
     templateUrl: './inicio.component.html',
     styleUrls: ['./inicio.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     animations: [
         trigger('entrada', [
             state('oculto', style({ opacity: 0, transform: 'translateY({{desplazamiento}})' }), { params: { desplazamiento: '10px' } }),

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,7 +13,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 @Component({
     selector: 'app-cuenta',
     imports: [ReactiveFormsModule, RouterLink, MatButtonModule, MatFormFieldModule, MatInputModule, MatProgressBarModule],
-    templateUrl: './cuenta.component.html', styleUrl: './cuenta.component.css'
+    templateUrl: './cuenta.component.html', changeDetection: ChangeDetectionStrategy.Eager,
+ styleUrl: './cuenta.component.css'
 })
 export class CuentaComponent implements OnInit {
   private auth = inject(AuthService);

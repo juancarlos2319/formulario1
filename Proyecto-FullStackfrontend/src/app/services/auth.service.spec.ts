@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, discardPeriodicTasks } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { PersonasService } from './personas.service';
@@ -9,7 +9,7 @@ describe('AuthService: datos de la cuenta en sesión', () => {
   const token = () => `header.${btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))}.firma`;
   beforeEach(() => {
     localStorage.removeItem('jwt_token');
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    TestBed.configureTestingModule({ providers: [provideHttpClient(withXhr()), provideHttpClientTesting()] });
   });
 
   it('actualiza el header propio desde la fila guardada sin consultar auth/me', fakeAsync(() => {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { RouterLink } from '@angular/router';
@@ -14,6 +14,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     imports: [RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
     templateUrl: './dashboard.component.html',
     styleUrls: ['../shared/admin-pages.css', './dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     animations: [trigger('entradaDashboard', [
             state('oculto', style({ opacity: 0, transform: 'scale({{escala}})' }), { params: { escala: 0.99 } }),
             state('visible', style({ opacity: 1, transform: 'scale(1)' })),

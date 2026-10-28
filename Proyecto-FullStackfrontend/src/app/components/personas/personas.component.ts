@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
     selector: 'app-personas',
     imports: [FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
     templateUrl: './personas.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['../shared/admin-pages.css', './personas.component.css']
 })
 export class PersonasComponent implements OnInit {

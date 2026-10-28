@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject } from '@angular/core';
+import { Component, EventEmitter, Output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -11,6 +11,7 @@ import { AuthService } from '../../../services/auth.service';
     selector: 'app-sidebar',
     imports: [RouterLink, RouterLinkActive, MatListModule, MatButtonModule],
     templateUrl: './sidebar.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent {

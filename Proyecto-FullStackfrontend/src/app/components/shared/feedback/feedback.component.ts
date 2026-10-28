@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FeedbackService } from './feedback.service';
 
@@ -6,6 +6,7 @@ import { FeedbackService } from './feedback.service';
     selector: 'app-feedback',
     imports: [CommonModule],
     templateUrl: './feedback.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './feedback.component.css'
 })
 export class FeedbackComponent implements AfterViewChecked {

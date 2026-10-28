@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
     selector: 'app-personas-desactivadas',
     imports: [FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
     templateUrl: './personas-desactivadas.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['../shared/admin-pages.css', './personas-desactivadas.component.css']
 })
 export class PersonasDesactivadasComponent implements OnInit {

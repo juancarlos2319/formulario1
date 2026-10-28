@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -15,7 +15,7 @@ describe('jwtInterceptor: errores de autorización', () => {
     auth = jasmine.createSpyObj('AuthService', ['logout']);
     auth.logout.and.callFake(() => localStorage.removeItem('jwt_token'));
     TestBed.configureTestingModule({ providers: [provideRouter([]),
-      provideHttpClient(withInterceptors([jwtInterceptor])), provideHttpClientTesting(),
+      provideHttpClient(withXhr(), withInterceptors([jwtInterceptor])), provideHttpClientTesting(),
       { provide: AuthService, useValue: auth }
     ] });
     http = TestBed.inject(HttpTestingController);

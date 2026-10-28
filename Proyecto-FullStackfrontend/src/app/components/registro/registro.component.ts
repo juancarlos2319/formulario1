@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 
 import { AbstractControl, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
     selector: 'app-registro',
     imports: [ReactiveFormsModule, RouterLink, MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatSelectModule],
     templateUrl: './registro.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./registro.component.css']
 })
 export class RegistroComponent implements OnInit {
