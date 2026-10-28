@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { finalize, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -6,14 +6,15 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../services/auth.service';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
     selector: 'app-admin-layout',
-    imports: [CommonModule, RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
+    imports: [RouterOutlet, RouterLink, SidebarComponent, MatSidenavModule, MatToolbarModule, MatButtonModule],
     templateUrl: './admin-layout.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './admin-layout.component.css'
 })
 export class AdminLayoutComponent implements OnInit {

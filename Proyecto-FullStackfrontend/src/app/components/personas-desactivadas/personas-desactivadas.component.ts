@@ -1,5 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
@@ -14,8 +14,9 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'app-personas-desactivadas',
-    imports: [CommonModule, FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
+    imports: [FormsModule, RouterLink, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatProgressBarModule, MatTableModule],
     templateUrl: './personas-desactivadas.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['../shared/admin-pages.css', './personas-desactivadas.component.css']
 })
 export class PersonasDesactivadasComponent implements OnInit {

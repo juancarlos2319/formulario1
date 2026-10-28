@@ -31,3 +31,5 @@ footer{flex-shrink:0;font-size:11px;color:#a29baa;padding-top:20px;text-align:ce
 @media(max-width:760px){.login-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.intro{padding:12px 24px}.intro-copy,.intro-footer{display:none}.access{padding:16px 24px}}
 @media(max-height:700px){.access-icon{display:none}.description{margin-bottom:12px}.help{margin-top:12px}footer{padding-top:12px}.feature{margin-top:12px}.intro-footer{display:none}}
 @media(max-height:480px) and (min-width:761px){.intro-copy>p,.feature{display:none}}
+
+.login-enter{animation:login-enter var(--entrada-duracion,450ms) cubic-bezier(.2,0,0,1) var(--entrada-retraso,0ms) both}@keyframes login-enter{from{opacity:0;transform:translateY(var(--entrada-desplazamiento,10px))}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion:reduce){.login-enter{animation-duration:250ms}}

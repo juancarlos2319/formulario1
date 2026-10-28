@@ -6,14 +6,22 @@
     <div class="main" [class.dashboard-view]="esDashboard">
       <header>
         <mat-toolbar class="header-toolbar">
-          <button mat-icon-button *ngIf="esMovil()" type="button" class="menu-toggle" (click)="menu.toggle()" aria-label="Abrir menú principal" aria-controls="menu-principal" [attr.aria-expanded]="menu.opened"><span aria-hidden="true">☰</span></button>
+          @if (esMovil()) {
+            <button mat-icon-button type="button" class="menu-toggle" (click)="menu.toggle()" aria-label="Abrir menú principal" aria-controls="menu-principal" [attr.aria-expanded]="menu.opened"><span aria-hidden="true">☰</span></button>
+          }
           <span class="page-title">Mi espacio <span class="muted">/ {{ titulo }}</span></span>
           <div class="account">
             <section class="account-data">
               <strong>{{ usuarioActual()?.nombre || 'Cuenta' }}</strong>
-              <small *ngIf="usuarioActual()?.correo">{{ usuarioActual()?.correo }}</small>
-              <small *ngIf="cargandoCuenta()" role="status">Cargando cuenta...</small>
-              <small *ngIf="errorCuenta()" role="alert">No se pudieron cargar tus datos.</small>
+              @if (usuarioActual()?.correo) {
+                <small>{{ usuarioActual()?.correo }}</small>
+              }
+              @if (cargandoCuenta()) {
+                <small role="status">Cargando cuenta...</small>
+              }
+              @if (errorCuenta()) {
+                <small role="alert">No se pudieron cargar tus datos.</small>
+              }
             </section>
             <a mat-stroked-button class="editar-cuenta" routerLink="/cuenta">Editar cuenta</a>
           </div>

@@ -1,13 +1,14 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+
 
 // Sube dos niveles para salir de tarjeta-usuario y dashboard hasta llegar a services
 import { Usuario } from '../../../interfaces/usuario.interface';
 
 @Component({
     selector: 'app-tarjeta-usuario',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './tarjeta-usuario.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tarjeta-usuario.component.css']
 })
 export class TarjetaUsuarioComponent {

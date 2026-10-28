@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { ContactoEmergencia } from '../../interfaces/contacto-emergencia.interface';
@@ -12,8 +12,9 @@ import { MatTableModule } from '@angular/material/table';
 
 @Component({
     selector: 'app-contactos-lista',
-    imports: [CommonModule, RouterLink, MatButtonModule, MatCardModule, MatProgressBarModule, MatTableModule],
+    imports: [RouterLink, MatButtonModule, MatCardModule, MatProgressBarModule, MatTableModule],
     templateUrl: './contactos-lista.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['../shared/admin-pages.css', './contactos-lista.component.css']
 })
 export class ContactosListaComponent implements OnInit {

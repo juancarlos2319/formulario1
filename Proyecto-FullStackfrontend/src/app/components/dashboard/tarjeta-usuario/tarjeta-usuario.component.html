@@ -14,17 +14,23 @@
     <p><strong>Teléfono:</strong> {{ usuario.telefonos.join(', ') }}</p>
     <p><strong>Ciudad:</strong> {{ usuario.direcciones?.[0]?.municipio }}</p>
     <p><strong>Direcciones:</strong></p>
-    <p *ngFor="let direccion of usuario.direcciones">{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</p>
-    <p *ngIf="!usuario.direcciones?.length">No registrada</p>
+    @for (direccion of usuario.direcciones; track direccion) {
+      <p>{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, C.P. {{ direccion.codigoPostal }}, {{ direccion.municipio }}, {{ direccion.estado }}</p>
+    }
+    @if (!usuario.direcciones?.length) {
+      <p>No registrada</p>
+    }
     <p><strong>Género:</strong> {{ usuario.genero }}</p>
     <p><strong>Fecha Nacimiento:</strong> {{ usuario.fechaNacimiento }}</p>
 
-    <div class="emergency-box" *ngFor="let contacto of usuario.contactosEmergencia">
-      <h4>Contacto de emergencia</h4>
-      <p>{{ contacto.nombre }} {{ contacto.apellido }}</p>
-      <p>{{ contacto.telefonos?.join(', ') }}</p>
-      <p>{{ contacto.parentesco }}</p>
-    </div>
+    @for (contacto of usuario.contactosEmergencia; track contacto) {
+      <div class="emergency-box">
+        <h4>Contacto de emergencia</h4>
+        <p>{{ contacto.nombre }} {{ contacto.apellido }}</p>
+        <p>{{ contacto.telefonos?.join(', ') }}</p>
+        <p>{{ contacto.parentesco }}</p>
+      </div>
+    }
   </div>
 
   <div class="card-footer">

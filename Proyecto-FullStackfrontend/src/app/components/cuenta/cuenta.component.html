@@ -2,42 +2,54 @@
   <h1 id="account-title">Editar cuenta</h1>
   <p>Actualiza tus datos de inicio de sesión. Al guardar tendrás que iniciar sesión nuevamente.</p>
 
-  <mat-progress-bar *ngIf="cargando() || guardando()" mode="indeterminate"
+  @if (cargando() || guardando()) {
+    <mat-progress-bar mode="indeterminate"
     [attr.aria-label]="cargando() ? 'Cargando cuenta' : 'Guardando cambios'"></mat-progress-bar>
-  <p *ngIf="error()" role="alert" class="error">{{ error() }}</p>
+  }
+  @if (error()) {
+    <p role="alert" class="error">{{ error() }}</p>
+  }
 
-  <form *ngIf="!cargando()" [formGroup]="formulario" (ngSubmit)="guardar()" [attr.aria-busy]="guardando()">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
-      <mat-label>Nombre de usuario</mat-label>
-      <input matInput id="username" formControlName="username" autocomplete="username" maxlength="255">
-      <mat-error *ngIf="formulario.controls.username.touched && formulario.controls.username.invalid">Introduce un usuario sin espacios.</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
-      <mat-label>Contraseña actual</mat-label>
-      <input matInput id="passwordActual" type="password" formControlName="passwordActual" autocomplete="current-password">
-      <mat-error *ngIf="formulario.controls.passwordActual.touched && formulario.controls.passwordActual.invalid">Introduce tu contraseña actual.</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
-      <mat-label>Contraseña nueva (opcional)</mat-label>
-      <input matInput id="passwordNueva" type="password" formControlName="passwordNueva" autocomplete="new-password">
-      <mat-hint>Déjala vacía para conservar la actual. Mínimo 8 caracteres.</mat-hint>
-      <mat-error *ngIf="formulario.controls.passwordNueva.touched && formulario.controls.passwordNueva.invalid">Usa al menos 8 caracteres.</mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
-      <mat-label>Confirmar contraseña nueva</mat-label>
-      <input matInput id="confirmarPassword" type="password" formControlName="confirmarPassword" autocomplete="new-password">
-      <mat-error *ngIf="formulario.controls.confirmarPassword.touched && formulario.hasError('passwordsDistintas')">Las contraseñas nuevas no coinciden.</mat-error>
-    </mat-form-field>
-
-    <p *ngIf="formulario.hasError('passwordLarga')" class="error" role="alert">La contraseña supera el máximo de 72 bytes.</p>
-    <div class="acciones">
-      <a mat-stroked-button routerLink="/dashboard" [disabled]="guardando()">Cancelar</a>
-      <button mat-flat-button type="submit" [disabled]="guardando() || formulario.invalid">
-        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
-      </button>
-    </div>
-  </form>
+  @if (!cargando()) {
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" [attr.aria-busy]="guardando()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
+        <mat-label>Nombre de usuario</mat-label>
+        <input matInput id="username" formControlName="username" autocomplete="username" maxlength="255">
+        @if (formulario.controls.username.touched && formulario.controls.username.invalid) {
+          <mat-error>Introduce un usuario sin espacios.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
+        <mat-label>Contraseña actual</mat-label>
+        <input matInput id="passwordActual" type="password" formControlName="passwordActual" autocomplete="current-password">
+        @if (formulario.controls.passwordActual.touched && formulario.controls.passwordActual.invalid) {
+          <mat-error>Introduce tu contraseña actual.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
+        <mat-label>Contraseña nueva (opcional)</mat-label>
+        <input matInput id="passwordNueva" type="password" formControlName="passwordNueva" autocomplete="new-password">
+        <mat-hint>Déjala vacía para conservar la actual. Mínimo 8 caracteres.</mat-hint>
+        @if (formulario.controls.passwordNueva.touched && formulario.controls.passwordNueva.invalid) {
+          <mat-error>Usa al menos 8 caracteres.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
+        <mat-label>Confirmar contraseña nueva</mat-label>
+        <input matInput id="confirmarPassword" type="password" formControlName="confirmarPassword" autocomplete="new-password">
+        @if (formulario.controls.confirmarPassword.touched && formulario.hasError('passwordsDistintas')) {
+          <mat-error>Las contraseñas nuevas no coinciden.</mat-error>
+        }
+      </mat-form-field>
+      @if (formulario.hasError('passwordLarga')) {
+        <p class="error" role="alert">La contraseña supera el máximo de 72 bytes.</p>
+      }
+      <div class="acciones">
+        <a mat-stroked-button routerLink="/dashboard" [disabled]="guardando()">Cancelar</a>
+        <button mat-flat-button type="submit" [disabled]="guardando() || formulario.invalid">
+          {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </form>
+  }
 </section>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
@@ -8,6 +8,7 @@ import { FeedbackComponent } from './components/shared/feedback/feedback.compone
     selector: 'app-root',
     imports: [RouterOutlet, FeedbackComponent],
     templateUrl: './app.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './app.component.css'
 })
 export class AppComponent {

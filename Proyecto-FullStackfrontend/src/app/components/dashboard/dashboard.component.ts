@@ -1,6 +1,5 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { RouterLink } from '@angular/router';
 import { PersonasService } from '../../services/personas.service';
 import { Resumen } from '../../interfaces/usuario.interface';
@@ -11,25 +10,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
+    imports: [RouterLink, MatCardModule, MatButtonModule, MatListModule, MatProgressBarModule],
     templateUrl: './dashboard.component.html',
     styleUrls: ['../shared/admin-pages.css', './dashboard.component.css'],
-    animations: [trigger('entradaDashboard', [
-            state('oculto', style({ opacity: 0, transform: 'scale({{escala}})' }), { params: { escala: 0.99 } }),
-            state('visible', style({ opacity: 1, transform: 'scale(1)' })),
-            transition('oculto => visible', animate('{{duracion}}ms {{retraso}}ms cubic-bezier(0.2,0,0,1)'), { params: { duracion: 280, retraso: 0 } })
-        ])]
+    changeDetection: ChangeDetectionStrategy.Eager,
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  private temporizadorCabecera?: ReturnType<typeof setTimeout>;
-  private temporizadorContenido?: ReturnType<typeof setTimeout>;
-  readonly cabeceraVisible = signal(false);
-  readonly contenidoVisible = signal(false);
+export class DashboardComponent implements OnInit {
   private readonly movimientoReducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  readonly entradas = [0, 0, 35, 70, 105, 140, 180].map(retraso => ({
-    duracion: this.movimientoReducido ? 180 : 280, retraso,
-    escala: this.movimientoReducido ? 1 : 0.99
-  }));
+  readonly duracionEntrada = this.movimientoReducido ? 180 : 280;
   private registroService = inject(PersonasService);
   readonly resumen = signal<Resumen>({ total: 0, conCorreo: 0, conTelefono: 0, ocupaciones: [] });
   readonly cargando = signal(true);
@@ -48,32 +36,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return resumen.ocupaciones.map(grupo => ({ ...grupo, porcentaje: resumen.total ? grupo.cantidad / resumen.total * 100 : 0 }));
   }
 
-  /** Programa la entrada de la cabecera y solicita los agregados del dashboard. */
   ngOnInit(): void {
-    this.temporizadorCabecera = setTimeout(() => this.cabeceraVisible.set(true), 100);
     this.cargarUsuarios();
-  }
-
-  /** Cancela temporizadores u observadores pendientes al abandonar la pantalla. */
-  ngOnDestroy(): void {
-    clearTimeout(this.temporizadorCabecera);
-    clearTimeout(this.temporizadorContenido);
-  }
-
-  /** Activa la entrada del contenido después de actualizar los datos. */
-  private mostrarContenido(): void {
-    this.temporizadorContenido = setTimeout(() => this.contenidoVisible.set(true), 100);
   }
 
   /** Solicita el resumen y actualiza carga, errores y visibilidad del contenido. */
   cargarUsuarios(): void {
-    clearTimeout(this.temporizadorContenido);
-    this.contenidoVisible.set(false);
     this.cargando.set(true);
     this.mensajeError.set('');
     this.registroService.obtenerResumen().subscribe({
-      next: data => { this.resumen.set(data); this.cargando.set(false); this.mostrarContenido(); },
-      error: () => { this.mensajeError.set('No se pudo cargar el resumen. Intenta nuevamente.'); this.cargando.set(false); this.mostrarContenido(); }
+      next: data => { this.resumen.set(data); this.cargando.set(false); },
+      error: () => { this.mensajeError.set('No se pudo cargar el resumen. Intenta nuevamente.'); this.cargando.set(false); }
     });
   }
 
