@@ -4,6 +4,7 @@ import com.example.demo.dto.PersonaDTO;
 import com.example.demo.dto.PersonaResumenDTO;
 import com.example.demo.dto.ResultadoDTO;
 import com.example.demo.service.PersonaService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/personas")
+@SecurityRequirement(name = "bearerAuth")
 @CrossOrigin(
         origins = "http://localhost:4200",
         allowedHeaders = "*",

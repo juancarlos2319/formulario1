@@ -9,7 +9,9 @@ Java 21, Spring Boot 4.1.1, MVC, Security, Data JPA/JDBC, PostgreSQL y JJWT 0.11
 .\mvnw.cmd test
 ```
 
-Wrapper Maven 3.9.16, puerto esperado 8080, CORS http://localhost:4200. El POM fija Java 21 y contiene plugin Asciidoctor en prepare-package; no hay OpenAPI/REST Docs efectivo que sustituya los contratos Markdown. En Linux/macOS usar ./mvnw.
+Wrapper Maven 3.9.16, puerto esperado 8080, CORS http://localhost:4200. El POM fija Java 21 y contiene plugin Asciidoctor en prepare-package; Swagger genera la especificacion OpenAPI desde los controllers, mientras los contratos Markdown siguen describiendo las reglas funcionales. En Linux/macOS usar ./mvnw.
+
+Swagger UI se sirve en `http://localhost:8080/swagger-ui/index.html` y el documento OpenAPI JSON en `http://localhost:8080/v3/api-docs`. Las rutas de documentación son públicas; los endpoints de la API conservan su autenticación habitual. En Swagger UI, usa **Authorize** y pega únicamente el token JWT de una cuenta administradora; el login permanece público.
 
 Configuración: src/main/resources/application.properties. Datasource/clave JWT contienen valores literales sensibles; se omiten aquí/PDF. ddl-auto=update, show-sql=true, dialecto PostgreSQL. No asumir consumo automático de DATABASE_URL/JWT_SECRET sin vincularlo mediante propiedades/overrides Spring. Externalización/rotación pendiente registrada.
 

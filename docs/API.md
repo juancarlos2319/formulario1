@@ -2,7 +2,7 @@
 
 ## Convenciones
 
-Base local: `http://localhost:8080`. Todos los endpoints de aplicación, excepto `POST /api/auth/login`, requieren `Authorization: Bearer <JWT>` asociado a una cuenta vigente con `rol=ROLE_ADMIN`. El filtro vuelve a consultar la cuenta y toma el rol actual de la base en cada petición. JWT inválido/vencido o cuenta inexistente: 401; cuenta existente con otro rol: 403. El login también rechaza cuentas que no sean administradoras con 403. OPTIONS está permitido globalmente. CORS declara `http://localhost:4200` en los controllers. No hay versionado `/v1`, paginación ni documentación OpenAPI generada.
+Base local: `http://localhost:8080`. Swagger UI esta disponible en `/swagger-ui/index.html`; el documento OpenAPI JSON, en `/v3/api-docs`. Ambos recursos de documentacion son publicos. En Swagger UI, usa **Authorize** y pega unicamente el token JWT de una cuenta administradora para probar operaciones protegidas. Todos los endpoints de aplicacion, excepto `POST /api/auth/login`, requieren un JWT asociado a una cuenta vigente con `rol=ROLE_ADMIN`. El filtro vuelve a consultar la cuenta y toma el rol actual de la base en cada peticion. JWT invalido/vencido o cuenta inexistente: 401; cuenta existente con otro rol: 403. El login tambien rechaza cuentas que no sean administradoras con 403. OPTIONS esta permitido globalmente. CORS declara `http://localhost:4200` en los controllers. No hay versionado `/v1` ni paginacion.
 
 Los IDs JSON corresponden a `Long`, las fechas a `LocalDate` (`YYYY-MM-DD`) y las comunicaciones a arreglos de cadenas. Este documento usa nombres y tipos; no contiene credenciales ni registros personales de la semilla.
 

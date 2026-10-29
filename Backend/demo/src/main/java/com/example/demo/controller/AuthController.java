@@ -5,6 +5,7 @@ import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.dto.UsuarioActualDTO;
 import com.example.demo.service.CuentaService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,18 +32,21 @@ public class AuthController {
     private CuentaService cuentaService;
 
     /** Devuelve nombre y correo de la cuenta identificada por el JWT. */
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
     public UsuarioActualDTO obtenerUsuarioActual(Authentication authentication) {
         return cuentaService.obtenerUsuarioActual(authentication.getName());
     }
 
     /** Devuelve el username de la cuenta autenticada para su edición. */
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me/login")
     public Map<String, String> obtenerDatosLogin(Authentication authentication) {
         return cuentaService.obtenerDatosLogin(authentication.getName());
     }
 
     /** Delega el cambio de credenciales y devuelve una confirmación de guardado. */
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/me/login")
     public com.example.demo.dto.ResultadoDTO actualizarLogin(Authentication authentication,
             @RequestBody com.example.demo.dto.EditarCuentaDTO datos) {
