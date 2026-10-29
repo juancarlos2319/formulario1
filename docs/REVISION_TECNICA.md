@@ -1,11 +1,11 @@
 # Revisión técnica y limitaciones conocidas
 
-Revisión del 15 de octubre de 2026 sobre el código versionado. Los hallazgos siguientes proceden de lectura estática, no de explotación, medición de carga ni inspección de una base instalada. Esta entrega actualiza documentación y su generador; no corrige funcionalidad, configuración de credenciales ni esquema de producción.
+Revisión base del 15 de octubre de 2026 sobre el código versionado entonces. Los hallazgos proceden de lectura estática, no de explotación, medición de carga ni inspección de una base instalada. La migración posterior actualizó Angular, el builder, el runner de pruebas y las animaciones del frontend; este informe conserva sus resultados y hallazgos con la fecha original, sin certificar el estado de producción.
 
-## Resultados comprobados
+## Resultados comprobados en la revisión base (2026-10-15)
 
 - `npm.cmd run build`: aprobado; conserva warnings de presupuesto inicial/CSS.
-- Angular/Karma/ChromeHeadless: 94 pruebas aprobadas.
+- Frontend en revisión base: Angular/Karma/ChromeHeadless, 94 pruebas aprobadas. Este runner fue sustituido por Vitest durante la migración del 2026-10-28; no tomar este número como verificación actual.
 - Maven: 43 unitarias seleccionadas, ejecutadas y aprobadas; 13 integraciones excluidas expresamente.
 - Login: verificación visual previa con tema Material activo, controles de 56 px y botón de 49 px. No hay auditoría visual completa.
 - No se usó ni vació la base de desarrollo para esta revisión.

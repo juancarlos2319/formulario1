@@ -17,7 +17,7 @@ El frontend es una SPA con estado en memoria y almacenamiento del navegador. No 
 
 ## 2. Frontend
 
-`app.config.ts` registra Router, `provideAnimations()`, HttpClient y el interceptor funcional. Los componentes son standalone y declaran sus módulos Material. Los formularios de registro/contactos/cuenta son reactivos; el login usa `ngModel`. Las señales controlan carga, errores, selección y datos visibles; RxJS gestiona HTTP, deduplicación y comprobación de coincidencias.
+`app.config.ts` registra Router, detección de cambios por Zone y HttpClient con transporte XHR e interceptor funcional JWT. Las animaciones legacy se retiraron; Inicio y Dashboard usan `animate.enter` y CSS. Los componentes son standalone y declaran sus módulos Material. Los formularios de registro/contactos/cuenta son reactivos; el login usa `ngModel`. Las señales controlan carga, errores, selección y datos visibles; RxJS gestiona HTTP, deduplicación y comprobación de coincidencias.
 
 `AppComponent` contiene RouterOutlet y el feedback global. Escucha `AuthService.tokenChanges$` y redirige a `/inicio` al perder el token fuera del login. `AdminLayoutComponent` proporciona sidenav, toolbar y datos de la cuenta. El menú es superpuesto hasta 760 px y persistente en escritorio. Sus subapartados se calculan desde la URL de edición de personas y contactos.
 
@@ -107,6 +107,6 @@ No hay IndexedDB, Service Worker, sincronización en tiempo real ni invalidació
 
 `styles.scss` importa el tema con `@use './material-typography'`. El tema Material 3 mantiene Azure/Blue, agrega Sora para títulos y Plus Jakarta Sans para texto, e incluye solo los módulos usados. Las variables `--app-font-*` unifican estilos locales; IBM Plex Mono se reserva para estadísticas y campos numéricos. `index.html` carga Google Fonts con `display=swap`, preconnect y familias de respaldo.
 
-El feedback usa señales, avisos temporizados de 5 s y `<dialog>` nativo con `showModal()`, no `MatDialog`. El login y dashboard usan animaciones Angular y respetan `prefers-reduced-motion`. Formularios incluyen etiquetas, errores, estados de carga y atributos ARIA. Hay vistas móviles para Personas, Desactivadas y Contactos; la revisión de código no equivale a una auditoría de accesibilidad completa.
+El feedback usa señales, avisos temporizados de 5 s y `<dialog>` nativo con `showModal()`, no `MatDialog`. El login y dashboard usan `animate.enter` con CSS y respetan `prefers-reduced-motion`. Formularios incluyen etiquetas, errores, estados de carga y atributos ARIA. Hay vistas móviles para Personas, Desactivadas y Contactos; la revisión de código no equivale a una auditoría de accesibilidad completa.
 
 La edición del titular usa `PATCH /api/personas/{id}`. `PersonasService` conserva una copia del formulario cargado, compara los campos efectivos, omite la solicitud cuando no hay diferencias y envía las colecciones completas cuando cambian. La respuesta incluye los valores persistidos de los campos enviados y el servicio aplica deltas por ID al listado y detalles en memoria sin un GET adicional. El endpoint PUT completo sigue disponible para compatibilidad.

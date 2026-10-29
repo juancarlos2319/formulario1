@@ -1,6 +1,6 @@
 # Contexto de agentes — Backend
 
-API Java 21 con Spring Boot 4.1.1, Spring MVC, Spring Security, Spring Data JPA, JWT y PostgreSQL. Lee `docs/ESPECIFICACION_AGENTES.md` y `README.md` antes de cambiar reglas funcionales o contratos.
+API Java 21 con Spring Boot 4.1.1, Spring MVC, Spring Security, Spring Data JPA, JWT y PostgreSQL. Lee `../../docs/back/BACKEND_ESPECIFICACION_AGENTES.md` y `README.md` antes de cambiar reglas funcionales o contratos.
 
 ## Reglas rápidas
 

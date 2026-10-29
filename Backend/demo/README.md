@@ -61,12 +61,12 @@ Integración requiere TEST_DATABASE_URL local /nomina_backend_test y ejecuta TRU
 
 ## Guía PDF e índice de fuentes
 
-- [PDF](docs/Guia_backend_archivos_y_lineas.pdf): documentación técnica e índice de declaraciones/tablas con líneas calculadas.
-- [Manifiesto](docs/referencias_backend.json): rutas, SHA-256, line counts y referencias, sin cuerpos de configuración/semilla.
-- [Generador](docs/generar_guia.py): lee Markdown/fuentes, no reescribe README ni publica secretos/datos personales.
+- [PDF](../../docs/back/Guia_backend_archivos_y_lineas.pdf): documentación técnica e índice de declaraciones/tablas con líneas calculadas.
+- [Manifiesto](../../docs/back/referencias_backend.json): rutas, SHA-256, line counts y referencias, sin cuerpos de configuración/semilla.
+- [Generador](../../docs/back/generar_guia_backend.py): lee Markdown/fuentes, no reescribe README ni publica secretos/datos personales.
 
 ```powershell
-python docs/generar_guia.py --date 2026-10-15
+python ../../docs/back/generar_guia_backend.py --date 2026-10-29
 ```
 
 Requiere ReportLab/pypdf, usa fuente del sistema si existe y fallback portable. Mermaid se conserva como notación textual en PDF. Regenerar después de modificar fuentes; las líneas son de una revisión, no IDs estables.

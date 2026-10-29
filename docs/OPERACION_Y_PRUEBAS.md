@@ -3,9 +3,9 @@
 ## Requisitos y versiones
 
 - JDK 21 con `java` accesible desde la terminal.
-- Node.js y npm compatibles con Angular 18; `package.json` no fija `engines` ni hay `.nvmrc`. Usar el lockfile para resolver dependencias.
+- Node.js y npm compatibles con Angular CLI 22; `package.json` no fija `engines` ni hay `.nvmrc`. Usar el lockfile para resolver dependencias.
 - PostgreSQL con una base de desarrollo vacía y permisos de creación de tablas/índices/secuencias. No hay Docker Compose versionado.
-- Chrome disponible para Karma/ChromeHeadless.
+- No se requiere Chrome para las pruebas unitarias: el runner es Vitest con jsdom.
 - Python con `reportlab` y `pypdf` si se necesita regenerar el PDF. Estas dependencias son del generador documental, no de la API.
 
 Los comandos siguientes se ejecutan manualmente. La revisión documental no recrea, vacía ni modifica bases instaladas.
@@ -15,8 +15,8 @@ Los comandos siguientes se ejecutan manualmente. La revisión documental no recr
 Crear una base nueva con la herramienta habitual de PostgreSQL y ejecutar, en este orden:
 
 ```powershell
-psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Proyecto-FullStackbackend/demo/src/main/resources/schema.sql
-psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Proyecto-FullStackbackend/demo/src/main/resources/data.sql
+psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Backend/demo/src/main/resources/schema.sql
+psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Backend/demo/src/main/resources/data.sql
 ```
 
 `<base_nueva>` es un marcador que debe sustituirse. No pegar estos comandos sin ajustarlo. Configurar autenticación de PostgreSQL fuera de argumentos registrados o documentación. Los SQL son manuales; la configuración actual no garantiza ejecutarlos automáticamente al arrancar Spring.
@@ -25,7 +25,7 @@ psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Proyecto-FullStackbackend/demo/src
 
 ## 2. Configurar y arrancar el backend
 
-Ubicación: `Proyecto-FullStackbackend/demo/src/main/resources/application.properties`. Se revisaron nombres de propiedades y opciones no sensibles; se omitieron valores de conexión y firma.
+Ubicación: `Backend/demo/src/main/resources/application.properties`. Se revisaron nombres de propiedades y opciones no sensibles; se omitieron valores de conexión y firma.
 
 | Propiedad | Estado comprobado |
 | --- | --- |
@@ -40,7 +40,7 @@ Ubicación: `Proyecto-FullStackbackend/demo/src/main/resources/application.prope
 El archivo actual no utiliza placeholders para esas credenciales. No asumir que `DATABASE_URL` o `JWT_SECRET` se consumen automáticamente: deben vincularse mediante configuración Spring/overrides y verificarse. El generador PDF no incluye los valores.
 
 ```powershell
-# Desde Proyecto-FullStackbackend/demo
+# Desde Backend/demo
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -49,7 +49,7 @@ Linux/macOS: `./mvnw spring-boot:run`. El puerto esperado es 8080. La URL CORS l
 ## 3. Instalar y arrancar el frontend
 
 ```powershell
-# Desde Proyecto-FullStackfrontend
+# Desde Frontend
 npm.cmd ci
 npm.cmd start
 ```
@@ -64,29 +64,29 @@ La API se referencia en `AuthService`, `PersonasService` y `jwtInterceptor`. El 
 npm.cmd run build
 ```
 
-Salida: `Proyecto-FullStackfrontend/dist/formulario-registro/browser`. La configuración production usa hashing. Presupuestos declarados:
+Salida: `Frontend/dist/formulario-registro/browser`. La configuración production usa hashing. Presupuestos declarados:
 
 | Presupuesto | Warning | Error |
 | --- | --- | --- |
-| `initial` | 500 kB | 1026 kB |
+| `initial` | 500 kB | 1100 kB |
 | `anyComponentStyle` | 2 kB | 4 kB |
 
-La última verificación pasó con paquete inicial aproximado de 1.01 MB y estilos globales de 36.00 kB. Hay advertencias de tamaño inicial y de varios estilos locales; no son errores de compilación. La optimización del tema incluye únicamente componentes Material utilizados. Añadir un módulo nuevo puede requerir su mixin de tema.
+La configuración fija umbrales, pero el tamaño depende del estado de las fuentes y dependencias. Durante la migración Angular 22 (2026-10-28) se registró build aprobado con avisos de presupuesto; no se repitió tras los cambios visuales posteriores.
 
 ## 5. Pruebas frontend
 
 ```powershell
-npm.cmd test -- --watch=false --browsers=ChromeHeadless
+npm.cmd test -- --watch=false
 ```
 
-La suite usa Jasmine/Karma, HttpTestingController y pruebas de componentes standalone. En esta revisión: **94 pruebas aprobadas**, salida 0. Se comprobaron respuestas HTTP simuladas, invalidación de cachés, guards/flujos de sesión, formularios, navegación, feedback y timeout/errores del interceptor.
+La suite usa Vitest, jsdom, TestBed y HttpTestingController en componentes standalone. Durante la migración Angular 22 (2026-10-28) se registraron **92 pruebas aprobadas**, salida 0. Es un resultado histórico, no repetido después de los cambios visuales posteriores.
 
 No hay script E2E, configuración Playwright/Cypress ni prueba de todos los flujos conectados a una base real. Una prueba de componentes no verifica el contrato efectivo Spring/Jackson/PostgreSQL. Existe una verificación visual previa del login en Chrome; no equivale a cobertura visual de todas las resoluciones/pantallas.
 
 ## 6. Pruebas backend
 
 ```powershell
-# Desde Proyecto-FullStackbackend/demo
+# Desde Backend/demo
 .\mvnw.cmd test
 ```
 
@@ -142,10 +142,10 @@ java --class-path $runtimeClasspath scripts/HashPassword.java
 No registrar hashes ni claves resultantes en commits o documentos. Para la guía:
 
 ```powershell
-python docs/generar_guia.py --date 2026-10-15
+python ../../docs/back/generar_guia_backend.py --date 2026-10-29
 ```
 
-Ejecutar desde backend/demo. Produce PDF y manifiesto; no modifica README ni reproduce cuerpos de fuentes que puedan contener secretos. Las fuentes de documentación son Markdown y las referencias de líneas se calculan nuevamente.
+Ejecutar desde `Backend/demo`. El generador y sus entregables viven en `docs/back/` de la raíz. Produce el PDF y el manifiesto; no modifica README ni reproduce cuerpos de fuentes que puedan contener secretos. Las fuentes de documentación son Markdown y las referencias de líneas se calculan nuevamente.
 
 ## 8. Diagnóstico
 
@@ -159,8 +159,8 @@ Ejecutar desde backend/demo. Produce PDF y manifiesto; no modifica README ni rep
 | Username largo falla aunque formulario lo acepta | SQL limita 50; validación frontend/backend permite 255 |
 | Nueva ocupación falla con PK | Revisar secuencia del catálogo tras semilla con IDs explícitos |
 | No se ven cambios de otro cliente | Caché en memoria sin TTL ni invalidación remota; recargar |
-| ChromeHeadless no inicia | Comprobar instalación/permisos de Chrome y entorno; no confundir con fallo de assertions |
+| Vitest no encuentra el DOM | Confirmar jsdom, polyfills `zone.js/testing` y `zone.js/plugins/vitest-patch` del target testing |
 
 ## Alcance de los resultados
 
-Fecha de verificación: 2026-10-15. Se ejecutaron build y suites, además de revisión estática de fuentes. No se ejecutaron recreación de base, integración PostgreSQL, pruebas de carga, pentest, despliegue ni pruebas E2E. Actualizar esta sección con evidencia nueva cuando se ejecuten esas verificaciones.
+Historial de verificación: backend unitario, 43 pruebas seleccionadas aprobadas el 2026-10-15; la integración PostgreSQL se omitió. Frontend: durante la migración Angular 22, build y 92 pruebas Vitest aprobadas el 2026-10-28. Estos resultados no certifican los cambios posteriores ni sustituyen una nueva ejecución. No se registran aquí pruebas de carga, pentest, despliegue ni E2E.

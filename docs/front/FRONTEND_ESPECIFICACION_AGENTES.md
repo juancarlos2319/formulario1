@@ -1,10 +1,10 @@
 # Contexto técnico frontend
 
-Fuentes: [README](../README.md), [arquitectura](../../docs/ARQUITECTURA.md), [API](../../docs/API.md), [operación](../../docs/OPERACION_Y_PRUEBAS.md) y [revisión](../../docs/REVISION_TECNICA.md).
+Fuentes: [README frontend](../../Frontend/README.md), [arquitectura](../ARQUITECTURA.md), [API](../API.md), [operación](../OPERACION_Y_PRUEBAS.md) y [revisión](../REVISION_TECNICA.md).
 
 ## Stack y ejecución
 
-Angular/Material 18.2.14, TypeScript 5.5.4, RxJS 7.8.2; standalone. npm.cmd start/build/test (scripts de package.json). Estilos globales en src/styles.scss con @use Material; Sass debe funcionar en build y Karma. API local http://localhost:8080/api/, URLs en servicios/interceptor, CP externo.
+Angular/Material/CDK 22.x, TypeScript 6.x, RxJS 7.8.x; standalone. npm.cmd start/build/test (scripts de package.json). Build con @angular/build; pruebas Vitest/jsdom mediante el builder unit-test. Estilos globales en src/styles.scss con Sass y @use Material. API local http://localhost:8080/api/, URLs en servicios/interceptor, CP externo.
 
 ## Invariantes
 
@@ -27,6 +27,6 @@ Angular/Material 18.2.14, TypeScript 5.5.4, RxJS 7.8.2; standalone. npm.cmd star
 
 Tema Material completo para módulos utilizados: core/base/color/densidad/tipografía; extender al agregar otro módulo. Sora títulos, Plus Jakarta Sans lectura, IBM Plex Mono cifras; variables --app-font-*. Mantener reduced-motion, feedback, ARIA y vistas móviles.
 
-Revisión 2026-10-15: build y 94 pruebas aprobadas. No E2E/integración HTTP real. Consultar hallazgos antes de afirmar igualdad de validaciones/tipos/cachés. Sincronizar DTOs, interfaz y documentación al modificar contratos.
+Migración 2026-10-28: se registraron build aprobado y 92 pruebas Vitest aprobadas; resultado histórico, no repetido tras los cambios visuales posteriores. No E2E/integración HTTP real. Consultar hallazgos antes de afirmar igualdad de validaciones/tipos/cachés. Sincronizar DTOs, interfaz y documentación al modificar contratos.
 
 Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El servicio compara con una copia en memoria, omite peticiones sin cambios y fusiona cambios de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible por compatibilidad.

@@ -1,33 +1,33 @@
 {
   "schema_version": 2,
-  "review_date": "2026-10-15",
-  "base_commit": "3782768e5d7bd76b1a95c9e74a715225886ee99d",
+  "review_date": "2026-10-29",
+  "base_commit": "5010a02f0bb8fd634c7fc0c520e4360931045cda",
   "note": "Puede incluir cambios locales documentales; hashes identifican las fuentes exactas.",
   "sources": [
     {
-      "path": "Proyecto-FullStackbackend/demo/.gitattributes",
+      "path": "Backend/demo/.gitattributes",
       "sha256": "1c8cc8fb65937e0ee87a7ed50745c6f87fb78ded993fb796aa800c877cc6d517",
       "lines": 3,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/.gitignore",
+      "path": "Backend/demo/.gitignore",
       "sha256": "089382e4d7944ab6cb6900a1269678ebff93c00d441ada788cd05a8da182b22b",
       "lines": 33,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/.mvn/wrapper/maven-wrapper.properties",
+      "path": "Backend/demo/.mvn/wrapper/maven-wrapper.properties",
       "sha256": "488e1b3f2e641779d4636abf9390845f901e64607261bc3c0b0bfe4fe96e6706",
       "lines": 3,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/AGENTS.md",
-      "sha256": "a5f4793816b2fcb78ffe7f64c8404470a285f3ad61ed7a66c0f320e874210db6",
+      "path": "Backend/demo/AGENTS.md",
+      "sha256": "96e8f0b3ef868457c52cfbcd80a7a32dbf1f7fb229e7a8fe4c801bb86cf316da",
       "lines": 12,
       "references": [
         {
@@ -44,8 +44,8 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/README.md",
-      "sha256": "8de46df64880a22f28f66241de27dae5d655c1941289afaa66c46af4799fad4b",
+      "path": "Backend/demo/README.md",
+      "sha256": "02c01a828abe053162f61fbbfb7b3421758a48f83c217b310ba5ea3c79321cb8",
       "lines": 78,
       "references": [
         {
@@ -87,109 +87,28 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/docs/ESPECIFICACION_AGENTES.md",
-      "sha256": "c0122cd8f772108f399fd462fe198009d581880e71c3fd6dac35e55a81f3956b",
-      "lines": 30,
-      "references": [
-        {
-          "line": 1,
-          "kind": "seccion",
-          "name": "Contexto técnico backend"
-        },
-        {
-          "line": 5,
-          "kind": "seccion",
-          "name": "Stack/capas"
-        },
-        {
-          "line": 9,
-          "kind": "seccion",
-          "name": "Modelo y contratos"
-        },
-        {
-          "line": 24,
-          "kind": "seccion",
-          "name": "Pruebas/documentación"
-        }
-      ],
-      "content_included": false
-    },
-    {
-      "path": "Proyecto-FullStackbackend/demo/docs/generar_guia.py",
-      "sha256": "0ffc9d7382de99ce3e818814c0b666ef2ca512038bef1b61aa950e81fa2b006a",
-      "lines": 189,
-      "references": [
-        {
-          "line": 32,
-          "kind": "funcion",
-          "name": "source_paths"
-        },
-        {
-          "line": 46,
-          "kind": "funcion",
-          "name": "declarations"
-        },
-        {
-          "line": 65,
-          "kind": "funcion",
-          "name": "inventory"
-        },
-        {
-          "line": 77,
-          "kind": "funcion",
-          "name": "plain"
-        },
-        {
-          "line": 83,
-          "kind": "funcion",
-          "name": "styles"
-        },
-        {
-          "line": 100,
-          "kind": "funcion",
-          "name": "append_markdown"
-        },
-        {
-          "line": 119,
-          "kind": "funcion",
-          "name": "page_footer"
-        },
-        {
-          "line": 127,
-          "kind": "funcion",
-          "name": "generate_pdf"
-        },
-        {
-          "line": 159,
-          "kind": "funcion",
-          "name": "main"
-        }
-      ],
-      "content_included": false
-    },
-    {
-      "path": "Proyecto-FullStackbackend/demo/mvnw",
+      "path": "Backend/demo/mvnw",
       "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02",
       "lines": 295,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/mvnw.cmd",
+      "path": "Backend/demo/mvnw.cmd",
       "sha256": "46eedb8419bd14fe70d5bb2916d7b6f51806e51b39d5b76a42610384ca929c1c",
       "lines": 189,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/pom.xml",
+      "path": "Backend/demo/pom.xml",
       "sha256": "08d655df6a9f0862c150f8b0007b89281bdd1e619e5a3e9954d937313f7b35fb",
       "lines": 137,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/scripts/HashPassword.java",
+      "path": "Backend/demo/scripts/HashPassword.java",
       "sha256": "1599fa458ab3945867a199860e684309fe9234946844db5e89981bab89ee5a70",
       "lines": 31,
       "references": [
@@ -207,7 +126,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/DemoApplication.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/DemoApplication.java",
       "sha256": "e1bd99f8bd2cbf0f10991838de37dbc13063f1057834bc1095efe82d0bc64dbb",
       "lines": 14,
       "references": [
@@ -225,7 +144,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/config/SecurityConfig.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/config/SecurityConfig.java",
       "sha256": "b70476be6e1e267a7b606f17dfe9bd71017445465f9a16f5fa2c67ef571ed958",
       "lines": 55,
       "references": [
@@ -253,7 +172,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/AuthController.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/controller/AuthController.java",
       "sha256": "61911103ee4d5325f3a9df429fe92f8aebccf94ed932ab4c3706477a775dbf3b",
       "lines": 81,
       "references": [
@@ -286,7 +205,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/OcupacionController.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/controller/OcupacionController.java",
       "sha256": "cc811cdd8c1f93314f224d5a2eb61f63833b9d354821d06b72d7e293292bbbef",
       "lines": 21,
       "references": [
@@ -304,7 +223,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/ParentescoController.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/controller/ParentescoController.java",
       "sha256": "3a3e7f5667639715fa1c0ea0f808d39ca57d2f854a1bad60426823bbbd725f2f",
       "lines": 24,
       "references": [
@@ -322,7 +241,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/controller/PersonaController.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/controller/PersonaController.java",
       "sha256": "2a7393963ea00bec6abf317a60f2f2a66485630e454c2932a0349af71422a8fe",
       "lines": 152,
       "references": [
@@ -400,7 +319,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/BusquedaContactoDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/BusquedaContactoDTO.java",
       "sha256": "16adf76b407c7368ccc6dc06cbf975548b86fd16f1e34199e9db637bf6a296a2",
       "lines": 3,
       "references": [
@@ -418,7 +337,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ContactoDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/ContactoDTO.java",
       "sha256": "e11e38730abb827200e60364da4b8625c774f8950b7b9db95d2d6d98792d0a68",
       "lines": 8,
       "references": [
@@ -436,7 +355,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/EditarCuentaDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/EditarCuentaDTO.java",
       "sha256": "3c98f2ea42fff341955cb53db9aabf1aa5d086fe043802a31f86d1ead5c94b4d",
       "lines": 3,
       "references": [
@@ -454,7 +373,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaActualizadaDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/PersonaActualizadaDTO.java",
       "sha256": "6def8e1f98c64d7534bdd5b3eac2d21c9db2a95fbbf90475015e8d567878e012",
       "lines": 4,
       "references": [
@@ -472,7 +391,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/PersonaDTO.java",
       "sha256": "828fd2ddd7b3cdcf0d3a711bc6c92bbe88e0b71d5872c3f969ab49f3ac836ba5",
       "lines": 71,
       "references": [
@@ -605,7 +524,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaDetalleDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/PersonaDetalleDTO.java",
       "sha256": "965e5981488b35ea58da2e010b1250df27aaee72d582853feab6fb4667a85547",
       "lines": 7,
       "references": [
@@ -623,7 +542,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaParcialDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/PersonaParcialDTO.java",
       "sha256": "b2477a0dfd37e90181ec359872f79851b97ffe6fc66bff7f006bab0add2324c4",
       "lines": 24,
       "references": [
@@ -641,7 +560,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/PersonaResumenDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/PersonaResumenDTO.java",
       "sha256": "6d68d607fb0fc55b11d131ea682761c1146fe6824680d8c5771630b9232767cd",
       "lines": 10,
       "references": [
@@ -669,7 +588,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ResultadoDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/ResultadoDTO.java",
       "sha256": "c25001a6773ee0a6d532312d6e4bf6d4fcc7b9c79ed72f45a594cb84accbc8d3",
       "lines": 3,
       "references": [
@@ -687,7 +606,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/ResumenDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/ResumenDTO.java",
       "sha256": "eb75d1dcfb81e399314660fb9b6fe7d54e7550ae3522885927df72c6641a7791",
       "lines": 7,
       "references": [
@@ -715,7 +634,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/dto/UsuarioActualDTO.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/dto/UsuarioActualDTO.java",
       "sha256": "b994e11dc196673032570950a13343a203fcd5cb94eec934b29ec820209198b0",
       "lines": 3,
       "references": [
@@ -733,7 +652,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/CatalogoOcupacion.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/CatalogoOcupacion.java",
       "sha256": "3053c17ceb118e39f1ca9776571b7eebefef4aa796c6d6e1e44effe36f7005f2",
       "lines": 26,
       "references": [
@@ -766,7 +685,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/CatalogoParentesco.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/CatalogoParentesco.java",
       "sha256": "fa884333ff21416c855663d84f4bfcbaaf3a0584ea0441bfaf9d3547b14656d6",
       "lines": 25,
       "references": [
@@ -799,7 +718,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/ContactoEmergencia.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/ContactoEmergencia.java",
       "sha256": "f627a351382c7adf734f1764a74ca91912814bbd547a6905fbcf7ad19e80f125",
       "lines": 44,
       "references": [
@@ -852,7 +771,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/DireccionTitular.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/DireccionTitular.java",
       "sha256": "c1341b885057485f42f30e79f39e4c2520e8d54781d9769c0d04fb5c36328b65",
       "lines": 78,
       "references": [
@@ -960,7 +879,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PerfilTitular.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/PerfilTitular.java",
       "sha256": "20077078eb48cc9a84f3246884cf1732dd7558f17e0e8e327c5bc3a9885c6baa",
       "lines": 32,
       "references": [
@@ -1008,7 +927,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/Persona.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/Persona.java",
       "sha256": "a4ac0e5f3cae24351f9848ed23a2abc9b4b19ed5f965ec2a1c5c676a430175ea",
       "lines": 60,
       "references": [
@@ -1116,7 +1035,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PersonaCorreo.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/PersonaCorreo.java",
       "sha256": "8385606bf2dae32cefdfbaa4249991223acf817cf431fb2ce90fa23bc0b083fd",
       "lines": 34,
       "references": [
@@ -1159,7 +1078,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/PersonaTelefono.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/PersonaTelefono.java",
       "sha256": "e3f67b38258d7631bce312618cc7d00280366e8b42868c03e5d66c4eb13cdb84",
       "lines": 34,
       "references": [
@@ -1202,7 +1121,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/model/Usuario.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/model/Usuario.java",
       "sha256": "97cc7126f230a9c7c922eba3840480a0fd89c2525b60d115d43f3c37d2503917",
       "lines": 49,
       "references": [
@@ -1265,7 +1184,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/CatalogoOcupacionRepository.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/repository/CatalogoOcupacionRepository.java",
       "sha256": "98b4a44c762a83ab57de7a07ff60f7be281201376de65b92be11d1f924938800",
       "lines": 12,
       "references": [
@@ -1278,7 +1197,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/CatalogoParentescoRepository.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/repository/CatalogoParentescoRepository.java",
       "sha256": "de09d5761757d58545f9f4a1384bff7efa091b9894d17aeca54fe9cdd64892fc",
       "lines": 10,
       "references": [
@@ -1291,7 +1210,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/PersonaRepository.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/repository/PersonaRepository.java",
       "sha256": "3bb0e2e1b7b4b99de6f93c111cff3ec8a6e094983d937f3cbd46e564cb7adaf9",
       "lines": 94,
       "references": [
@@ -1304,7 +1223,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/repository/UsuarioRepository.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/repository/UsuarioRepository.java",
       "sha256": "a3be220b2d8a6223e364fbc1a1aba1512170e3a706c7c30d2bd73bcfc44adb61",
       "lines": 16,
       "references": [
@@ -1317,7 +1236,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/security/JwtFilter.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/security/JwtFilter.java",
       "sha256": "9b18410e5ebecf7a227c721962bdb92d37a80502768a70c65f97a59b936fd033",
       "lines": 51,
       "references": [
@@ -1335,7 +1254,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/security/JwtUtil.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/security/JwtUtil.java",
       "sha256": "724a6f1c73f097dfc7790af6a5540779d3482bd6fe65148725d19f33414bcb5f",
       "lines": 45,
       "references": [
@@ -1363,7 +1282,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/CuentaService.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/service/CuentaService.java",
       "sha256": "5bccc87ac65c761b2590c0e7c6f6795480168d32623b0a7e6d7c2f0f592619aa",
       "lines": 79,
       "references": [
@@ -1391,7 +1310,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/java/com/example/demo/service/PersonaService.java",
+      "path": "Backend/demo/src/main/java/com/example/demo/service/PersonaService.java",
       "sha256": "188b71bfdbd879ddeefeeb0d10970e24e10ac4a4532c4c5c15e7f46cf4536773",
       "lines": 533,
       "references": [
@@ -1589,21 +1508,21 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/resources/application.properties",
+      "path": "Backend/demo/src/main/resources/application.properties",
       "sha256": "e554a6d068c355f0845cd3f8dddaf01e6e0947fb0b8b9bce34866554f61665c2",
       "lines": 11,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/resources/data.sql",
+      "path": "Backend/demo/src/main/resources/data.sql",
       "sha256": "2120fc1d063ec9109674f0521a984346173caa530accab5200db708911750f75",
       "lines": 46,
       "references": [],
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/main/resources/schema.sql",
+      "path": "Backend/demo/src/main/resources/schema.sql",
       "sha256": "902f40c1b37137d8ac05185431d3dba791c230e2951e1e8fd7b8462d6b668bdf",
       "lines": 70,
       "references": [
@@ -1656,7 +1575,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/DemoApplicationTests.java",
+      "path": "Backend/demo/src/test/java/com/example/demo/DemoApplicationTests.java",
       "sha256": "fc2a8f02e973bd98da9f05afc9e78e361f05736287f35aa2c4892519d1ec7ee2",
       "lines": 173,
       "references": [
@@ -1689,7 +1608,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/security/JwtUtilTest.java",
+      "path": "Backend/demo/src/test/java/com/example/demo/security/JwtUtilTest.java",
       "sha256": "b4fa3c0d32d70d997b5b82cd7509a8c658f2dc2a637a92d59008e6bec8a0cfdb",
       "lines": 21,
       "references": [
@@ -1702,7 +1621,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/CuentaServiceTest.java",
+      "path": "Backend/demo/src/test/java/com/example/demo/service/CuentaServiceTest.java",
       "sha256": "562b3e3968b749ff226a8db20db275939d284f067be9e8c2f16923d198a56465",
       "lines": 109,
       "references": [
@@ -1720,7 +1639,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/PersonaContratosTest.java",
+      "path": "Backend/demo/src/test/java/com/example/demo/service/PersonaContratosTest.java",
       "sha256": "af4a4e79dca3fe6a43c68609ad021dfb329c38d8c3f424ec14ef20930d6dc77e",
       "lines": 84,
       "references": [
@@ -1733,7 +1652,7 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackbackend/demo/src/test/java/com/example/demo/service/RegistroCompletoTest.java",
+      "path": "Backend/demo/src/test/java/com/example/demo/service/RegistroCompletoTest.java",
       "sha256": "d5a0586e0cc19f48659053926185823e8a4841a974a65d3dffeaa5c44ff4d698",
       "lines": 404,
       "references": [
@@ -1776,8 +1695,8 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackfrontend/README.md",
-      "sha256": "edc991f7ab194d2b1b69164c3c988b80bde88d448a7e5339b9139123a2e0a3ad",
+      "path": "Frontend/README.md",
+      "sha256": "303416541aa99bb468b94a616d9dd499b737136b5d30800ddcc4e966bbab4ae7",
       "lines": 99,
       "references": [
         {
@@ -1824,42 +1743,9 @@
       "content_included": false
     },
     {
-      "path": "Proyecto-FullStackfrontend/docs/ESPECIFICACION_AGENTES.md",
-      "sha256": "4bce6f01c8be94c9b1cc54bd7cd6316b59906be12d209cb51301d9e156abf710",
-      "lines": 32,
-      "references": [
-        {
-          "line": 1,
-          "kind": "seccion",
-          "name": "Contexto técnico frontend"
-        },
-        {
-          "line": 5,
-          "kind": "seccion",
-          "name": "Stack y ejecución"
-        },
-        {
-          "line": 9,
-          "kind": "seccion",
-          "name": "Invariantes"
-        },
-        {
-          "line": 18,
-          "kind": "seccion",
-          "name": "Estado y errores"
-        },
-        {
-          "line": 26,
-          "kind": "seccion",
-          "name": "UI y verificación"
-        }
-      ],
-      "content_included": false
-    },
-    {
       "path": "README.md",
-      "sha256": "bd0ea3d4c56befc429e0bcab0ef1175674801eb29a5636caeba4e24dbf7411cf",
-      "lines": 68,
+      "sha256": "90b677fe7d0fb4570c5f6f05ec195bd51946f39b3847ee918ab6b6f9da13144c",
+      "lines": 75,
       "references": [
         {
           "line": 1,
@@ -1872,22 +1758,22 @@
           "name": "Documentación técnica"
         },
         {
-          "line": 18,
+          "line": 22,
           "kind": "seccion",
           "name": "Organización del repositorio"
         },
         {
-          "line": 36,
+          "line": 43,
           "kind": "seccion",
           "name": "Tecnologías comprobadas"
         },
         {
-          "line": 49,
+          "line": 56,
           "kind": "seccion",
           "name": "Inicio local"
         },
         {
-          "line": 58,
+          "line": 65,
           "kind": "seccion",
           "name": "Modelo funcional vigente"
         }
@@ -1896,8 +1782,8 @@
     },
     {
       "path": "docs/API.md",
-      "sha256": "0577c14adfa56f25f05a3d7f26aaa438bdb528578d97624ecc667609befea09d",
-      "lines": 146,
+      "sha256": "d5809cf402071a7e5a88b977f29046edea24ae08bafd27493c0031c47213b6c3",
+      "lines": 147,
       "references": [
         {
           "line": 1,
@@ -1915,37 +1801,37 @@
           "name": "Endpoints"
         },
         {
-          "line": 36,
+          "line": 37,
           "kind": "seccion",
           "name": "DTOs de lectura"
         },
         {
-          "line": 77,
+          "line": 78,
           "kind": "seccion",
           "name": "Alta y actualización de titular"
         },
         {
-          "line": 99,
+          "line": 100,
           "kind": "seccion",
           "name": "Contactos compartidos y sustitución de relaciones"
         },
         {
-          "line": 115,
+          "line": 116,
           "kind": "seccion",
           "name": "Coincidencias"
         },
         {
-          "line": 119,
+          "line": 120,
           "kind": "seccion",
           "name": "Cuenta y login"
         },
         {
-          "line": 125,
+          "line": 126,
           "kind": "seccion",
           "name": "Errores y límites HTTP"
         },
         {
-          "line": 140,
+          "line": 141,
           "kind": "seccion",
           "name": "Edicion parcial del titular"
         }
@@ -1954,7 +1840,7 @@
     },
     {
       "path": "docs/ARQUITECTURA.md",
-      "sha256": "deb67d172155dcd2bc644deaaf0a5f13680725cddc8701be6c0f4c326897c500",
+      "sha256": "e483eb8df1d74a0d4b0dcc529a7525d8bb4e0fc1e41fc8bd55a263de8348eaa5",
       "lines": 112,
       "references": [
         {
@@ -2007,7 +1893,7 @@
     },
     {
       "path": "docs/BASE_DE_DATOS.md",
-      "sha256": "cceaab8c7312f4e858bcadc20aec2a2db55d7098f63c7207ec575cea6c1c58b4",
+      "sha256": "2f84b2ee876dd1709b2bfd2d6f9acbcc23c49d498d039d79d7215fe9f018fad4",
       "lines": 123,
       "references": [
         {
@@ -2080,7 +1966,7 @@
     },
     {
       "path": "docs/OPERACION_Y_PRUEBAS.md",
-      "sha256": "dbda8edbc82d5e8825f24eb2b13c6ee69c9889b1a50afc9d81947f2b351f6d09",
+      "sha256": "55e004204e68535a1dd2600c3a33837da8326bbba9ec89501d7f78b869de7003",
       "lines": 166,
       "references": [
         {
@@ -2106,7 +1992,7 @@
         {
           "line": 43,
           "kind": "seccion",
-          "name": "Desde Proyecto-FullStackbackend/demo"
+          "name": "Desde Backend/demo"
         },
         {
           "line": 49,
@@ -2116,7 +2002,7 @@
         {
           "line": 52,
           "kind": "seccion",
-          "name": "Desde Proyecto-FullStackfrontend"
+          "name": "Desde Frontend"
         },
         {
           "line": 61,
@@ -2136,7 +2022,7 @@
         {
           "line": 89,
           "kind": "seccion",
-          "name": "Desde Proyecto-FullStackbackend/demo"
+          "name": "Desde Backend/demo"
         },
         {
           "line": 114,
@@ -2168,7 +2054,7 @@
     },
     {
       "path": "docs/REVISION_TECNICA.md",
-      "sha256": "68e95c145c7ad1eaee4434b82735f69c09466366ee1ac5e6cdbe92d551f7c944",
+      "sha256": "17949023df0f3b40d0f8fcbcbade45ba1f4f2272ab43e702726284aa1658c552",
       "lines": 55,
       "references": [
         {
@@ -2179,7 +2065,7 @@
         {
           "line": 5,
           "kind": "seccion",
-          "name": "Resultados comprobados"
+          "name": "Resultados comprobados en la revisión base (2026-10-15)"
         },
         {
           "line": 13,
@@ -2198,11 +2084,125 @@
         }
       ],
       "content_included": false
+    },
+    {
+      "path": "docs/back/BACKEND_ESPECIFICACION_AGENTES.md",
+      "sha256": "6a25a5935346618481a4335b0692aefc7879f0e887be2001579f06d16abd371f",
+      "lines": 30,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contexto técnico backend"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Stack/capas"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Modelo y contratos"
+        },
+        {
+          "line": 24,
+          "kind": "seccion",
+          "name": "Pruebas/documentación"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/back/generar_guia_backend.py",
+      "sha256": "fa6120546227f9f00ff638fdd66dbbcc322598a7bd8fa0bcd487b46bf0befedd",
+      "lines": 189,
+      "references": [
+        {
+          "line": 32,
+          "kind": "funcion",
+          "name": "source_paths"
+        },
+        {
+          "line": 46,
+          "kind": "funcion",
+          "name": "declarations"
+        },
+        {
+          "line": 65,
+          "kind": "funcion",
+          "name": "inventory"
+        },
+        {
+          "line": 77,
+          "kind": "funcion",
+          "name": "plain"
+        },
+        {
+          "line": 83,
+          "kind": "funcion",
+          "name": "styles"
+        },
+        {
+          "line": 100,
+          "kind": "funcion",
+          "name": "append_markdown"
+        },
+        {
+          "line": 119,
+          "kind": "funcion",
+          "name": "page_footer"
+        },
+        {
+          "line": 127,
+          "kind": "funcion",
+          "name": "generate_pdf"
+        },
+        {
+          "line": 159,
+          "kind": "funcion",
+          "name": "main"
+        }
+      ],
+      "content_included": false
+    },
+    {
+      "path": "docs/front/FRONTEND_ESPECIFICACION_AGENTES.md",
+      "sha256": "d8e3f2cfe5e3d8818decf7bb36f13514c29578a54c06bba480e73db3cc52a82b",
+      "lines": 32,
+      "references": [
+        {
+          "line": 1,
+          "kind": "seccion",
+          "name": "Contexto técnico frontend"
+        },
+        {
+          "line": 5,
+          "kind": "seccion",
+          "name": "Stack y ejecución"
+        },
+        {
+          "line": 9,
+          "kind": "seccion",
+          "name": "Invariantes"
+        },
+        {
+          "line": 18,
+          "kind": "seccion",
+          "name": "Estado y errores"
+        },
+        {
+          "line": 26,
+          "kind": "seccion",
+          "name": "UI y verificación"
+        }
+      ],
+      "content_included": false
     }
   ],
   "pdf": {
-    "path": "Proyecto-FullStackbackend/demo/docs/Guia_backend_archivos_y_lineas.pdf",
+    "path": "docs/back/Guia_backend_archivos_y_lineas.pdf",
     "pages": 39,
-    "sha256": "75911613223f2f8c6acf16520bc8aa03b1e41224cf748a0f766abe06f13b31f8"
+    "sha256": "108ccceeacf3b3a8a1a32e77c907eae913453a4b91df6f3826efb7c5b205e4ca"
   }
 }

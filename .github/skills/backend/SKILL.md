@@ -5,7 +5,7 @@ description: "Usa cuando se implementen, depuren o revisen controladores, servic
 
 # Flujo de trabajo backend
 
-1. Lee `Proyecto-FullStackbackend/demo/AGENTS.md`, `docs/ESPECIFICACION_AGENTES.md` y la sección aplicable de `README.md`.
+1. Lee `Backend/demo/AGENTS.md`, `docs/back/BACKEND_ESPECIFICACION_AGENTES.md` y la sección aplicable de `README.md`.
 2. Traza endpoint → controller → service → repository/entity/DTO y revisa pruebas relacionadas antes de editar.
 3. Preserva contratos HTTP, validación, transacciones y las invariantes de relaciones compartidas. Considera rollback e idempotencia en operaciones de escritura.
 4. Para cambios de persistencia, coteja entidades, restricciones y `src/main/resources/schema.sql`/`data.sql`; describe cualquier migración manual necesaria.

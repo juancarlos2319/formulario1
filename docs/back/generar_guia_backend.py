@@ -16,16 +16,16 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer
 
-BACKEND = Path(__file__).resolve().parents[1]
-REPO = BACKEND.parents[1]
-OUTPUT = BACKEND / "docs"
+REPO = Path(__file__).resolve().parents[2]
+BACKEND = REPO / "Backend" / "demo"
+OUTPUT = REPO / "docs" / "back"
 PDF = OUTPUT / "Guia_backend_archivos_y_lineas.pdf"
 MANIFEST = OUTPUT / "referencias_backend.json"
 DOCUMENTS = [
     REPO / "README.md", *sorted((REPO / "docs").glob("*.md")),
-    REPO / "Proyecto-FullStackfrontend/README.md", BACKEND / "README.md",
-    REPO / "Proyecto-FullStackfrontend/docs/ESPECIFICACION_AGENTES.md",
-    BACKEND / "docs/ESPECIFICACION_AGENTES.md",
+    REPO / "Frontend/README.md", BACKEND / "README.md",
+    REPO / "docs/front/FRONTEND_ESPECIFICACION_AGENTES.md",
+    REPO / "docs/back/BACKEND_ESPECIFICACION_AGENTES.md",
 ]
 
 

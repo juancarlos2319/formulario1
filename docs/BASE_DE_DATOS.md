@@ -2,7 +2,7 @@
 
 ## Fuente de verdad
 
-La estructura documentada procede de `Proyecto-FullStackbackend/demo/src/main/resources/schema.sql`, contrastada con las entidades. El script usa `CREATE TABLE IF NOT EXISTS`: define tablas nuevas y no convierte una base de una versión anterior. No existe un sistema activo de migraciones Flyway/Liquibase ni una carpeta de migraciones SQL vigente.
+La estructura documentada procede de `Backend/demo/src/main/resources/schema.sql`, contrastada con las entidades. El script usa `CREATE TABLE IF NOT EXISTS`: define tablas nuevas y no convierte una base de una versión anterior. No existe un sistema activo de migraciones Flyway/Liquibase ni una carpeta de migraciones SQL vigente.
 
 Las direcciones se almacenan solamente en `direccion_titular`. `perfil_titular` no tiene `direccion` ni `ciudad`. La existencia del perfil distingue titular/contacto; `Persona.isTitular()` es un método derivado, no una columna.
 

@@ -1,6 +1,6 @@
 # Contexto técnico backend
 
-Fuentes: [README](../README.md), [API](../../../docs/API.md), [BD](../../../docs/BASE_DE_DATOS.md), [arquitectura](../../../docs/ARQUITECTURA.md), [operación](../../../docs/OPERACION_Y_PRUEBAS.md), [revisión](../../../docs/REVISION_TECNICA.md).
+Fuentes: [README backend](../../Backend/demo/README.md), [API](../API.md), [BD](../BASE_DE_DATOS.md), [arquitectura](../ARQUITECTURA.md), [operación](../OPERACION_Y_PRUEBAS.md), [revisión](../REVISION_TECNICA.md).
 
 ## Stack/capas
 
@@ -25,6 +25,6 @@ Java 21, Spring Boot 4.1.1, MVC/Security/JPA/JDBC, JJWT 0.11.5 y PostgreSQL. Wra
 
 mvnw.cmd test desde demo. Integración requiere TEST_DATABASE_URL local /nomina_backend_test; usa TRUNCATE CASCADE. Nunca desarrollo. Revisión 2026-10-15: 43 unitarias aprobadas y 13 integraciones excluidas expresamente de la ejecución.
 
-Actualizar API/BD/READMEs al cambiar modelo/rutas. PDF/manifiesto con generador que calcula referencias, no reescribe README ni reproduce secretos o datos personales. Regenerar tras cambios; no conservar referencias a archivos eliminados.
+Actualizar API/BD/READMEs al cambiar modelo/rutas. PDF/manifiesto con generador que calcula referencias, no reescribe README ni reproduce secretos o datos personales. Regenerar tras cambios; no conservar referencias a archivos eliminados. El frontend usa Angular 22 y Vitest; consulta el README frontend y el informe de migración en razi.
 
 Edicion del formulario: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. Frontend compara con una copia en memoria, omite peticiones sin cambios y fusiona deltas de lista/detalles sin GET posterior. Colecciones modificadas se envian completas; PUT completo permanece compatible.

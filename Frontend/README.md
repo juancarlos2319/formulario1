@@ -1,6 +1,6 @@
 # Frontend Angular de administración de personas
 
-SPA standalone con Angular/Material 18.2.14, TypeScript 5.5.4 y RxJS 7.8.2. [Arquitectura](../docs/ARQUITECTURA.md), [API](../docs/API.md), [persistencia](../docs/BASE_DE_DATOS.md), [operación/pruebas](../docs/OPERACION_Y_PRUEBAS.md) y [revisión](../docs/REVISION_TECNICA.md) son la documentación compartida.
+SPA standalone con Angular/Material/CDK 22.x, TypeScript 6.x y RxJS 7.8.x. Las decisiones y el historial están en [Detalle de migración Angular 22](../razi/Detalle_Migracion_Angular_22.docx). [Arquitectura](../docs/ARQUITECTURA.md), [API](../docs/API.md), [persistencia](../docs/BASE_DE_DATOS.md), [operación/pruebas](../docs/OPERACION_Y_PRUEBAS.md) y [revisión](../docs/REVISION_TECNICA.md) son la documentación compartida.
 
 ## Ejecución
 
@@ -10,7 +10,7 @@ Desde esta carpeta:
 npm.cmd ci
 npm.cmd start
 npm.cmd run build
-npm.cmd test -- --watch=false --browsers=ChromeHeadless
+npm.cmd test -- --watch=false
 ```
 
 Servidor: http://localhost:4200; backend esperado: http://localhost:8080. En otras shells usar npm sin .cmd. Build production genera dist/formulario-registro/browser; watch usa development. No hay environment central de URLs, SSR, Service Worker, Docker ni E2E versionado.
@@ -20,7 +20,7 @@ Servidor: http://localhost:4200; backend esperado: http://localhost:8080. En otr
 | Archivo/carpeta | Responsabilidad |
 | --- | --- |
 | src/main.ts | Bootstrap standalone |
-| src/app/app.config.ts | Router, provideAnimations y HttpClient/interceptor |
+| src/app/app.config.ts | Router, detección Zone, HttpClient con XHR e interceptor JWT |
 | src/app/app.routes.ts | Rutas, guards, títulos y modos de contactos |
 | src/app/app.component.ts | Redirección global ante pérdida de token |
 | components/ | Pantallas, layout y feedback |
@@ -84,16 +84,16 @@ jwtInterceptor afecta solo http://localhost:8080/api/. Añade Bearer, timeout po
 
 Sora: títulos; Plus Jakarta Sans: controles/lectura; IBM Plex Mono: estadísticas/campos numéricos. Familias centralizadas en --app-font-body, --app-font-heading, --app-font-numeric. Google Fonts en index.html con display=swap, preconnect y fallbacks.
 
-El tema incluye core, botones/icon-buttons/FAB, card, checkbox, form-field/input, list, progress-bar/spinner, select, sidenav, table y toolbar. Añadir módulos Material puede requerir extender sus mixins. No reemplazar base/color/densidad por solo tipografía. Entrada Sass tanto en build como Karma; reiniciar ng serve tras cambios de angular.json.
+El tema incluye core, botones/icon-buttons/FAB, card, checkbox, form-field/input, list, progress-bar/spinner, select, sidenav, table y toolbar. Añadir módulos Material puede requerir extender sus mixins. No reemplazar base/color/densidad por solo tipografía. Entrada Sass en build y pruebas Angular; reiniciar ng serve tras cambios de angular.json. Las pruebas usan Vitest y jsdom.
 
 Feedback usa dialog nativo/showModal, no MatDialog. Login/dashboard tienen animaciones y reduced-motion. Las listas incluyen tarjetas móviles, estados de carga y atributos ARIA. No hay auditoría completa de accesibilidad ni visual automatizada.
 
 ## Verificación
 
-2026-10-15: build aprobado y 94 pruebas Angular aprobadas, con warnings de tamaño. Verificación visual previa del login en Chrome. No E2E ni pruebas de todos los componentes conectados a backend real.
+Durante la migración (2026-10-28) se registraron build de producción aprobado y 92 pruebas Vitest aprobadas, con avisos de presupuesto de tamaño. Ese resultado es histórico y no se repitió tras los cambios visuales posteriores. No hay E2E ni pruebas de todos los componentes conectados a backend real.
 
 Antes de modificar HTTP contrastar DTO Java/TypeScript. La respuesta de ocupaciones es objeto id/nombre aunque el servicio declara string[] y Registro usa any[]; no asumir que los generics equivalen a contrato runtime. Actualizar documentación compartida al cambiar modelo/rutas.
 
 Las funciones de componentes, servicios, guards e interceptor incluyen comentarios breves de propósito y lógica. Se documentan también getters, helpers locales y estado derivado relevante; no se añaden comentarios repetitivos a cada callback HTTP o prueba. Los comentarios no cambian contratos ni comportamiento.
 
-Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El servicio compara con una copia en memoria, omite peticiones sin cambios y fusiona los deltas de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible en la API por compatibilidad. La guía explicada de Angular está en [razi](../razi/Guia_Funcionamiento_Angular.docx).
+Edición del titular: PATCH /api/personas/{id} intercambia solo campos modificados y sus valores persistidos. El servicio compara con una copia en memoria, omite peticiones sin cambios y fusiona los deltas de lista/detalles sin GET posterior. Las colecciones modificadas se envían completas; PUT completo permanece disponible en la API por compatibilidad. La guía explicada de Angular está en [razi](../razi/Guia_Funcionamiento_Angular.docx); el informe por etapas está en [Detalle de migración Angular 22](../razi/Detalle_Migracion_Angular_22.docx).
