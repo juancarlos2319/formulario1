@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import com.example.demo.security.JwtUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.web.server.ResponseStatusException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -61,6 +62,28 @@ class DemoApplicationTests {
     }
     private ContactoDTO existente(long id) { return new ContactoDTO(id, null, null, null, null, null, null, 1L, null); }
     private int count(String table) { return jdbc.queryForObject("SELECT count(*) FROM " + table,Integer.class); }
+
+    @Test void semillaSincronizaSecuenciasDeIDsExplicitos() {
+        new ResourceDatabasePopulator(new ClassPathResource("data.sql")).execute(jdbc.getDataSource());
+
+        Long ocupacionId = jdbc.queryForObject(
+                "INSERT INTO catalogo_ocupacion(nombre) VALUES ('Ocupacion de prueba') RETURNING id",
+                Long.class);
+        Long parentescoId = jdbc.queryForObject(
+                "INSERT INTO catalogo_parentesco(nombre) VALUES ('Parentesco de prueba') RETURNING id",
+                Long.class);
+        Long personaId = jdbc.queryForObject(
+                "INSERT INTO persona(nombre,apellido,fecha_nacimiento,genero) VALUES (?,?,?,?) RETURNING id",
+                Long.class, "Persona", "Prueba", LocalDate.of(1990, 1, 1), "No especificado");
+        Long usuarioId = jdbc.queryForObject(
+                "INSERT INTO usuario(username,password,id_persona) VALUES (?,?,?) RETURNING id",
+                Long.class, "cuenta-secuencia-prueba", "hash-prueba", 1L);
+
+        assertTrue(ocupacionId > 7);
+        assertTrue(parentescoId > 11);
+        assertTrue(personaId > 6);
+        assertTrue(usuarioId > 2);
+    }
 
     private String crearCuentaConRol(String rol) {
         var persona = guardarConDatos(formulario(1));

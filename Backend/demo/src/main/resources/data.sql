@@ -43,4 +43,15 @@ INSERT INTO usuario (id, username, password, rol, id_persona) VALUES
 (1, 'admin1', '$2a$10$ZFWFlxEZakU8XcWCdAZBD.0CskpNHK12BJtt7Lfp9oQiilrm61296', 'ROLE_ADMIN', 1),
 (2, 'admin2', '$2a$10$e8W/9s5L5kI2j/4z3Y1PceVvN3HjV1G8Qk0t3J2x4k5l6m7n8o9p2', 'ROLE_ADMIN', 2)
 ON CONFLICT (id) DO NOTHING;
-SELECT setval('persona_id_seq', (SELECT MAX(id) FROM persona));
+SELECT setval(pg_get_serial_sequence('catalogo_ocupacion', 'id'),
+              COALESCE(MAX(id), 1), MAX(id) IS NOT NULL)
+FROM catalogo_ocupacion;
+SELECT setval(pg_get_serial_sequence('catalogo_parentesco', 'id'),
+              COALESCE(MAX(id), 1), MAX(id) IS NOT NULL)
+FROM catalogo_parentesco;
+SELECT setval(pg_get_serial_sequence('persona', 'id'),
+              COALESCE(MAX(id), 1), MAX(id) IS NOT NULL)
+FROM persona;
+SELECT setval(pg_get_serial_sequence('usuario', 'id'),
+              COALESCE(MAX(id), 1), MAX(id) IS NOT NULL)
+FROM usuario;

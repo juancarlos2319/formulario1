@@ -55,7 +55,7 @@ Los controllers no unifican errores: POST/PUT/DELETE tienen mapeos distintos de 
 
 ## SQL y pruebas
 
-Ejecutar [schema.sql](src/main/resources/schema.sql), después [data.sql](src/main/resources/data.sql), una vez sobre base vacía. No migraciones activas; IF NOT EXISTS no elimina columnas. Semilla con IDs explícitos, solo persona_id_seq reajustada y direcciones no idempotentes; varios campos iniciales pendientes de completar.
+Ejecutar [schema.sql](src/main/resources/schema.sql), después [data.sql](src/main/resources/data.sql), una vez sobre base vacía. No migraciones activas; IF NOT EXISTS no elimina columnas. La semilla reajusta las secuencias de ocupación, parentesco, persona y usuario a sus IDs explícitos; las direcciones siguen sin ser idempotentes y algunos campos iniciales quedan pendientes de completar.
 
 2026-10-15: ejecución seleccionada de 43 pruebas unitarias, todas aprobadas, sin fallos/errores. JwtUtilTest: 1; CuentaServiceTest: 7; PersonaContratosTest: 5; RegistroCompletoTest: 30. Las 13 de DemoApplicationTests se excluyeron expresamente; no se ejecutó integración con PostgreSQL.
 

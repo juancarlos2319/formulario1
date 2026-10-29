@@ -114,7 +114,7 @@ Las direcciones iniciales tienen calle/número/municipio; otros campos quedan va
 
 Varios INSERT usan `ON CONFLICT`, pero las direcciones no tienen una clave de conflicto declarada para el par persona/orden. Reejecutar la semilla puede duplicarlas. El script debe ejecutarse una vez sobre una base nueva.
 
-Se insertan IDs explícitos de persona, catálogos y cuentas. El script solo ejecuta `setval` sobre `persona_id_seq`; las secuencias de catálogos/usuario no quedan necesariamente alineadas. El alta implícita de una ocupación puede chocar con un ID sembrado. Ver [hallazgo R03](REVISION_TECNICA.md).
+Se insertan IDs explícitos de persona, catálogos y cuentas. Al final, el script sincroniza las secuencias de `catalogo_ocupacion`, `catalogo_parentesco`, `persona` y `usuario` con el máximo ID insertado, de modo que el siguiente valor generado no colisione con la semilla. Esta corrección aplica al inicializar una base nueva; no es una migración automática para bases ya instaladas. Ver [hallazgo R03](REVISION_TECNICA.md).
 
 ## DDL automático y alcance de verificación
 

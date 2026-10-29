@@ -21,7 +21,7 @@ psql -X -v ON_ERROR_STOP=1 -d <base_nueva> -f Backend/demo/src/main/resources/da
 
 `<base_nueva>` es un marcador que debe sustituirse. No pegar estos comandos sin ajustarlo. Configurar autenticación de PostgreSQL fuera de argumentos registrados o documentación. Los SQL son manuales; la configuración actual no garantiza ejecutarlos automáticamente al arrancar Spring.
 
-`CREATE TABLE IF NOT EXISTS` no elimina columnas existentes. Para obtener la estructura actual sin `direccion`/`ciudad`, usar una base vacía. No aplicar `data.sql` varias veces: sus direcciones no son idempotentes. La reconstrucción borra datos si previamente se decide eliminar la base; esa acción no forma parte de los comandos anteriores.
+`CREATE TABLE IF NOT EXISTS` no elimina columnas existentes. Para obtener la estructura actual sin `direccion`/`ciudad`, usar una base vacía. `data.sql` sincroniza las secuencias de ocupación, parentesco, persona y usuario después de insertar IDs explícitos. No aplicar `data.sql` varias veces: sus direcciones no son idempotentes. La reconstrucción borra datos si previamente se decide eliminar la base; esa acción no forma parte de los comandos anteriores.
 
 ## 2. Configurar y arrancar el backend
 
@@ -127,7 +127,7 @@ $env:TEST_DATABASE_URL = 'jdbc:postgresql://127.0.0.1:55439/nomina_backend_test'
 .\mvnw.cmd test
 ```
 
-Antes de ejecutar, confirmar que es una instancia/base independiente de desarrollo. `@BeforeEach` crea el esquema y ejecuta `TRUNCATE ... RESTART IDENTITY CASCADE`; estas pruebas destruyen los datos de la base indicada. Sustituyen `ddl-auto` por `none` y `spring.sql.init.mode` por `never`; no usan `data.sql` como preparación.
+Antes de ejecutar, confirmar que es una instancia/base independiente de desarrollo. `@BeforeEach` crea el esquema y ejecuta `TRUNCATE ... RESTART IDENTITY CASCADE`; estas pruebas destruyen los datos de la base indicada. Sustituyen `ddl-auto` por `none` y `spring.sql.init.mode` por `never`; la prueba de secuencias carga explícitamente `data.sql` en esa base desechable.
 
 ## 7. Contraseñas y documentación
 
@@ -157,7 +157,7 @@ Ejecutar desde `Backend/demo`. El generador y sus entregables viven en `docs/bac
 | Fuentes distintas en otra máquina | Comprobar Google Fonts y conexión; se usan familias de respaldo si falla |
 | Guardado con 404 pero registro existe | Controller PUT puede traducir una RuntimeException interna a 404 |
 | Username largo falla aunque formulario lo acepta | SQL limita 50; validación frontend/backend permite 255 |
-| Nueva ocupación falla con PK | Revisar secuencia del catálogo tras semilla con IDs explícitos |
+| Nueva ocupación falla con PK en una base ya inicializada | Las secuencias se sincronizan al cargar `data.sql` en una base nueva; una base previa a esta corrección requiere sincronización manual tras revisar sus IDs |
 | No se ven cambios de otro cliente | Caché en memoria sin TTL ni invalidación remota; recargar |
 | Vitest no encuentra el DOM | Confirmar jsdom, polyfills `zone.js/testing` y `zone.js/plugins/vitest-patch` del target testing |
 
