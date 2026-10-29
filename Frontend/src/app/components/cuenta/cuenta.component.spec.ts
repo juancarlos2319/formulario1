@@ -43,6 +43,14 @@ describe('CuentaComponent', () => {
         expect(component.formulario.controls.passwordActual.value).toBe('');
     });
 
+    it('rechaza usernames de más de 50 caracteres', () => {
+        component.formulario.patchValue({ username: 'u'.repeat(51), passwordActual: 'actual-prueba' });
+
+        expect(component.formulario.controls.username.hasError('maxlength')).toBe(true);
+        component.guardar();
+        expect(auth.actualizarLogin).not.toHaveBeenCalled();
+    });
+
     it('no cierra sesion si el servidor no confirma el guardado', () => {
         auth.actualizarLogin.mockReturnValue(of({ ok: false }));
         component.formulario.patchValue({ passwordActual: 'actual-prueba' });

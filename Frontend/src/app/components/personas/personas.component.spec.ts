@@ -24,6 +24,8 @@ describe('PersonasComponent: proteccion de administradores', () => {
             ] }).compileComponents();
         const fixture = TestBed.createComponent(PersonasComponent);
         fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
         const botones = fixture.nativeElement.querySelectorAll('button.danger') as NodeListOf<HTMLButtonElement>;
         expect(botones[0].disabled).toBe(true);
         expect(botones[1].disabled).toBe(false);

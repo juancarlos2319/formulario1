@@ -121,7 +121,7 @@ Entrada: `{correos?:string[], telefonos?:string[], excluirId?:number}`. Requiere
 
 Login no verifica baja ni rol. Devuelve 404 si no encuentra username y 401 si BCrypt no coincide. El body es Map, sin validación Bean Validation explícita; entradas incompletas pueden terminar en errores distintos a esos dos casos.
 
-`EditarCuentaDTO`: `username`, `passwordActual`, `passwordNueva`. Se exige username de 1–255 tras trim, sin espacios; contraseña actual válida; nueva opcional, mínimo 8 caracteres y máximo 72 bytes UTF-8. Username ocupado: 409. El SQL limita username a 50; esta discrepancia está registrada. Guardado exitoso no devuelve un token nuevo; el frontend cierra sesión y pide iniciar de nuevo.
+`EditarCuentaDTO`: `username`, `passwordActual`, `passwordNueva`. Se exige username de 1–50 caracteres tras trim, sin espacios; contraseña actual válida; nueva opcional, mínimo 8 caracteres y máximo 72 bytes UTF-8. Username ocupado: 409; username inválido, incluido el exceso de longitud: 400. La entidad JPA, la validación del servicio, el formulario y el SQL comparten el límite de 50. Guardado exitoso no devuelve un token nuevo; el frontend cierra sesión y pide iniciar de nuevo.
 
 ## Errores y límites HTTP
 

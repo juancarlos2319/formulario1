@@ -24,7 +24,7 @@ export class CuentaComponent implements OnInit {
   readonly guardando = signal(false);
   readonly error = signal('');
   readonly formulario = inject(FormBuilder).nonNullable.group({
-    username: ['', [Validators.required, Validators.maxLength(255), Validators.pattern(/^\S+$/)]],
+    username: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^\S+$/)]],
     passwordActual: ['', Validators.required],
     passwordNueva: ['', Validators.minLength(8)],
     confirmarPassword: ['']

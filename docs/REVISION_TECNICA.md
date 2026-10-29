@@ -14,7 +14,7 @@ Revisión base del 15 de octubre de 2026 sobre el código versionado entonces. L
 
 | ID | Prioridad de revisión | Evidencia | Implicación |
 | --- | --- | --- | --- |
-| R01 | Alta | `CuentaService.actualizarLogin`, `CuentaComponent` y `schema.sql` | Se aceptan username de hasta 255, pero SQL permite 50 y JPA no fija 50. Fallos de persistencia pueden traducirse a 409 engañoso |
+| R01 | Resuelta (2026-10-29) | `CuentaService.actualizarLogin`, `CuentaComponent`, `Usuario` y `schema.sql` | Límite de 50 alineado en servicio, JPA, formulario y SQL; los valores largos se rechazan con 400 antes de persistir |
 | R02 | Alta | `SecurityConfig`, `JwtFilter`, `AuthController` | Seguridad exige autenticación, no rol/pertenencia; JWT crea autoridades vacías, no reconsulta cuenta/baja. No hay autorización por titular ni revocación server-side |
 | R03 | Alta | `data.sql` y creación implícita de ocupaciones | Solo se reajusta `persona_id_seq`; catálogos/cuentas con IDs explícitos conservan secuencias potencialmente atrasadas |
 | R04 | Alta | `application.properties` | Valores de conexión y clave JWT literales en una fuente versionada. Se omitieron en los documentos; externalización/rotación debe tratarse separadamente |

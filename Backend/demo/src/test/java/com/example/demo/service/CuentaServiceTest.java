@@ -66,6 +66,28 @@ class CuentaServiceTest {
         verify(usuarios, org.mockito.Mockito.never()).saveAndFlush(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test void aceptaUsernameDe50Caracteres() {
+        String username = "u".repeat(50);
+        Usuario usuario = cuentaEditable();
+        when(usuarios.findByUsername(username)).thenReturn(Optional.empty());
+
+        service.actualizarLogin("cuenta-prueba", new com.example.demo.dto.EditarCuentaDTO(username, "actual-prueba", ""));
+
+        assertEquals(username, usuario.getUsername());
+        verify(usuarios).saveAndFlush(usuario);
+    }
+
+    @Test void rechazaUsernameMayorA50ConBadRequestAntesDeGuardar() {
+        String username = "u".repeat(51);
+        cuentaEditable();
+
+        var error = assertThrows(ResponseStatusException.class, () -> service.actualizarLogin("cuenta-prueba",
+                new com.example.demo.dto.EditarCuentaDTO(username, "actual-prueba", "")));
+
+        assertEquals(400, error.getStatusCode().value());
+        verify(usuarios, org.mockito.Mockito.never()).saveAndFlush(org.mockito.ArgumentMatchers.any());
+    }
+
     @Test void noDevuelvePasswordEnConsultaLogin() {
         cuentaEditable();
         assertEquals(java.util.Map.of("username", "cuenta-prueba"), service.obtenerDatosLogin("cuenta-prueba"));

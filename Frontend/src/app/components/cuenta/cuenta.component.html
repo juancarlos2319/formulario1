@@ -14,9 +14,9 @@
     <form [formGroup]="formulario" (ngSubmit)="guardar()" [attr.aria-busy]="guardando()">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">
         <mat-label>Nombre de usuario</mat-label>
-        <input matInput id="username" formControlName="username" autocomplete="username" maxlength="255">
+        <input matInput id="username" formControlName="username" autocomplete="username" maxlength="50">
         @if (formulario.controls.username.touched && formulario.controls.username.invalid) {
-          <mat-error>Introduce un usuario sin espacios.</mat-error>
+          <mat-error>Introduce un usuario de hasta 50 caracteres, sin espacios.</mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="account-field">

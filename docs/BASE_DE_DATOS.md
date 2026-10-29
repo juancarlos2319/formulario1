@@ -91,7 +91,7 @@ No existe unicidad global de correo/teléfono. Un índice de búsqueda no equiva
 | `catalogo_parentesco` | `id BIGSERIAL`, `nombre VARCHAR(50)` | PK; nombre UNIQUE NOT NULL |
 | `usuario` | `id BIGSERIAL`, `username VARCHAR(50)`, `password VARCHAR(255)`, `rol VARCHAR(20)`, `id_persona BIGINT` | PK; username UNIQUE NOT NULL; password NOT NULL; rol NOT NULL default ROLE_ADMIN; persona UNIQUE NOT NULL, FK CASCADE |
 
-`Usuario.idPersona` es un Long, no una relación JPA. La cuenta obtiene su persona mediante un repositorio separado. El modelo no declara longitud 50 para username y su validación permite 255, por lo que Hibernate/SQL pueden divergir.
+`Usuario.idPersona` es un Long, no una relación JPA. La cuenta obtiene su persona mediante un repositorio separado. `Usuario.username` declara longitud 50 en JPA; el servicio y el formulario también rechazan valores mayores antes de persistir, alineados con `VARCHAR(50)`.
 
 El script incluye `ALTER TABLE usuario ADD COLUMN IF NOT EXISTS id_persona ... NOT NULL UNIQUE REFERENCES persona(id)`. No rellena datos antiguos; una tabla ya poblada sin esa columna puede rechazar el ALTER. No debe interpretarse como migración general de cuentas.
 

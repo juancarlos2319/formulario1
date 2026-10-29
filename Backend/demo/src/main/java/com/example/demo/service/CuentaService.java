@@ -40,8 +40,8 @@ public class CuentaService {
         Usuario usuario = usuarioRepository.findByUsername(autenticado)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta no encontrada"));
         String nuevoUsuario = datos.username() == null ? "" : datos.username().trim();
-        if (nuevoUsuario.isEmpty() || nuevoUsuario.length() > 255 || nuevoUsuario.chars().anyMatch(Character::isWhitespace)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario debe tener entre 1 y 255 caracteres, sin espacios.");
+        if (nuevoUsuario.isEmpty() || nuevoUsuario.length() > 50 || nuevoUsuario.chars().anyMatch(Character::isWhitespace)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El usuario debe tener entre 1 y 50 caracteres, sin espacios.");
         }
         if (datos.passwordActual() == null || !passwordEncoder.matches(datos.passwordActual(), usuario.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña actual es incorrecta.");
