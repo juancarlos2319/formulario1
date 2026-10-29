@@ -15,7 +15,7 @@ Revisión base del 15 de octubre de 2026 sobre el código versionado entonces. L
 | ID | Prioridad de revisión | Evidencia | Implicación |
 | --- | --- | --- | --- |
 | R01 | Resuelta (2026-10-29) | `CuentaService.actualizarLogin`, `CuentaComponent`, `Usuario` y `schema.sql` | Límite de 50 alineado en servicio, JPA, formulario y SQL; los valores largos se rechazan con 400 antes de persistir |
-| R02 | Alta | `SecurityConfig`, `JwtFilter`, `AuthController` | Seguridad exige autenticación, no rol/pertenencia; JWT crea autoridades vacías, no reconsulta cuenta/baja. No hay autorización por titular ni revocación server-side |
+| R02 | Resuelta (2026-10-29) | `SecurityConfig`, `JwtFilter`, `AuthController` | Rutas privadas y login limitados a `ROLE_ADMIN`; el filtro consulta la cuenta y aplica el rol vigente en cada petición. Token inválido/vencido o cuenta inexistente no autentican; otros roles reciben 403. No existe baja lógica de cuentas ni pertenencia por titular: este portal es solo de administración |
 | R03 | Alta | `data.sql` y creación implícita de ocupaciones | Solo se reajusta `persona_id_seq`; catálogos/cuentas con IDs explícitos conservan secuencias potencialmente atrasadas |
 | R04 | Alta | `application.properties` | Valores de conexión y clave JWT literales en una fuente versionada. Se omitieron en los documentos; externalización/rotación debe tratarse separadamente |
 | R05 | Media | `PersonaService.reactivar` frente a `bloquearContactos` | Altas usan advisory lock global; reactivaciones no. Altas/reactivaciones concurrentes pueden superar el límite lógico de 20; SQL no lo garantiza |
@@ -48,7 +48,7 @@ Las prioridades indican impacto potencial para futuras tareas; no son una certif
 
 ## Cobertura y tareas pendientes de validación
 
-La suite usa mocks y pruebas HTTP simuladas; las pruebas de integración no se ejecutaron. Quedan sin comprobación empírica: serialización real de errores de Spring Security, URLs fuera de localhost, CORS del proveedor postal, persistencia y rollback con PostgreSQL, concurrencia de reactivaciones, planes de consulta, flujo completo en navegador con backend real y revisión de accesibilidad.
+La suite usa mocks y pruebas HTTP simuladas; las pruebas de integración requieren `TEST_DATABASE_URL` limitado a `nomina_backend_test`, base desechable que se trunca antes de cada prueba. Quedan sin comprobación empírica: URLs fuera de localhost, CORS del proveedor postal, persistencia y rollback con PostgreSQL, concurrencia de reactivaciones, planes de consulta, flujo completo en navegador con backend real y revisión de accesibilidad.
 
 La actualización selectiva del listado se verificó con respuestas HTTP simuladas: reemplazo por ID, conservación de otras filas/detalles, ediciones sucesivas, petición inicial tardía y escritura de una sesión anterior. El encabezado se comprobó con cambios propios/ajenos, campos no visibles, contacto compartido, guardado fallido y perfil antiguo pendiente.
 

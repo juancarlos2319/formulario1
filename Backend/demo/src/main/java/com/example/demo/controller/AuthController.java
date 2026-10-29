@@ -68,6 +68,10 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("message", "Credenciales incorrectas"));
         }
 
+        if (!"ROLE_ADMIN".equals(user.getRol())) {
+            return ResponseEntity.status(403).body(Map.of("message", "La cuenta no tiene permisos de administración"));
+        }
+
         // Genera el token JWT usando el JwtUtil que tienes en el proyecto
         String token = jwtUtil.generateToken(user.getUsername());
 

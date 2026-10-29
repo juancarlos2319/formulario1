@@ -30,9 +30,7 @@ public class SecurityConfig {
                         // 1. PERMITIR OPTIONS (Obligatorio para que Angular pueda enviar el Token sin ser bloqueado)
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/personas/**").authenticated()
-                        .requestMatchers("/api/ocupaciones/**").authenticated() // Agrega tus ocupaciones aquí
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("ADMIN")
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

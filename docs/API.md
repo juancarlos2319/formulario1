@@ -2,7 +2,7 @@
 
 ## Convenciones
 
-Base local: `http://localhost:8080`. Los endpoints de negocio requieren `Authorization: Bearer <JWT>`; el único endpoint de aplicación permitido sin autenticación es `/api/auth/login`. OPTIONS está permitido globalmente. CORS declara `http://localhost:4200` en los controllers. No hay versionado `/v1`, paginación ni documentación OpenAPI generada.
+Base local: `http://localhost:8080`. Todos los endpoints de aplicación, excepto `POST /api/auth/login`, requieren `Authorization: Bearer <JWT>` asociado a una cuenta vigente con `rol=ROLE_ADMIN`. El filtro vuelve a consultar la cuenta y toma el rol actual de la base en cada petición. JWT inválido/vencido o cuenta inexistente: 401; cuenta existente con otro rol: 403. El login también rechaza cuentas que no sean administradoras con 403. OPTIONS está permitido globalmente. CORS declara `http://localhost:4200` en los controllers. No hay versionado `/v1`, paginación ni documentación OpenAPI generada.
 
 Los IDs JSON corresponden a `Long`, las fechas a `LocalDate` (`YYYY-MM-DD`) y las comunicaciones a arreglos de cadenas. Este documento usa nombres y tipos; no contiene credenciales ni registros personales de la semilla.
 
@@ -119,7 +119,7 @@ Entrada: `{correos?:string[], telefonos?:string[], excluirId?:number}`. Requiere
 
 ## Cuenta y login
 
-Login no verifica baja ni rol. Devuelve 404 si no encuentra username y 401 si BCrypt no coincide. El body es Map, sin validación Bean Validation explícita; entradas incompletas pueden terminar en errores distintos a esos dos casos.
+Login devuelve 404 si no encuentra username, 401 si BCrypt no coincide y 403 si la cuenta no tiene `ROLE_ADMIN`. El body es Map, sin validación Bean Validation explícita; entradas incompletas pueden terminar en errores distintos a esos casos. Las peticiones posteriores vuelven a validar que la cuenta exista y conserve su rol actual.
 
 `EditarCuentaDTO`: `username`, `passwordActual`, `passwordNueva`. Se exige username de 1–50 caracteres tras trim, sin espacios; contraseña actual válida; nueva opcional, mínimo 8 caracteres y máximo 72 bytes UTF-8. Username ocupado: 409; username inválido, incluido el exceso de longitud: 400. La entidad JPA, la validación del servicio, el formulario y el SQL comparten el límite de 50. Guardado exitoso no devuelve un token nuevo; el frontend cierra sesión y pide iniciar de nuevo.
 

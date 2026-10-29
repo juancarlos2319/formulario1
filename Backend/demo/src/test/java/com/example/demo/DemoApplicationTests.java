@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.test.web.servlet.MockMvc;
+import com.example.demo.security.JwtUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @EnabledIfEnvironmentVariable(named = "TEST_DATABASE_URL",
         matches = "jdbc:postgresql://(localhost|127\\.0\\.0\\.1):[0-9]+/nomina_backend_test")
@@ -25,9 +30,12 @@ import static org.junit.jupiter.api.Assertions.*;
         "spring.sql.init.mode=never",
         "jwt.secret=test-only-secret-with-at-least-32-bytes"
 })
+@AutoConfigureMockMvc
 class DemoApplicationTests {
     @Autowired PersonaService personas;
     @Autowired JdbcTemplate jdbc;
+    @Autowired MockMvc mockMvc;
+    @Autowired JwtUtil jwt;
 
     @BeforeEach void prepararBaseDesechable() throws Exception {
         jdbc.execute(new ClassPathResource("schema.sql").getContentAsString(StandardCharsets.UTF_8));
@@ -53,6 +61,30 @@ class DemoApplicationTests {
     }
     private ContactoDTO existente(long id) { return new ContactoDTO(id, null, null, null, null, null, null, 1L, null); }
     private int count(String table) { return jdbc.queryForObject("SELECT count(*) FROM " + table,Integer.class); }
+
+    private String crearCuentaConRol(String rol) {
+        var persona = guardarConDatos(formulario(1));
+        jdbc.update("INSERT INTO usuario(username,password,rol,id_persona) VALUES (?,?,?,?)",
+                "cuenta-" + rol.toLowerCase(), "hash-prueba", rol, persona.getId());
+        return jwt.generateToken("cuenta-" + rol.toLowerCase());
+    }
+
+    @Test void endpointsAdministrativosPermitenSoloRolAdmin() throws Exception {
+        String admin = crearCuentaConRol("ROLE_ADMIN");
+        String usuario = crearCuentaConRol("ROLE_USER");
+
+        mockMvc.perform(get("/api/personas/resumen").header("Authorization", "Bearer " + admin))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/personas/resumen").header("Authorization", "Bearer " + usuario))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test void rechazaTokenVigenteDeUnaCuentaQueYaNoExiste() throws Exception {
+        String token = jwt.generateToken("cuenta-eliminada");
+
+        mockMvc.perform(get("/api/personas/resumen").header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test void persisteCuatroContactosComoPersonasYListaSoloTitular() {
         var d = guardarConDatos(formulario(4));
